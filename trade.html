@@ -1,90 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brixtrade - Trading Room</title>
-<link rel="stylesheet" href="css/style.css">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brixtrade – Currency & Metals Trading</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
-</head>
-<body>
-<div class="container">
-  <div class="nav">
-    <a href="index.html"><h2>BRIX<span>TRADE</span></h2></a>
-    <div>
-      <span>Balance: <b id="balance">$0.00</b></span> | 
-      <button onclick="depositWithPaystack()" style="padding:5px 10px; font-size:12px;">Deposit</button>
-      <button onclick="withdraw()" style="padding:5px 10px; font-size:12px;">Withdraw</button>
-    </div>
-  </div>
-
-  <div class="trade-grid">
-    <div class="left">
-      <div class="price-box">
-        <h1 id="livePrice">$67,452.21</h1>
-        <p>BTC/USD (Simulated skeleton price)</p>
-        <p>Timer: <span id="timer">Ready</span></p>
-      </div>
-
-      <div class="bots">
-        <div class="bot-card active" onclick="selectBot('scalper', this)">
-          <h3>⚡ Scalper</h3>
-          <p>30s | 20% Win</p>
-          <small>Safe for house</small>
-        </div>
-        <div class="bot-card" onclick="selectBot('trend', this)">
-          <h3>📈 Trend</h3>
-          <p>60s | 18% Win</p>
-          <small>Hardest</small>
-        </div>
-        <div class="bot-card" onclick="selectBot('sniper', this)">
-          <h3>🎯 Sniper VIP</h3>
-          <p>120s | 22% Win</p>
-          <small>Best odds - $10/mo</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="right">
-      <div class="trade-box">
-        <label>Stake ($)</label>
-        <input type="number" id="stake" value="1" min="1" max="5" step="1">
-        <p style="font-size:11px;">Max $5 - Safe Mode</p>
-
-        <label>Duration (seconds)</label>
-        <select id="duration">
-          <option value="30">30s</option>
-          <option value="60">60s</option>
-          <option value="120">120s (VIP)</option>
-        </select>
-
-        <div class="trade-btns">
-          <button class="buy" onclick="startTrade('BUY')">BUY ▲</button>
-          <button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
-        </div>
-
-        <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-        <div style="margin-top:15px;">
-          <p>Daily Profit: <span id="dailyProfit">$0.00</span> / $15 Limit</p>
-          <p>Win Rate: <span id="winRate">0%</span></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <p class="disclaimer">DISCLAIMER: Brixtrade is a simulated fixed-odds trading game. Prices derived from real BTC for display only (skeleton motivation). Trades are predictions against house odds: Scalper 20%, Trend 18%, Sniper VIP 22% win rate. Payout 70%. 18+ Only. This is not real financial market trading. Trade responsibly.</p>
+<style>
+:root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--ac:#b8841c;--acbg:#fbf1d8;--brix:#ffae00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;background:var(--pn);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+h1{font:700 18px Georgia,serif;margin:0;margin-right:auto}
+.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px;font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--ln);background:var(--pn);padding:7px 14px;border-radius:6px;cursor:pointer}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer}
+main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;padding:12px}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:8px;min-width:0}
+#list{max-height:600px;overflow:auto}
+.tabs{display:flex;border-bottom:1px solid var(--ln)}.tabs button{flex:1;border:0;background:none;padding:9px;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}
+.tabs button.on{color:var(--ink);border-color:var(--ac);font-weight:600}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--ln);cursor:pointer;font-variant-numeric:tabular-nums}
+.row:hover,.row.on{background:var(--acbg)}.row small{color:var(--mut);display:block}
+.up{color:var(--up)}.dn{color:var(--dn)}
+#ch{padding:12px}.ttl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}.ttl h2{margin:0;font-size:20px}
+#cv{width:100%;height:340px;display:block;margin-top:8px;background:var(--bg);border-radius:6px}
+#tk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+#tk label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
+input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--bg);border-radius:6px}
+.buy,.sell{border:0;border-radius:6px;padding:12px;font-weight:800;color:#fff;cursor:pointer;font-size:15px}.buy{background:var(--up)}.sell{background:var(--dn)}
+.bots{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+.bot-card{border:1px solid var(--ln);padding:10px;border-radius:8px;cursor:pointer;background:var(--pn)}
+.bot-card.active{border-color:var(--brix);background:var(--acbg);box-shadow:0 0 0 2px rgba(255,174,0,0.2)}
+.bot-card h3{margin:0;font-size:14px}.bot-card p{margin:4px 0;font-size:12px;color:var(--mut)}
+.btn-vip{width:100%;margin-top:10px;background:#111;color:var(--brix);border:1px solid var(--brix);padding:10px;border-radius:6px;cursor:pointer;font-weight:700}
+.disclaimer{padding:10px 12px;font-size:11px;color:var(--mut)}
+@media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
+</style></head><body>
+<header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">simulated · house odds</small></h1>
+<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00 / $15</b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
+<button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
+<main>
+<aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
+<section class="pn" id="ch">
+<div class="ttl"><h2 id="sn">-</h2><b id="sp" style="font-size:20px">-</b><span id="sc"></span><span style="color:var(--mut)" id="sq">Timer: <b id="timer">Ready</b></span></div>
+<canvas id="cv"></canvas>
+<div id="tk">
+<div><label>Stake ($) 1-5</label><input id="stake" type="number" min="1" max="5" step="1" value="1"></div>
+<div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div>
+<button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
 </div>
-
-<script src="js/main.js"></script>
+<div class="bots">
+<div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>30s | 20% Win - Safe for house</p></div>
+<div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>60s | 18% Win - Hardest</p></div>
+<div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>120s | 22% Win - $10/mo</p></div>
+</div>
+<button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
+<p class="disclaimer">DISCLAIMER: Simulated fixed-odds. Prices skeleton only. House odds 20%/18%/22%, 70% payout. 18+ Not real market.</p>
+</section>
+<aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
+</main>
+<script src="main.js"></script>
 <script>
-// Fake live price tick - skeleton moves but outcome decided by house
-setInterval(()=>{
-  const el = document.getElementById('livePrice');
-  if(!el) return;
-  let price = parseFloat(el.innerText.replace('$','').replace(',',''));
-  price += (Math.random()-0.5)*2;
-  el.innerText = `$${price.toFixed(2)}`;
-},1000);
+const S=0.0002,$=id=>document.getElementById(id);
+const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
+const M=Object.fromEntries(AS.map(a=>[a.k,a]));
+const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
+function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}
+AS.forEach(a=>{a.s=[{o:a.p,h:a.p,l:a.p,c:a.p}];a.n=0;for(let i=0;i<400;i++){step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})}});
+let sel="XAU",flt="all";
+const fp=p=>p.toFixed(p>=100?2:p>=1?4:p>=.01?5:6);
+function ui_design(){
+ $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}/USD</b><small>${a.n}</small></span><span style="text-align:right">${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch>=0?"+":""}${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui_design();};$("il").appendChild(r)});
+ const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k+"/USD";$("sp").textContent=fp(a.p);$("sc").textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();
+}
+function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.font="11px sans-serif";g.fillStyle=C("--mut");g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();g.fillText(fp(v),W-pr+6,y+4)}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
+$("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui_design();};
+setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
+addEventListener("resize",draw);ui_design();
+function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").appendChild(m);}
+say("Welcome to Brixtrade. Select currency/metal, pick bot, set stake $1-5 and BUY/SELL. House odds 20%. Graph is skeleton only.");
 </script>
-</body>
-</html>
+</body></html>
