@@ -1,10 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Milimu Trading</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brixtrade - AI Trading Bots</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
-  <h1>Milimu Trading - Live</h1>
-  <p>Manual coding works!</p>
+<div class="container">
+  <div class="nav">
+    <h2>BRIX<span>TRADE</span></h2>
+    <div>Balance: <b id="balance">$0.00</b></div>
+  </div>
+
+  <div class="hero">
+    <h1>Trade with AI Bots</h1>
+    <p>Scalper 20% Win | Trend 18% | Sniper VIP 22% | Payout 70%</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="depositWithPaystack()">Deposit via M-Pesa / Card</button>
+      <a href="trade.html"><button class="btn-secondary">Go to Trading Room</button></a>
+    </div>
+    <div style="margin-top:20px;">
+      <p>Daily Profit: <span id="dailyProfit">$0.00</span> | Win Rate: <span id="winRate">0%</span></p>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="card"><h3>⚡ Scalper</h3><p>30s trades, 20% win rate. Fast profit.</p></div>
+    <div class="card"><h3>📈 Trend</h3><p>60s trades, 18% win rate. Hardest, biggest thrill.</p></div>
+    <div class="card"><h3>🎯 Sniper VIP</h3><p>120s trades, 22% win rate. $10/month. Best odds.</p></div>
+  </div>
+
+  <p class="disclaimer">DISCLAIMER: Simulated fixed-odds game. Not real market. Scalper 20%, Trend 18%, Sniper 22% win. Payout 70%. 18+ Only.</p>
+</div>
+
+<script src="js/main.js"></script>
 </body>
 </html>

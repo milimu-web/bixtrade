@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brixtrade - Trading Room</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="nav">
+    <a href="index.html"><h2>BRIX<span>TRADE</span></h2></a>
+    <div>
+      <span>Balance: <b id="balance">$0.00</b></span> | 
+      <button onclick="depositWithPaystack()" style="padding:5px 10px; font-size:12px;">Deposit</button>
+      <button onclick="withdraw()" style="padding:5px 10px; font-size:12px;">Withdraw</button>
+    </div>
+  </div>
+
+  <div class="trade-grid">
+    <div class="left">
+      <div class="price-box">
+        <h1 id="livePrice">$67,452.21</h1>
+        <p>BTC/USD (Simulated skeleton price)</p>
+        <p>Timer: <span id="timer">Ready</span></p>
+      </div>
+
+      <div class="bots">
+        <div class="bot-card active" onclick="selectBot('scalper', this)">
+          <h3>⚡ Scalper</h3>
+          <p>30s | 20% Win</p>
+          <small>Safe for house</small>
+        </div>
+        <div class="bot-card" onclick="selectBot('trend', this)">
+          <h3>📈 Trend</h3>
+          <p>60s | 18% Win</p>
+          <small>Hardest</small>
+        </div>
+        <div class="bot-card" onclick="selectBot('sniper', this)">
+          <h3>🎯 Sniper VIP</h3>
+          <p>120s | 22% Win</p>
+          <small>Best odds - $10/mo</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="trade-box">
+        <label>Stake ($)</label>
+        <input type="number" id="stake" value="1" min="1" max="5" step="1">
+        <p style="font-size:11px;">Max $5 - Safe Mode</p>
+
+        <label>Duration (seconds)</label>
+        <select id="duration">
+          <option value="30">30s</option>
+          <option value="60">60s</option>
+          <option value="120">120s (VIP)</option>
+        </select>
+
+        <div class="trade-btns">
+          <button class="buy" onclick="startTrade('BUY')">BUY ▲</button>
+          <button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
+        </div>
+
+        <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
+        <div style="margin-top:15px;">
+          <p>Daily Profit: <span id="dailyProfit">$0.00</span> / $15 Limit</p>
+          <p>Win Rate: <span id="winRate">0%</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">DISCLAIMER: Brixtrade is a simulated fixed-odds trading game. Prices derived from real BTC for display only (skeleton motivation). Trades are predictions against house odds: Scalper 20%, Trend 18%, Sniper VIP 22% win rate. Payout 70%. 18+ Only. This is not real financial market trading. Trade responsibly.</p>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+// Fake live price tick - skeleton moves but outcome decided by house
+setInterval(()=>{
+  const el = document.getElementById('livePrice');
+  if(!el) return;
+  let price = parseFloat(el.innerText.replace('$','').replace(',',''));
+  price += (Math.random()-0.5)*2;
+  el.innerText = `$${price.toFixed(2)}`;
+},1000);
+</script>
+</body>
+</html>
