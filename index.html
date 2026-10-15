@@ -1,40 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brixtrade - AI Trading Bots</title>
-<link rel="stylesheet" href="css/style.css">
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brixtrade - Trade Currencies & Metals</title>
+<style>
+:root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--ac:#b8841c;--acbg:#fbf1d8;--brix:#ffae00;--dark:#0d1620}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",Roboto,sans-serif}
+a{text-decoration:none;color:inherit}
+.nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
+.logo{font:800 22px Georgia,serif}.logo span{color:var(--brix)}
+.nav-links{display:flex;gap:10px;align-items:center}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--ln);background:var(--pn);cursor:pointer;font-weight:600}
+.btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;cursor:pointer}
+.hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:32px;align-items:center;max-width:1200px;margin:0 auto;padding:60px 24px}
+.hero h1{font:800 48px/1.1 Georgia,serif;margin-bottom:16px}.hero h1 span{color:var(--brix)}
+.hero p{color:var(--mut);font-size:18px;margin-bottom:24px}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:20px}
+.bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.bot{border:2px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center}
+.bot.active{border-color:var(--brix);background:var(--acbg)}
+.cta{background:var(--dark);color:#e4ecf3;padding:60px 24px;text-align:center;margin-top:40px;border-radius:24px 24px 0 0}
+#authModal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;place-items:center;z-index:99}
+#authModal.on{display:grid}
+.authBox{background:var(--pn);padding:28px;border-radius:16px;width:min(380px,90vw);display:grid;gap:12px}
+.authBox input{padding:12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);width:100%}
+.tabs2{display:flex;border-bottom:1px solid var(--ln)}.tabs2 button{flex:1;padding:10px;border:0;background:none;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}.tabs2 button.on{color:var(--ink);border-color:var(--brix);font-weight:700}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.hero h1{font-size:36px}}
+</style>
 </head>
 <body>
-<div class="container">
-  <div class="nav">
-    <h2>BRIX<span>TRADE</span></h2>
-    <div>Balance: <b id="balance">$0.00</b></div>
+<div class="nav">
+  <div class="logo">BRIX<span>TRADE</span></div>
+  <div class="nav-links">
+    <span id="userName" style="font-weight:700;display:none"></span>
+    <button class="btn" id="loginBtn" onclick="openAuth()">Log in</button>
+    <button class="btn-brix" onclick="openAuth('register')">Get Started</button>
+    <button class="btn" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
   </div>
-
-  <div class="hero">
-    <h1>Trade with AI Bots</h1>
-    <p>Scalper 20% Win | Trend 18% | Sniper VIP 22% | Payout 70%</p>
-    <div class="hero-btns">
-      <button class="btn-primary" onclick="depositWithPaystack()">Deposit via M-Pesa / Card</button>
-      <a href="trade.html"><button class="btn-secondary">Go to Trading Room</button></a>
-    </div>
-    <div style="margin-top:20px;">
-      <p>Daily Profit: <span id="dailyProfit">$0.00</span> | Win Rate: <span id="winRate">0%</span></p>
-    </div>
-  </div>
-
-  <div class="features">
-    <div class="card"><h3>⚡ Scalper</h3><p>30s trades, 20% win rate. Fast profit.</p></div>
-    <div class="card"><h3>📈 Trend</h3><p>60s trades, 18% win rate. Hardest, biggest thrill.</p></div>
-    <div class="card"><h3>🎯 Sniper VIP</h3><p>120s trades, 22% win rate. $10/month. Best odds.</p></div>
-  </div>
-
-  <p class="disclaimer">DISCLAIMER: Simulated fixed-odds game. Not real market. Scalper 20%, Trend 18%, Sniper 22% win. Payout 70%. 18+ Only.</p>
 </div>
 
-<script src="js/main.js"></script>
+<div class="hero">
+  <div>
+    <div style="display:inline-block;background:var(--acbg);border:1px solid var(--ac);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:12px">● LIVE SIMULATED MARKET</div>
+    <h1>Trade Currencies & <span>Metals</span> Like a Pro</h1>
+    <p>25 assets: EUR, GBP, JPY, KES, XAU Gold, XAG Silver, Platinum & more. Real price skeleton, house odds trading, $1-5 safe mode.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn-brix" style="font-size:18px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
+    </div>
+  </div>
+  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b>XAU/USD Gold</b><b style="color:var(--up)">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg);border:1px solid var(--ln);border-radius:8px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
+</div>
+
+<div class="bots" id="bots">
+  <div class="bot"><h3>⚡ Scalper</h3><p>30s | 20% Win</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
+  <div class="bot"><h3>📈 Trend</h3><p>60s | 18% Win</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
+  <div class="bot active"><h3>🎯 Sniper VIP</h3><p>$10/mo | 22% Win</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
+</div>
+
+<div class="cta"><h2>Ready to start trading smarter?</h2><button class="btn-brix" style="margin-top:20px;padding:14px 36px;font-size:18px" onclick="handleStart()">Open Free Account →</button></div>
+
+<!-- AUTH MODAL -->
+<div id="authModal"><div class="authBox">
+  <div class="tabs2"><button id="tabLogin" class="on" onclick="switchTab('login')">Log in</button><button id="tabReg" onclick="switchTab('register')">Create Account</button></div>
+  <div id="loginForm">
+    <input id="lEmail" placeholder="Email">
+    <input id="lPass" type="password" placeholder="Password">
+    <button class="btn-brix" style="width:100%;margin-top:8px" onclick="login()">Log in</button>
+  </div>
+  <div id="regForm" style="display:none">
+    <input id="rName" placeholder="Full Name">
+    <input id="rEmail" placeholder="Email">
+    <input id="rPass" type="password" placeholder="Password (min 6)">
+    <button class="btn-brix" style="width:100%;margin-top:8px" onclick="register()">Create Account</button>
+  </div>
+  <button class="btn" style="width:100%" onclick="closeAuth()">Cancel</button>
+</div></div>
+
+<script>
+let currentTab='login';
+function openAuth(tab='login'){currentTab=tab;switchTab(tab);document.getElementById('authModal').classList.add('on');}
+function closeAuth(){document.getElementById('authModal').classList.remove('on');}
+function switchTab(t){currentTab=t;document.getElementById('tabLogin').classList.toggle('on',t==='login');document.getElementById('tabReg').classList.toggle('on',t==='register');document.getElementById('loginForm').style.display=t==='login'?'grid':'none';document.getElementById('regForm').style.display=t==='register'?'grid':'none';}
+
+function register(){
+  const name=document.getElementById('rName').value.trim();
+  const email=document.getElementById('rEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('rPass').value;
+  if(!name||!email||pass.length<6){alert('Fill all, password min 6');return;}
+  let users=JSON.parse(localStorage.getItem('brix_users')||'[]');
+  if(users.find(u=>u.email===email)){alert('Account exists, log in');switchTab('login');return;}
+  users.push({name,email,pass}); localStorage.setItem('brix_users',JSON.stringify(users));
+  localStorage.setItem('brix_current_user',JSON.stringify({name,email}));
+  alert('Account created! Welcome '+name); closeAuth(); updateNav();
+}
+function login(){
+  const email=document.getElementById('lEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('lPass').value;
+  let users=JSON.parse(localStorage.getItem('brix_users')||'[]');
+  const u=users.find(u=>u.email===email && u.pass===pass);
+  if(!u){alert('Wrong email or password');return;}
+  localStorage.setItem('brix_current_user',JSON.stringify({name:u.name,email:u.email}));
+  closeAuth(); updateNav(); alert('Welcome back '+u.name);
+}
+function logout(){localStorage.removeItem('brix_current_user');updateNav();}
+function updateNav(){
+  const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');
+  const ln=document.getElementById('loginBtn'); const lo=document.getElementById('logoutBtn'); const un=document.getElementById('userName');
+  if(cur){ln.style.display='none';lo.style.display='inline-block';un.style.display='inline-block';un.innerText='Hi, '+cur.name.split(' ')[0];} else {ln.style.display='inline-block';lo.style.display='none';un.style.display='none';}
+}
+function handleStart(){
+  const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');
+  if(!cur){openAuth('register'); return;}
+  location.href='trade.html';
+}
+updateNav();
+document.getElementById('authModal').onclick=e=>{if(e.target.id==='authModal')closeAuth();}
+</script>
 </body>
 </html>
