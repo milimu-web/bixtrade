@@ -78,6 +78,6 @@ $("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("
 setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
 addEventListener("resize",draw);ui_design();
 function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").appendChild(m);}
-say("Welcome to Brixtrade. Select currency/metal, pick bot, set stake $1-5 and BUY/SELL. House odds 20%. Graph is skeleton only.");
+say("Welcome to Brixtrade. Select currency/metal, pick bot, set stake $1-infinity and BUY/SELL.");
 </script>
 </body></html>
