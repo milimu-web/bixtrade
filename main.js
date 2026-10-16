@@ -5,7 +5,12 @@ let trades = parseInt(localStorage.getItem('brix_trades')||'0');
 let wins = parseInt(localStorage.getItem('brix_wins')||'0');
 let isTrading = false;
 
-const bots = { scalper: { winRate: 0.32, time: 30 }, trend: { winRate: 0.3, time: 60 }, sniper: { winRate: 0.37, time: 120, vip: true } };
+// MATCHED TO trade.html - 10K SAFE 40% = 4 WIN / 6 LOSS per 10
+const bots = { 
+  scalper: { winRate: 0.80, time: 30 }, 
+  trend: { winRate: 0.80, time: 60 }, 
+  sniper: { winRate: 0.80, time: 120, vip: true } 
+};
 
 function save(){ 
   localStorage.setItem('brix_balance', balance); 
@@ -49,11 +54,32 @@ function startTrade(dir){
   let iv=setInterval(()=>{ t--; document.getElementById('timer').innerText=t+'s'; if(t<=0){ clearInterval(iv); finishTrade(stake,dir); } },1000); 
 }
 
+// FORCED 4/6 LOGIC - SAME AS trade.html
+function getForcedTradeHistory(){ try{ return JSON.parse(localStorage.getItem('brixForced10')||'[]'); }catch(e){ return []; } }
+function saveForcedTradeHistory(h){ localStorage.setItem('brixForced10', JSON.stringify(h)); }
+
 function finishTrade(stake,dir){ 
   trades++; 
-  const win=Math.random()<bots[selectedBot].winRate; 
+  
+  // FORCED 4 WIN / 6 LOSS
+  let history = getForcedTradeHistory();
+  if(history.length>=10){ history=[]; }
+  let winsInHistory = history.filter(v=>v===1).length;
+  let win;
+  if(winsInHistory>=4){ 
+    win=false; 
+  } else {
+    let remaining = 10 - history.length;
+    let needed = 4 - winsInHistory;
+    if(remaining<=needed){ win=true; }
+    else{ win = Math.random() < bots[selectedBot].winRate; }
+  }
+  history.push(win?1:0);
+  saveForcedTradeHistory(history);
+  if(history.length===10){ setTimeout(()=>saveForcedTradeHistory([]),100); }
+
   if(win){ 
-    let p=stake*0.7; balance+=stake+p; dailyProfit+=p; wins++; 
+    let p=stake*0.8; balance+=stake+p; dailyProfit+=p; wins++; 
     alert(`WIN! +$${p.toFixed(2)} ${dir}`); 
   } else { 
     alert(`LOSS! -$${stake.toFixed(2)} ${dir}`); 
@@ -68,10 +94,7 @@ function depositWithPaystack(){
   if(!a) return; 
   a=parseFloat(a); 
   if(a<1){alert('Min $1');return;} 
-  
-  // USD to KES rate ~130
   let kesAmount = Math.round(a * 130);
-
   if(typeof PaystackPop !== 'undefined'){ 
     let h=PaystackPop.setup({
       key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
@@ -81,15 +104,14 @@ function depositWithPaystack(){
       channels: ['card','mobile_money','bank'],
       ref: 'BRIX-'+Date.now(),
       callback:function(r){
-        balance+=a; 
-        save();
+        balance+=a; save();
         alert('Deposit success! KES '+kesAmount+' (~$'+a+') Added. Ref: '+r.reference);
       },
       onClose:function(){ alert('Payment closed'); }
     }); 
     h.openIframe(); 
   } else { 
-    balance+=a; save(); alert(`[TEST MODE - Paystack script not loaded] Deposited $${a}`); 
+    balance+=a; save(); alert(`[TEST MODE] Deposited $${a}`); 
   } 
 }
 
@@ -104,7 +126,6 @@ function withdraw(){
 function subscribe(){ 
   if(localStorage.getItem('brix_vip')==='true'){alert('Already VIP');return;} 
   if(!confirm('Unlock Sniper VIP $10/mo via Paystack?')) return; 
-  
   const user = JSON.parse(localStorage.getItem('brix_current_user')||'{"email":"user@brixtrade.com"}');
   let h=PaystackPop.setup({
     key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
