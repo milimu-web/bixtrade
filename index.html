@@ -23,7 +23,6 @@ a{text-decoration:none;color:inherit}
 .bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .bot{border:2px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center}
 .bot.active{border-color:var(--brix);background:var(--acbg)}
-.cta{background:var(--dark);color:#e4ecf3;padding:60px 24px;text-align:center;margin-top:40px;border-radius:24px 24px 0 0}
 .about{max-width:1200px;margin:0 auto;padding:60px 24px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;margin-top:30px}
 .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
 .about-box{background:var(--bg);border:1px solid var(--ln);padding:20px;border-radius:12px}
@@ -31,14 +30,34 @@ a{text-decoration:none;color:inherit}
 .about-box p{color:var(--mut);font-size:14px}
 .socials{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
 .social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg);font-weight:700;font-size:13px}
-.pay-logos{display:flex;gap:20px;justify-content:center;align-items:center;margin-top:24px;flex-wrap:wrap;background:#fff;border:1px solid var(--ln);padding:14px 20px;border-radius:12px}
-.pay-logos img{height:26px;width:auto;object-fit:contain}
+.pay-logos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
 #authModal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;place-items:center;z-index:99}
 #authModal.on{display:grid}
 .authBox{background:var(--pn);padding:28px;border-radius:16px;width:min(380px,90vw);display:grid;gap:12px}
 .authBox input{padding:12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);width:100%}
 .tabs2{display:flex;border-bottom:1px solid var(--ln)}.tabs2 button{flex:1;padding:10px;border:0;background:none;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}.tabs2 button.on{color:var(--ink);border-color:var(--brix);font-weight:700}
-@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.hero h1{font-size:36px}}
+
+/* FOOTER EXACT LIKE YOUR SCREENSHOT - BOTTOM */
+.brix-footer{background:#111618;color:#aab7c1;padding:40px 24px 30px;font:14px/1.6 "Segoe UI",sans-serif;margin-top:50px}
+.brix-footer-wrap{max-width:1300px;margin:0 auto}
+.brix-footer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.brix-footer-logo{font:800 26px "Segoe UI",sans-serif;letter-spacing:-0.5px;color:#fff}
+.brix-footer-logo span{color:#00c2a8}
+.brix-footer-socials{display:flex;gap:18px}
+.brix-footer-socials a{color:#aab7c1;font-size:20px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%}
+.brix-footer-socials a:hover{color:#fff}
+.brix-footer-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px}
+.brix-footer-col h4{color:#e6eef3;font-size:13px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #1e2a31;padding-bottom:8px}
+.brix-footer-col a{display:block;color:#8fa0ad;font-size:13px;margin-bottom:8px;text-decoration:underline;text-underline-offset:2px}
+.brix-footer-col a:hover{color:#fff}
+.brix-footer-col.sup-item{display:flex;gap:8px;margin-bottom:14px;font-size:12.5px}
+.brix-footer-col.sup-item b{color:#cbd8e0;font-weight:600;text-decoration:underline;display:block}
+.brix-footer-col.sup-item span{color:#7a8c98;font-size:11.5px}
+.brix-footer-bottom{margin-top:50px;border-top:1px solid #1a262d;padding-top:24px}
+.brix-footer-bottom b{color:#e6eef3;font-size:12px}
+.brix-footer-bottom a{color:#8fa0ad;font-size:13px;display:flex;align-items:center;gap:6px;margin-top:8px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}.brix-footer-grid.sup{grid-column:span 2}.hero h1{font-size:36px}}
+@media(max-width:500px){.brix-footer-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -106,8 +125,8 @@ a{text-decoration:none;color:inherit}
       <button class="btn-brix" style="padding:14px 28px;font-size:16px" onclick="handleStart()">START TRADING</button>
       <button class="btn" style="padding:14px 28px;font-size:16px" onclick="handleStart()">TRY FOR FREE</button>
     </div>
-    <!-- REAL PAYMENT PHOTOS -->
-    <div class="pay-logos" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+    <!-- FIXED PAYMENT LOGOS - NEVER BREAKS -->
+    <div class="pay-logos">
       <span style="background:#00a651;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px">M-PESA</span>
       <span style="background:#e90000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px">Airtel Money</span>
       <span style="background:#fff;border:1px solid #1a1f71;color:#1a1f71;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px;font-style:italic">VISA</span>
@@ -116,7 +135,34 @@ a{text-decoration:none;color:inherit}
   </div>
 </section>
 
-<div class="cta"><h2>Ready to start trading smarter?</h2><button class="btn-brix" style="margin-top:20px;padding:14px 36px;font-size:18px" onclick="handleStart()">Open Free Account →</button></div>
+<!-- FOOTER IS HERE AT THE BOTTOM -->
+<footer class="brix-footer">
+  <div class="brix-footer-wrap">
+    <div class="brix-footer-top">
+      <div class="brix-footer-logo">BRIX<span>TRADE</span></div>
+      <div class="brix-footer-socials">
+        <a href="#">f</a><a href="#">𝕏</a><a href="#">◉</a><a href="#">in</a><a href="#">♫</a>
+      </div>
+    </div>
+    <div class="brix-footer-grid">
+      <div class="brix-footer-col"><h4>Products</h4><a href="#">Forex</a><a href="#">Indices</a><a href="#">Commodities</a><a href="#">Shares</a><a href="#">ETFs</a><a href="#">All products</a></div>
+      <div class="brix-footer-col"><h4>Platforms</h4><a href="#">MetaTrader 4</a><a href="#">MetaTrader 5</a><a href="#">BrixTrader App</a><a href="#">All platforms</a></div>
+      <div class="brix-footer-col"><h4>Accounts</h4><a href="#">Copy trading</a><a href="#">Demo</a><a href="#">All accounts</a></div>
+      <div class="brix-footer-col"><h4>Partnerships</h4><a href="#">Partner with us</a><a href="#">Refer a friend</a></div>
+      <div class="brix-footer-col"><h4>About BRIXTRADE</h4><a href="#">About us</a><a href="#">Careers</a><a href="#">Media releases</a></div>
+      <div class="brix-footer-col sup"><h4>Support</h4>
+        <div class="sup-item"><span>📞</span><div><b>Phone (Toll-Free Kenya)</b><span>0800-211-185</span></div></div>
+        <div class="sup-item"><span>📞</span><div><b>WhatsApp</b><span>+254-719-856-258</span></div></div>
+        <div class="sup-item"><span>📞</span><div><b>Phone (International)</b><span>+254-730-676-002</span></div></div>
+        <div class="sup-item"><span>@</span><div><b>Email</b></div></div>
+        <div class="sup-item"><span>📍</span><div><b>The RiverFront,</b><b>2nd Floor,</b><b>Prof David Wasawo Drive,</b><b>Westlands</b></div></div>
+        <div class="sup-item"><span>?</span><div><b>FAQs</b></div></div>
+      </div>
+    </div>
+    <div class="brix-footer-bottom"><b>Region & language</b><a href="#">🌐 Change country</a></div>
+  </div>
+</footer>
+<!-- FOOTER END -->
 
 <div id="authModal"><div class="authBox">
   <div class="tabs2"><button id="tabLogin" class="on" onclick="switchTab('login')">Log in</button><button id="tabReg" onclick="switchTab('register')">Create Account</button></div>
