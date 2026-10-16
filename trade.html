@@ -24,6 +24,10 @@ main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;paddi
 .up{color:var(--up)}.dn{color:var(--dn)}
 #ch{padding:12px}.ttl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}.ttl h2{margin:0;font-size:20px}
 #cv{width:100%;height:340px;display:block;margin-top:8px;background:var(--bg);border-radius:6px}
+#equityPanel{margin-top:10px;padding:10px;background:var(--bg);border-radius:6px}
+.equity-heading{display:flex;justify-content:space-between;align-items:center}
+#equityChart{width:100%;height:130px;display:block}
+#equityPanel small{color:var(--mut)}
 #tk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
 #tk label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
 input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--bg);border-radius:6px}
@@ -36,16 +40,17 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 .disclaimer{padding:10px 12px;font-size:11px;color:var(--mut)}
 @media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
 </style></head><body>
-<header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">Real odds</small></h1>
-<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit"></b></div><div class="stat"><small>Win Rate</small><b id="Trade with">Birixtrade</b></div>
+<header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">DEMO — simulated outcomes</small></h1>
+<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit"></b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
 <button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
 <section class="pn" id="ch">
 <div class="ttl"><h2 id="sn">-</h2><b id="sp" style="font-size:20px">-</b><span id="sc"></span><span style="color:var(--mut)" id="sq">Timer: <b id="timer">Ready</b></span></div>
-<canvas id="cv"></canvas>
+<canvas id="cv" aria-label="Simulated market price chart"></canvas>
+<section id="equityPanel" aria-label="Demo balance history"><div class="equity-heading"><b>Demo balance history</b><span id="equityValue">$10.00</span></div><canvas id="equityChart" height="130" aria-label="Balance history line chart"></canvas><small>Moves only after a simulated trade result. This is not a market prediction.</small></section>
 <div id="tk">
-<div><label>Stake($) </label><input id="stake" type="number" min="1" max="infinity" step="1" value="1"></div>
+<div><label>Stake($) </label><input id="stake" type="number" min="1" max="5" step="1" value="1"></div>
 <div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div>
 <button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
 </div>
@@ -55,7 +60,7 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 <div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>120s | 22% Win - $10/mo</p></div>
 </div>
 <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">DISCLAIMER: Real odds. 18+ only trade like never before</p>
+<p class="disclaimer">DISCLAIMER: DEMO — simulated outcomes. 18+ only; simulated prices and trade results.</p>
 </section>
 <aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
 </main>
@@ -76,8 +81,8 @@ function ui_design(){
 function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.font="11px sans-serif";g.fillStyle=C("--mut");g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();g.fillText(fp(v),W-pr+6,y+4)}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
 $("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui_design();};
 setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
-addEventListener("resize",draw);ui_design();
+addEventListener("resize",()=>{draw();if(typeof renderOutcomeChart==="function")renderOutcomeChart();});ui_design();
 function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").appendChild(m);}
-say("Welcome to Brixtrade. Select currency/metal, pick bot, set stake $1-infinity and BUY/SELL.");
+say("Welcome to the Brixtrade demo. Prices and trade results are simulated. Select an asset, choose a bot and stake, then BUY or SELL.");
 </script>
 </body></html>
