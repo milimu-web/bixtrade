@@ -31,6 +31,8 @@ a{text-decoration:none;color:inherit}
 .about-box p{color:var(--mut);font-size:14px}
 .socials{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
 .social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg);font-weight:700;font-size:13px}
+.pay-logos{display:flex;gap:20px;justify-content:center;align-items:center;margin-top:24px;flex-wrap:wrap;background:#fff;border:1px solid var(--ln);padding:14px 20px;border-radius:12px}
+.pay-logos img{height:26px;width:auto;object-fit:contain}
 #authModal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;place-items:center;z-index:99}
 #authModal.on{display:grid}
 .authBox{background:var(--pn);padding:28px;border-radius:16px;width:min(380px,90vw);display:grid;gap:12px}
@@ -69,7 +71,6 @@ a{text-decoration:none;color:inherit}
   <div class="bot active"><h3>🎯 Sniper VIP</h3><p>$10/mo | 22% Win</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
 </div>
 
-<!-- BRIXTRADE ABOUT US - BLENDED FROM FXPESA DEMO - START -->
 <section class="about" id="about">
   <p style="color:var(--brix);font-size:12px;font-weight:800;letter-spacing:1px">MEET BRIXTRADE</p>
   <h2 style="font:800 32px Georgia,serif;margin-top:6px">Why choose BRIXTRADE?</h2>
@@ -105,10 +106,15 @@ a{text-decoration:none;color:inherit}
       <button class="btn-brix" style="padding:14px 28px;font-size:16px" onclick="handleStart()">START TRADING</button>
       <button class="btn" style="padding:14px 28px;font-size:16px" onclick="handleStart()">TRY FOR FREE</button>
     </div>
-    <p style="margin-top:20px;font-weight:700;letter-spacing:1px;font-size:12px;color:var(--mut)">M-PESA | AIRTEL MONEY | VISA | MASTERCARD</p>
+    <!-- REAL PAYMENT PHOTOS -->
+    <div class="pay-logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" alt="M-Pesa">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/b/Airtel_money_logo.svg" alt="Airtel Money">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+    </div>
   </div>
 </section>
-<!-- BRIXTRADE ABOUT US - END -->
 
 <div class="cta"><h2>Ready to start trading smarter?</h2><button class="btn-brix" style="margin-top:20px;padding:14px 36px;font-size:18px" onclick="handleStart()">Open Free Account →</button></div>
 
