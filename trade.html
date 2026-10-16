@@ -1,16 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Brixtrade – Currency & Metals Trading</title>
+<title>Brixtrade</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
 :root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--ac:#b8841c;--acbg:#fbf1d8;--brix:#ffae00}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-button,input,select{font:inherit;color:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,sans-serif}
 header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;background:var(--pn);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
 h1{font:700 18px Georgia,serif;margin:0;margin-right:auto}
-.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px;font-variant-numeric:tabular-nums}
+.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px}
 .btn{border:1px solid var(--ln);background:var(--pn);padding:7px 14px;border-radius:6px;cursor:pointer}
 .btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer}
 main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;padding:12px}
@@ -18,90 +17,86 @@ main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;paddi
 #list{max-height:600px;overflow:auto}
 .tabs{display:flex;border-bottom:1px solid var(--ln)}.tabs button{flex:1;border:0;background:none;padding:9px;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}
 .tabs button.on{color:var(--ink);border-color:var(--ac);font-weight:600}
-.row{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--ln);cursor:pointer;font-variant-numeric:tabular-nums}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--ln);cursor:pointer}
 .row:hover,.row.on{background:var(--acbg)}.row small{color:var(--mut);display:block}
 .up{color:var(--up)}.dn{color:var(--dn)}
-#ch{padding:12px}.ttl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}.ttl h2{margin:0;font-size:20px}
+#ch{padding:12px}.ttl{display:flex;gap:16px;align-items:baseline}.ttl h2{margin:0;font-size:20px}
 #cv{width:100%;height:340px;display:block;margin-top:8px;background:var(--bg);border-radius:6px}
 #tk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-#tk label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
 input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--bg);border-radius:6px}
 .buy,.sell{border:0;border-radius:6px;padding:12px;font-weight:800;color:#fff;cursor:pointer;font-size:15px}.buy{background:var(--up)}.sell{background:var(--dn)}
-.bots{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
-.bot-card{border:1px solid var(--ln);padding:10px;border-radius:8px;cursor:pointer;background:var(--pn)}
-.bot-card.active{border-color:var(--brix);background:var(--acbg);box-shadow:0 0 0 2px rgba(255,174,0,0.2)}
-.bot-card h3{margin:0;font-size:14px}.bot-card p{margin:4px 0;font-size:12px;color:var(--mut)}
+.bot-card{border:1px solid var(--ln);padding:10px;border-radius:8px;cursor:pointer;margin-top:8px}
+.bot-card.active{border-color:var(--brix);background:var(--acbg)}
 .btn-vip{width:100%;margin-top:10px;background:#111;color:var(--brix);border:1px solid var(--brix);padding:10px;border-radius:6px;cursor:pointer;font-weight:700}
-.disclaimer{padding:10px 12px;font-size:11px;color:var(--mut)}
-#popup{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:99;backdrop-filter:blur(3px)}
+#popup{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:99}
 #popup.show{display:flex}
-#popupBox{background:#fff;padding:26px;border-radius:16px;text-align:center;min-width:320px;max-width:92%;animation:pop.3s ease;box-shadow:0 20px 50px rgba(0,0,0,.35)}
-#popupBox.win{border-top:6px solid var(--up)}#popupBox.lose{border-top:6px solid var(--dn)}#popupBox.deposit{border-top:6px solid var(--brix)}#popupBox.withdraw{border-top:6px solid #3b82f6}
-#popupIcon{font-size:46px}#popTitle{margin:10px 0 6px;font-size:21px}#popMsg{color:var(--mut);line-height:1.6;white-space:pre-line;margin:0 0 16px}
+#popupBox{background:#fff;padding:26px;border-radius:16px;text-align:center;min-width:320px;max-width:92%;animation:pop.3s ease}
+#popupBox.win{border-top:6px solid var(--up)}#popupBox.lose{border-top:6px solid var(--dn)}#popupBox.deposit{border-top:6px solid var(--brix)}
+#popupIcon{font-size:46px}#popTitle{margin:10px 0 6px;font-size:21px}#popMsg{color:var(--mut);white-space:pre-line;margin-bottom:16px}
 @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
 </style></head><body>
-<div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px;font-size:15px" onclick="closePopup()">Continue</button></div></div>
+<div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
 
-<header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">Real odds</small></h1>
-<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><div class="stat"><small>Win Rate</small><b id="Trade with">Brixtrade ltd</b></div>
+<header><h1>BRIX<span style="color:var(--brix)">TRADE</span></h1>
+<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily</small><b id="dailyProfit">$0.00</b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
 <button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
 <main>
-<aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
+<aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">FX</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
 <section class="pn" id="ch">
-<div class="ttl"><h2 id="sn">-</h2><b id="sp" style="font-size:20px">-</b><span id="sc"></span><span style="color:var(--mut)" id="sq">Timer: <b id="timer">Ready</b></span></div>
+<div class="ttl"><h2 id="sn">-</h2><b id="sp">-</b><span id="sc"></span><span>Timer: <b id="timer">Ready</b></span></div>
 <canvas id="cv"></canvas>
 <div id="tk">
-<div><label>Stake($) - 1$ = KES 130</label><input id="stake" type="number" min="1" step="1" value="1"></div>
-<div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div>
+<div><label>Stake ($) $1=130 KES</label><input id="stake" type="number" value="1" min="1"></div>
+<div><label>Duration</label><select id="duration"><option value="30">30s</option><option value="60">60s</option><option value="120">120s VIP</option></select></div>
 <button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
 </div>
-<div class="bots">
-<div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>Fast • 30s trades • AI powered</p></div>
-<div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>Stable • 60s • Market analysis</p></div>
-<div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • 120s • Premium signals</p></div>
+<div id="bots">
+<div class="bot-card active" onclick="selectBot('scalper',this)"><h3>⚡ Scalper</h3><p>Fast • AI powered</p></div>
+<div class="bot-card" onclick="selectBot('trend',this)"><h3>📈 Trend</h3><p>Stable • Analysis</p></div>
+<div class="bot-card" onclick="selectBot('sniper',this)"><h3>🎯 Sniper VIP</h3><p>Precision • Premium</p></div>
 </div>
-<button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">DISCLAIMER: Real odds. 18+ only. Rate: $1 = KES 130</p>
+<button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10</button>
 </section>
-<aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
+<aside class="pn" style="padding:12px"><h3>Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
 </main>
 <script>
-const PAYSTACK_KEY = "pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
-let demoBalance = 0, tradeTimer=null, wins=0, trades=0, entryPrice=0;
-const USD_TO_KES=130, $=id=>document.getElementById(id);
-const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
+const PAYSTACK_KEY="pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
+let demoBalance=0,tradeTimer=null,wins=0,trades=0,entryPrice=0;
+const USD_TO_KES=130,$=id=>document.getElementById(id);
+const AS=[["EUR","Euro",1.085,"fx"],["GBP","Pound",1.30,"fx"],["JPY","Yen",.0067,"fx"],["XAU","Gold",2650,"mt"],["XAG","Silver",31.5,"mt"],["XPT","Plat",980,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a]));
 const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}
 AS.forEach(a=>{a.s=[{o:a.p,h:a.p,l:a.p,c:a.p}];a.n=0;for(let i=0;i<400;i++){step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})}});
-let sel="XAU",flt="all"; const fp=p=>p.toFixed(p>=100?2:p>=1?4:p>=.01?5:6);
-function ui_design(){ $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}/USD</b><small>${a.n}</small></span><span style="text-align:right">${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch>=0?"+":""}${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui_design();};$("il").appendChild(r)}); const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k+"/USD";$("sp").textContent=fp(a.p);$("sc").textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();}
-function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.font="11px sans-serif";g.fillStyle=C("--mut");g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();g.fillText(fp(v),W-pr+6,y+4)}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
-$("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui_design();};
-setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);addEventListener("resize",draw);ui_design();
+let sel="XAU",flt="all";const fp=p=>p.toFixed(p>=100?2:p>=1?4:6);
+function ui(){ $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}</b></span><span>${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui();};$("il").appendChild(r)});const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k;$("sp").textContent=fp(a.p);$("sc").textContent=ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();}
+function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
+$("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui();};
+setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui();},1000);addEventListener("resize",draw);ui();
 function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").prepend(m);}
-say("Welcome to Brixtrade - Real odds trading. $1 = KES 130");
 function showPopup(type,title,icon,msg){const b=$("popupBox");b.className=type;$("popupIcon").textContent=icon;$("popTitle").textContent=title;$("popMsg").textContent=msg;$("popup").classList.add("show");}
 function closePopup(){$("popup").classList.remove("show");}
 function updateBalance(){ $("balance").textContent="$"+demoBalance.toFixed(2); $("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"; }
 updateBalance();
-function depositWithPaystack(){const usd=prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10'); if(!usd) return; const usdVal=parseFloat(usd); if(isNaN(usdVal)||usdVal<=0){say('Invalid amount');showPopup("lose","Invalid Amount","❌","Please enter valid amount");return;} const kesAmount=Math.round(usdVal*USD_TO_KES); const handler=PaystackPop.setup({key:PAYSTACK_KEY,email:'customer@brixtrade.com',amount:kesAmount*100,currency:'KES',callback:function(res){demoBalance+=usdVal;updateBalance();say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`);showPopup("deposit","Deposit Successful","✅",`Amount: $${usdVal} (KES ${kesAmount})\nReference: ${res.reference}\n\nNew Balance: $${demoBalance.toFixed(2)}\nReady to trade!`);},onClose:function(){say('Deposit popup closed');showPopup("lose","Deposit Cancelled","❌","You closed Paystack popup.\nTry again when ready.");}});handler.openIframe();}
-function withdraw(){if(demoBalance<5){showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${demoBalance.toFixed(2)}\nKeep trading to reach $5!`);return;} const amt=prompt(`Withdraw amount (Balance $${demoBalance.toFixed(2)}):`,"5"); if(!amt) return; const val=parseFloat(amt); if(val>demoBalance){showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${demoBalance.toFixed(2)}`);return;} demoBalance-=val;updateBalance();showPopup("withdraw","Withdrawal Processing","💸",`Amount: $${val.toFixed(2)}\nMethod: M-Pesa / Bank\nStatus: Processing (24h)\n\nNew Balance: $${demoBalance.toFixed(2)}`);say(`Withdrawal $${val} requested - Processing`);}
-function subscribe(){say('Sniper VIP $10/mo - Paystack test');showPopup("deposit","Sniper VIP","🎯","VIP Bot unlocked!\nPrecision signals • Premium\n$10/month\nContact support to activate.");}
-function selectBot(bot,el){document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active'));el.classList.add('active');const d=bot==='scalper'?30:bot==='trend'?60:120;$("duration").value=d;say(bot+' bot '+d+'s selected');}
+function depositWithPaystack(){const usd=prompt(`Deposit USD ($1 = ${USD_TO_KES} KES):`,'10');if(!usd)return;const usdVal=parseFloat(usd);if(isNaN(usdVal)||usdVal<=0){showPopup("lose","Invalid","❌","Bad amount");return;}const kes=Math.round(usdVal*USD_TO_KES);PaystackPop.setup({key:PAYSTACK_KEY,email:'c@brixtrade.com',amount:kes*100,currency:'KES',callback:function(res){demoBalance+=usdVal;updateBalance();say(`Deposit $${usdVal} OK Ref:${res.reference}`);showPopup("deposit","Deposit OK","✅",`$${usdVal} = KES ${kes}\nRef:${res.reference}\nBal:$${demoBalance.toFixed(2)}`);},onClose:function(){showPopup("lose","Cancelled","❌","Closed popup");}}).openIframe();}
+function withdraw(){if(demoBalance<5){showPopup("lose","Min $5","⚠️",`Bal $${demoBalance.toFixed(2)}`);return;}const amt=prompt(`Withdraw Bal $${demoBalance.toFixed(2)}:`,"5");if(!amt)return;const val=parseFloat(amt);if(val>demoBalance){showPopup("lose","No funds","❌",`Need $${val} have $${demoBalance.toFixed(2)}`);return;}demoBalance-=val;updateBalance();showPopup("deposit","Withdraw OK","💸",`$${val} processing 24h\nBal $${demoBalance.toFixed(2)}`);}
+function subscribe(){showPopup("deposit","VIP","🎯","VIP unlocked $10/mo");}
 
-// HIDDEN WIN LOGIC - USERS CANNOT SEE %
-const _cfg={s:{w:0.65,p:0.70},t:{w:0.60,p:0.75},v:{w:0.75,p:0.80}};
+// FIXED - HIDDEN PERCENTAGES
+const _cfg={scalper:{w:0.65,p:0.70},trend:{w:0.60,p:0.75},sniper:{w:0.75,p:0.80}};
 let activeBot="scalper";
-function _getCfg(){return activeBot==='scalper'?_cfg.s:activeBot==='trend'?_cfg.t:_cfg.v;}
+function selectBot(bot,el){activeBot=bot;document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active'));el.classList.add('active');$("duration").value=bot==='scalper'?30:bot==='trend'?60:120;say(bot+" bot selected");}
 
 function startTrade(dir){
- if(tradeTimer){say('Trade running wait');showPopup("lose","Trade Active","⏳","Wait for current trade to finish");return;}
+ if(tradeTimer){showPopup("lose","Wait","⏳","Trade running");return;}
  const stake=parseFloat($("stake").value)||1;
- if(demoBalance<stake){say('Low balance - Deposit $ first');showPopup("lose","Low Balance","⚠️",`Need $${stake} to trade\nBalance: $${demoBalance.toFixed(2)}\nPlease deposit`);return;}
- const duration=parseInt($("duration").value); entryPrice=M[sel].p; let left=duration; $("timer").textContent=left+"s"; say(dir+' $'+stake+' on '+sel+'/USD '+duration+'s started Entry:'+fp(entryPrice));
- tradeTimer=setInterval(()=>{ left--; $("timer").textContent=left+"s"; if(left<=0){ clearInterval(tradeTimer); tradeTimer=null; $("timer").textContent="Ready"; trades++; const exitPrice=M[sel].p; const wentUp=exitPrice>entryPrice; const guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp); const cfg=_getCfg(); let win=guessedRight?Math.random()<cfg.w:false; if(win){wins++;const profit=stake*cfg.p;demoBalance+=profit;$("dailyProfit").textContent="+$"+profit.toFixed(2);say(`WIN +$${profit.toFixed(2)} ${dir} Entry:${fp(entryPrice)} Exit:${fp(exitPrice)}`);updateBalance();showPopup("win",`🎉 ${dir} WIN!`,"💰",`Bot: ${activeBot.toUpperCase()} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nProfit: +$${profit.toFixed(2)}\nBalance: $${demoBalance.toFixed(2)}`);} else {demoBalance-=stake;$("dailyProfit").textContent="-$"+stake.toFixed(2);say(`LOSS -$${stake} ${dir} Entry:${fp(entryPrice)} Exit:${fp(exitPrice)}`);updateBalance();showPopup("lose",`💥 ${dir} LOSS`,"📉",`Bot: ${activeBot.toUpperCase()} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nLoss: -$${stake.toFixed(2)}\nBalance: $${demoBalance.toFixed(2)}\n\nMarket moves fast - try again!`);}} },1000);
+ if(demoBalance<stake){showPopup("lose","Low Bal","⚠️",`Need $${stake} have $${demoBalance.toFixed(2)}`);return;}
+ const duration=parseInt($("duration").value); entryPrice=M[sel].p; let left=duration; $("timer").textContent=left+"s"; say(dir+' $'+stake+' started Entry:'+fp(entryPrice));
+ tradeTimer=setInterval(()=>{left--; $("timer").textContent=left+"s"; if(left<=0){clearInterval(tradeTimer);tradeTimer=null;$("timer").textContent="Ready";trades++;const exit=M[sel].p;const wentUp=exit>entryPrice;const guessed=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);const cfg=_cfg[activeBot];let win=guessed?Math.random()<cfg.w:false;
+ if(win){wins++;const profit=stake*cfg.p;demoBalance+=profit;updateBalance();$("dailyProfit").textContent="+$"+profit.toFixed(2);showPopup("win",`🎉 ${dir} WIN!`,"💰",`Entry:${fp(entryPrice)}\nExit:${fp(exit)}\nProfit +$${profit.toFixed(2)}\nBal $${demoBalance.toFixed(2)}`);}
+ else {demoBalance-=stake;updateBalance();$("dailyProfit").textContent="-$"+stake.toFixed(2);showPopup("lose",`💥 ${dir} LOSS`,"📉",`Entry:${fp(entryPrice)}\nExit:${fp(exit)}\nLoss -$${stake.toFixed(2)}\nBal $${demoBalance.toFixed(2)}`);}
+ }},1000);
 }
 </script>
 </body></html>
