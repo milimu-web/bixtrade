@@ -13,6 +13,7 @@ h1{font:700 18px Georgia,serif;margin:0;margin-right:auto}
 .stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px;font-variant-numeric:tabular-nums}
 .btn{border:1px solid var(--ln);background:var(--pn);padding:7px 14px;border-radius:6px;cursor:pointer}
 .btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer}
+.btn-demo{background:#111;color:#fff;border:1px solid #333;padding:7px 14px;border-radius:6px;cursor:pointer;font-weight:700}
 main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;padding:12px}
 .pn{background:var(--pn);border:1px solid var(--ln);border-radius:8px;min-width:0}
 #list{max-height:600px;overflow:auto}
@@ -38,14 +39,16 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 #popupBox{background:#fff;padding:26px;border-radius:16px;text-align:center;min-width:320px;max-width:92%;animation:pop.3s ease;box-shadow:0 20px 50px rgba(0,0,0,.35)}
 #popupBox.win{border-top:6px solid var(--up)}#popupBox.lose{border-top:6px solid var(--dn)}#popupBox.deposit{border-top:6px solid var(--brix)}#popupBox.withdraw{border-top:6px solid #3b82f6}
 #popupIcon{font-size:46px}#popTitle{margin:10px 0 6px;font-size:21px}#popMsg{color:var(--mut);line-height:1.6;white-space:pre-line;margin:0 0 16px}
+#demoBadge{display:none;background:var(--brix);color:#000;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:800;margin-left:6px}
+#demoBadge.on{display:inline-block}
 @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
 </style></head><body>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px;font-size:15px" onclick="closePopup()">Continue</button></div></div>
 
 <header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">Real odds</small></h1>
-<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
-<button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
+<div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
+<button class="btn-demo" onclick="tryDemo()">Try Demo</button><button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
 <section class="pn" id="ch">
@@ -62,15 +65,19 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 <div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • Premium signals</p></div>
 </div>
 <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">DISCLAIMER: Real odds. 18+ only. Rate: $1 = KES 130</p>
+<p class="disclaimer">DISCLAIMER: Max profit $15/day in Real mode. Demo is unlimited practice. 18+ only. Rate: $1 = KES 130</p>
 </section>
 <aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
 </main>
 <script>
 const PAYSTACK_KEY = "pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
 let demoBalance = 0;
+let isDemo = false;
+let demoBalanceFake = 1000;
 let tradeTimer = null;
 let wins=0, trades=0, entryPrice=0;
+let dailyProfitAmount = 0;
+let lastProfitReset = new Date().toDateString();
 const USD_TO_KES = 130;
 const $=id=>document.getElementById(id);
 const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
@@ -91,9 +98,30 @@ addEventListener("resize",draw);ui_design();
 function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").prepend(m);}
 function showPopup(type,title,icon,msg){const b=$("popupBox");b.className=type;$("popupIcon").textContent=icon;$("popTitle").textContent=title;$("popMsg").textContent=msg;$("popup").classList.add("show");}
 function closePopup(){$("popup").classList.remove("show");}
-function updateBalance(){ $("balance").textContent="$"+demoBalance.toFixed(2); $("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"; }
+function getCurrentBalance(){ return isDemo ? demoBalanceFake : demoBalance; }
+function setCurrentBalance(v){ if(isDemo) demoBalanceFake=v; else demoBalance=v; }
+function updateBalance(){ 
+  let bal = getCurrentBalance();
+  $("balance").textContent="$"+bal.toFixed(2); 
+  $("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"; 
+  $("demoBadge").classList.toggle("on", isDemo);
+}
 updateBalance();
+function tryDemo(){
+  isDemo=true;
+  demoBalanceFake=1000;
+  dailyProfitAmount=0;
+  wins=0; trades=0;
+  $("dailyProfit").textContent="$0.00";
+  updateBalance();
+  say('DEMO MODE: $1000 unlimited practice - same 45% odds');
+  showPopup("deposit","Demo Mode Activated","🎮","Balance: $1000 DEMO\nUnlimited practice\nSame 45% real odds\n\nNo deposit needed!\nClick Deposit to switch to REAL");
+}
 function depositWithPaystack(){
+ if(isDemo){
+   // Switching from demo to real
+   if(!confirm("Switch from DEMO to REAL trading?\nDemo balance will be saved.")) return;
+ }
  const usd = prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10');
  if(!usd) return;
  const usdVal = parseFloat(usd);
@@ -105,26 +133,27 @@ function depositWithPaystack(){
   amount: kesAmount * 100,
   currency: 'KES',
   callback:function(res){
+   isDemo=false;
    demoBalance += usdVal;
    updateBalance();
    say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`);
-   showPopup("deposit","Deposit Successful","✅",`Amount: $${usdVal} (KES ${kesAmount})\nReference: ${res.reference}\n\nNew Balance: $${demoBalance.toFixed(2)}\nReady to trade!`);
+   showPopup("deposit","Deposit Successful","✅",`Amount: $${usdVal} (KES ${kesAmount})\nReference: ${res.reference}\n\nNew Balance: $${demoBalance.toFixed(2)}\nDaily limit: $15 profit\nReady to trade!`);
   },
   onClose:function(){ say('Deposit popup closed'); showPopup("lose","Deposit Cancelled","❌","You closed Paystack popup.\nTry again when ready."); }
  });
  handler.openIframe();
 }
 function withdraw(){
- if(demoBalance<5){ showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${demoBalance.toFixed(2)}\nKeep trading to reach $5!`); return; }
- const amt=prompt(`Withdraw amount (Balance $${demoBalance.toFixed(2)}):`,"5"); if(!amt) return;
- const val=parseFloat(amt); if(val>demoBalance){ showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${demoBalance.toFixed(2)}`); return; }
+ let bal = getCurrentBalance();
+ if(isDemo){ showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw"); return; }
+ if(bal<5){ showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${bal.toFixed(2)}\nKeep trading to reach $5!`); return; }
+ const amt=prompt(`Withdraw amount (Balance $${bal.toFixed(2)}):`,"5"); if(!amt) return;
+ const val=parseFloat(amt); if(val>bal){ showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${bal.toFixed(2)}`); return; }
  demoBalance-=val; updateBalance();
  showPopup("withdraw","Withdrawal Processing","💸",`Amount: $${val.toFixed(2)}\nMethod: M-Pesa / Bank\nStatus: Processing (24h)\n\nNew Balance: $${demoBalance.toFixed(2)}`);
  say(`Withdrawal $${val} requested - Processing`);
 }
 function subscribe(){ say('Sniper VIP $10/mo - Paystack test'); showPopup("deposit","Sniper VIP","🎯","VIP Bot unlocked!\nPremium signals\n$10/month\nContact support to activate."); }
-
-// FIX 1: ADDED activeBot assignment
 function selectBot(bot,el){ 
   activeBot=bot;
   document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active')); 
@@ -133,20 +162,21 @@ function selectBot(bot,el){
   $("duration").value=d; 
   say(bot+' bot selected'); 
 }
-
-// FIX 2: 45% FAIR - HIDDEN (was 32% now 45%)
 const BOTS={scalper:{win:0.90,pay:0.80},trend:{win:0.86,pay:0.80},sniper:{win:0.96,pay:0.85}};
 let activeBot="scalper";
-
 function startTrade(dir){
  if(tradeTimer){ say('Trade running wait'); showPopup("lose","Trade Active","⏳","Wait for current trade to finish"); return; }
  const stake=parseFloat($("stake").value)||1;
- if(demoBalance < stake){ say('Low balance - Deposit $ first (KES via Paystack)'); showPopup("lose","Low Balance","⚠️",`Need $${stake} to trade\nBalance: $${demoBalance.toFixed(2)}\nPlease deposit`); return; }
+ let bal = getCurrentBalance();
+ if(bal < stake){ 
+   if(isDemo){ demoBalanceFake=1000; updateBalance(); say('Demo reset to $1000'); }
+   else { say('Low balance - Deposit $ first'); showPopup("lose","Low Balance","⚠️",`Need $${stake} to trade\nBalance: $${bal.toFixed(2)}\nPlease deposit`); return; }
+ }
  const duration=parseInt($("duration").value);
  entryPrice=M[sel].p;
  let left=duration;
  $("timer").textContent=left+"s";
- say(dir+' $'+stake+' on '+sel+'/USD '+duration+'s started Entry:'+fp(entryPrice));
+ say(dir+' $'+stake+' on '+sel+'/USD '+duration+'s started Entry:'+fp(entryPrice)+(isDemo?' [DEMO]':''));
  tradeTimer=setInterval(()=>{
    left--; $("timer").textContent=left+"s";
    if(left<=0){
@@ -158,20 +188,35 @@ function startTrade(dir){
      const guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
      let bot=BOTS[activeBot];
      let win=guessedRight?Math.random()<bot.win:false;
+
+     // DAILY $15 LIMIT - REAL MODE ONLY
+     if(!isDemo){
+       let today = new Date().toDateString();
+       if(lastProfitReset !== today){ dailyProfitAmount=0; lastProfitReset=today; $("dailyProfit").textContent="$0.00"; }
+       if(win && dailyProfitAmount >= 15){
+         showPopup("lose","Daily Limit Reached","⏰",`You already made $15 today!\nMax profit $15/day\n\nCome back tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);
+         say('Daily $15 limit reached - try tomorrow');
+         return;
+       }
+     }
+
      if(win){ 
        wins++; 
        const profit=stake*bot.pay; 
-       demoBalance+=profit; 
-       $("dailyProfit").textContent="+$"+profit.toFixed(2); 
-       say(`WIN +$${profit.toFixed(2)} ${dir} Entry:${fp(entryPrice)} Exit:${fp(exitPrice)}`); 
+       setCurrentBalance(getCurrentBalance()+profit);
+       if(!isDemo){ dailyProfitAmount+=profit; $("dailyProfit").textContent="+$"+dailyProfitAmount.toFixed(2); }
+       else { $("dailyProfit").textContent="+$"+profit.toFixed(2); }
+       say(`WIN +$${profit.toFixed(2)} ${dir} ${isDemo?'[DEMO]':''}`); 
        updateBalance();
-       showPopup("win",`🎉 ${dir} WIN!`,"💰",`Bot: ${activeBot} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nProfit: +$${profit.toFixed(2)}\nBalance: $${demoBalance.toFixed(2)}`);
+       showPopup("win",`🎉 ${dir} WIN!${isDemo?' [DEMO]':''}`,"💰",`Bot: ${activeBot} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`);
      } else { 
-       demoBalance-=stake; 
-       $("dailyProfit").textContent="-$"+stake.toFixed(2); 
-       say(`LOSS -$${stake} ${dir} Entry:${fp(entryPrice)} Exit:${fp(exitPrice)}`); 
+       setCurrentBalance(getCurrentBalance()-stake);
+       if(!isDemo) $("dailyProfit").textContent="-$"+stake.toFixed(2);
+       say(`LOSS -$${stake} ${dir} ${isDemo?'[DEMO]':''}`); 
        updateBalance();
-       showPopup("lose",`💥 ${dir} LOSS`,"📉",`Bot: ${activeBot} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nLoss: -$${stake.toFixed(2)}\nBalance: $${demoBalance.toFixed(2)}`);
+       // AUTO RESET DEMO IF BROKE
+       if(isDemo && getCurrentBalance()<1){ demoBalanceFake=1000; updateBalance(); say('Demo reset $1000 - keep practicing'); }
+       showPopup("lose",`💥 ${dir} LOSS${isDemo?' [DEMO]':''}`,"📉",`Bot: ${activeBot} | ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`);
      }
    }
  },1000);
