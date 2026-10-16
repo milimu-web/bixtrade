@@ -45,7 +45,6 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 @media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
 </style></head><body>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px;font-size:15px" onclick="closePopup()">Continue</button></div></div>
-
 <header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">Real odds</small></h1>
 <div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div>
 <button class="btn-demo" id="demoBtn" onclick="toggleDemo()">Try Demo</button><button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
@@ -71,27 +70,14 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 </main>
 <script>
 const PAYSTACK_KEY = "pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
-let demoBalance = 0;
-let isDemo = false;
-let demoBalanceFake = 1000;
-let tradeTimer = null;
-let wins=0, trades=0, entryPrice=0;
-let dailyProfitAmount = 0;
-let demoDailyProfit = 0;
-let lastProfitReset = new Date().toDateString();
-const USD_TO_KES = 130;
-const $=id=>document.getElementById(id);
+let demoBalance = 0; let isDemo = false; let demoBalanceFake = 1000; let tradeTimer = null; let wins=0, trades=0, entryPrice=0; let dailyProfitAmount = 0; let demoDailyProfit = 0; let lastProfitReset = new Date().toDateString();
+const USD_TO_KES = 130; const $=id=>document.getElementById(id);
 const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
-const M=Object.fromEntries(AS.map(a=>[a.k,a]));
-const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
+const M=Object.fromEntries(AS.map(a=>[a.k,a])); const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}
 AS.forEach(a=>{a.s=[{o:a.p,h:a.p,l:a.p,c:a.p}];a.n=0;for(let i=0;i<400;i++){step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})}});
-let sel="XAU",flt="all";
-const fp=p=>p.toFixed(p>=100?2:p>=1?4:p>=.01?5:6);
-function ui_design(){
- $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}/USD</b><small>${a.n}</small></span><span style="text-align:right">${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch>=0?"+":""}${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui_design();};$("il").appendChild(r)});
- const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k+"/USD";$("sp").textContent=fp(a.p);$("sc").textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();
-}
+let sel="XAU",flt="all"; const fp=p=>p.toFixed(p>=100?2:p>=1?4:p>=.01?5:6);
+function ui_design(){ $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}/USD</b><small>${a.n}</small></span><span style="text-align:right">${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch>=0?"+":""}${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui_design();};$("il").appendChild(r)}); const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k+"/USD";$("sp").textContent=fp(a.p);$("sc").textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();}
 function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.font="11px sans-serif";g.fillStyle=C("--mut");g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();g.fillText(fp(v),W-pr+6,y+4)}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
 $("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui_design();};
 setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
@@ -101,127 +87,54 @@ function showPopup(type,title,icon,msg){const b=$("popupBox");b.className=type;$
 function closePopup(){$("popup").classList.remove("show");}
 function getCurrentBalance(){ return isDemo ? demoBalanceFake : demoBalance; }
 function setCurrentBalance(v){ if(isDemo) demoBalanceFake=v; else demoBalance=v; }
-function updateBalance(){ 
-  let bal = getCurrentBalance();
-  $("balance").textContent="$"+bal.toFixed(2);
-  $("demoBadge").classList.toggle("on", isDemo);
-  $("demoBtn").textContent = isDemo ? "Leave Demo" : "Try Demo";
-}
+function updateBalance(){ let bal = getCurrentBalance(); $("balance").textContent="$"+bal.toFixed(2); $("demoBadge").classList.toggle("on", isDemo); $("demoBtn").textContent = isDemo ? "Leave Demo" : "Try Demo"; }
 updateBalance();
-function toggleDemo(){
-  if(!isDemo){
-    isDemo=true;
-    demoBalanceFake=1000;
-    demoDailyProfit=0;
-    $("dailyProfit").textContent="$0.00";
-    updateBalance();
-    say('DEMO ROOM: $1000 unlimited practice');
-    showPopup("deposit","Demo Room","🎮","You are in DEMO\n$1000 free money\nUnlimited trading\n\nClick Leave Demo for REAL");
-  } else {
-    isDemo=false;
-    demoBalance=0;
-    dailyProfitAmount=0;
-    wins=0; trades=0;
-    $("dailyProfit").textContent="$0.00";
-    updateBalance();
-    say('Left Demo - REAL mode: $0.00 Deposit to trade');
-    showPopup("lose","Real Mode","💼","Back to REAL\nBalance: $0.00\nDaily Profit: $0.00\nDeposit via Paystack to start");
-  }
-}
-function depositWithPaystack(){
- const usd = prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10');
- if(!usd) return;
- const usdVal = parseFloat(usd);
- if(isNaN(usdVal) || usdVal<=0){ say('Invalid amount'); showPopup("lose","Invalid Amount","❌","Please enter valid amount"); return; }
- const kesAmount = Math.round(usdVal * USD_TO_KES);
- const handler=PaystackPop.setup({
-  key: PAYSTACK_KEY,
-  email: 'customer@brixtrade.com',
-  amount: kesAmount * 100,
-  currency: 'KES',
-  callback:function(res){
-   isDemo=false;
-   demoBalance += usdVal;
-   updateBalance();
-   say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`);
-   showPopup("deposit","Deposit Successful","✅",`Amount: $${usdVal} (KES ${kesAmount})\nReference: ${res.reference}\n\nNew Balance: $${demoBalance.toFixed(2)}\nDaily limit: $15 profit`);
-  },
-  onClose:function(){ say('Deposit popup closed'); showPopup("lose","Deposit Cancelled","❌","You closed Paystack popup."); }
- });
- handler.openIframe();
-}
-function withdraw(){
- let bal = getCurrentBalance();
- if(isDemo){ showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw"); return; }
- if(bal<5){ showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${bal.toFixed(2)}`); return; }
- const amt=prompt(`Withdraw amount (Balance $${bal.toFixed(2)}):`,"5"); if(!amt) return;
- const val=parseFloat(amt); if(val>bal){ showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${bal.toFixed(2)}`); return; }
- demoBalance-=val; updateBalance();
- showPopup("withdraw","Withdrawal Processing","💸",`Amount: $${val.toFixed(2)}\nMethod: M-Pesa / Bank\nStatus: Processing (24h)\n\nNew Balance: $${demoBalance.toFixed(2)}`);
- say(`Withdrawal $${val} requested - Processing`);
-}
+function toggleDemo(){ if(!isDemo){ isDemo=true; demoBalanceFake=1000; demoDailyProfit=0; $("dailyProfit").textContent="$0.00"; updateBalance(); say('DEMO ROOM: $1000 unlimited practice'); showPopup("deposit","Demo Room","🎮","You are in DEMO\n$1000 free money\nUnlimited trading\n\nClick Leave Demo for REAL"); } else { isDemo=false; demoBalance=0; dailyProfitAmount=0; wins=0; trades=0; $("dailyProfit").textContent="$0.00"; updateBalance(); say('Left Demo - REAL mode: $0.00 Deposit to trade'); showPopup("lose","Real Mode","💼","Back to REAL\nBalance: $0.00\nDaily Profit: $0.00\nDeposit via Paystack to start"); } }
+function depositWithPaystack(){ const usd = prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10'); if(!usd) return; const usdVal = parseFloat(usd); if(isNaN(usdVal) || usdVal<=0){ say('Invalid amount'); showPopup("lose","Invalid Amount","❌","Please enter valid amount"); return; } const kesAmount = Math.round(usdVal * USD_TO_KES); const handler=PaystackPop.setup({ key: PAYSTACK_KEY, email: 'customer@brixtrade.com', amount: kesAmount * 100, currency: 'KES', callback:function(res){ isDemo=false; demoBalance += usdVal; updateBalance(); say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`); showPopup("deposit","Deposit Successful","✅",`Amount: $${usdVal} (KES ${kesAmount})\nReference: ${res.reference}\n\nNew Balance: $${demoBalance.toFixed(2)}\nDaily limit: $15 profit`); }, onClose:function(){ say('Deposit popup closed'); showPopup("lose","Deposit Cancelled","❌","You closed Paystack popup."); } }); handler.openIframe(); }
+function withdraw(){ let bal = getCurrentBalance(); if(isDemo){ showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw"); return; } if(bal<5){ showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${bal.toFixed(2)}`); return; } const amt=prompt(`Withdraw amount (Balance $${bal.toFixed(2)}):`,"5"); if(!amt) return; const val=parseFloat(amt); if(val>bal){ showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${bal.toFixed(2)}`); return; } demoBalance-=val; updateBalance(); showPopup("withdraw","Withdrawal Processing","💸",`Amount: $${val.toFixed(2)}\nMethod: M-Pesa / Bank\nStatus: Processing (24h)\n\nNew Balance: $${demoBalance.toFixed(2)}`); say(`Withdrawal $${val} requested - Processing`); }
 function subscribe(){ say('Sniper VIP $10/mo'); showPopup("deposit","Sniper VIP","🎯","VIP Bot unlocked!\nPremium signals\n$10/month"); }
-function selectBot(bot,el){ 
-  activeBot=bot;
-  document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active')); 
-  el.classList.add('active'); 
-  const d=bot==='scalper'?30:bot==='trend'?60:120; 
-  $("duration").value=d; 
-  say(bot+' bot selected'); 
-}
-const BOTS={scalper:{win:0.90,pay:0.80},trend:{win:0.86,pay:0.80},sniper:{win:0.96,pay:0.85}};
+function selectBot(bot,el){ activeBot=bot; document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active')); el.classList.add('active'); const d=bot==='scalper'?30:bot==='trend'?60:120; $("duration").value=d; say(bot+' bot selected'); }
+
+// 10K SAFE SETTINGS - 40% WIN = 4/10
+const BOTS={scalper:{win:0.80,pay:0.80},trend:{win:0.80,pay:0.80},sniper:{win:0.80,pay:0.80}};
 let activeBot="scalper";
+
+// FORCED 4 WINS / 6 LOSS - SAVES EVEN AFTER TAB CLOSE
+function getForcedTradeHistory(){ try{ return JSON.parse(localStorage.getItem('brixForced10')||'[]'); }catch(e){ return []; } }
+function saveForcedTradeHistory(h){ localStorage.setItem('brixForced10', JSON.stringify(h)); }
+
 function startTrade(dir){
  if(tradeTimer){ say('Trade running wait'); showPopup("lose","Trade Active","⏳","Wait for current trade to finish"); return; }
- const stake=parseFloat($("stake").value)||1;
- let bal = getCurrentBalance();
- if(bal < stake){ 
-   if(isDemo){ demoBalanceFake=1000; updateBalance(); say('Demo reset to $1000'); }
-   else { say('Low balance - Deposit'); showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`); return; }
- }
- const duration=parseInt($("duration").value);
- entryPrice=M[sel].p;
- let left=duration;
- $("timer").textContent=left+"s";
+ const stake=parseFloat($("stake").value)||1; let bal = getCurrentBalance();
+ if(bal < stake){ if(isDemo){ demoBalanceFake=1000; updateBalance(); say('Demo reset to $1000'); } else { say('Low balance - Deposit'); showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`); return; } }
+ const duration=parseInt($("duration").value); entryPrice=M[sel].p; let left=duration; $("timer").textContent=left+"s";
  say(dir+' $'+stake+' on '+sel+'/USD '+duration+'s Entry:'+fp(entryPrice)+(isDemo?' [DEMO]':''));
  tradeTimer=setInterval(()=>{
    left--; $("timer").textContent=left+"s";
    if(left<=0){
-     clearInterval(tradeTimer); tradeTimer=null;
-     $("timer").textContent="Ready";
-     trades++;
-     const exitPrice=M[sel].p;
-     const wentUp=exitPrice>entryPrice;
-     const guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
+     clearInterval(tradeTimer); tradeTimer=null; $("timer").textContent="Ready"; trades++;
+     const exitPrice=M[sel].p; const wentUp=exitPrice>entryPrice; const guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
      let bot=BOTS[activeBot];
-     let win=guessedRight?Math.random()<bot.win:false;
-     if(!isDemo){
-       let today = new Date().toDateString();
-       if(lastProfitReset !== today){ dailyProfitAmount=0; lastProfitReset=today; $("dailyProfit").textContent="$0.00"; }
-       if(win && dailyProfitAmount >= 15){
-         showPopup("lose","Daily Limit Reached","⏰",`You already made $15 today!\nMax profit $15/day\nCome back tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);
-         say('Daily $15 limit reached - try tomorrow');
-         return;
-       }
+     
+     // === FORCED 4/10 LOGIC ===
+     let history = getForcedTradeHistory();
+     if(history.length>=10){ history=[]; }
+     let winsInHistory = history.filter(v=>v===1).length;
+     let win;
+     if(winsInHistory>=4){ win=false; }
+     else{
+       let remaining = 10 - history.length;
+       let needed = 4 - winsInHistory;
+       if(remaining<=needed){ win=true; }
+       else{ win = guessedRight ? Math.random()<bot.win : false; if(win && winsInHistory>=4) win=false; }
      }
-     if(win){ 
-       wins++; 
-       const profit=stake*bot.pay; 
-       setCurrentBalance(getCurrentBalance()+profit);
-       if(!isDemo){ dailyProfitAmount+=profit; $("dailyProfit").textContent="+$"+dailyProfitAmount.toFixed(2); }
-       else { demoDailyProfit+=profit; $("dailyProfit").textContent="+$"+demoDailyProfit.toFixed(2); }
-       say(`WIN +$${profit.toFixed(2)} ${dir} ${isDemo?'[DEMO]':''}`); 
-       updateBalance();
-       showPopup("win",`🎉 ${dir} WIN!${isDemo?' [DEMO]':''}`,"💰",`Bot: ${activeBot}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`);
-     } else { 
-       setCurrentBalance(getCurrentBalance()-stake);
-       if(!isDemo) $("dailyProfit").textContent="-$"+stake.toFixed(2);
-       else $("dailyProfit").textContent="-$"+stake.toFixed(2);
-       say(`LOSS -$${stake} ${dir} ${isDemo?'[DEMO]':''}`); 
-       updateBalance();
-       if(isDemo && getCurrentBalance()<1){ demoBalanceFake=1000; updateBalance(); say('Demo reset $1000'); }
-       showPopup("lose",`💥 ${dir} LOSS${isDemo?' [DEMO]':''}`,"📉",`Bot: ${activeBot}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`);
-     }
+     history.push(win?1:0);
+     saveForcedTradeHistory(history);
+     if(history.length===10){ setTimeout(()=>saveForcedTradeHistory([]),100); }
+     // === END FORCED ===
+
+     if(!isDemo){ let today = new Date().toDateString(); if(lastProfitReset !== today){ dailyProfitAmount=0; lastProfitReset=today; $("dailyProfit").textContent="$0.00"; } if(win && dailyProfitAmount >= 15){ showPopup("lose","Daily Limit Reached","⏰",`You already made $15 today!\nMax profit $15/day\nCome back tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`); say('Daily $15 limit reached - try tomorrow'); return; } }
+     if(win){ wins++; const profit=stake*bot.pay; setCurrentBalance(getCurrentBalance()+profit); if(!isDemo){ dailyProfitAmount+=profit; $("dailyProfit").textContent="+$"+dailyProfitAmount.toFixed(2); } else { demoDailyProfit+=profit; $("dailyProfit").textContent="+$"+demoDailyProfit.toFixed(2); } say(`WIN +$${profit.toFixed(2)} ${dir} ${isDemo?'[DEMO]':''}`); updateBalance(); showPopup("win",`🎉 ${dir} WIN!${isDemo?' [DEMO]':''}`,"💰",`Bot: ${activeBot}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`); } else { setCurrentBalance(getCurrentBalance()-stake); $("dailyProfit").textContent="-$"+stake.toFixed(2); say(`LOSS -$${stake} ${dir} ${isDemo?'[DEMO]':''}`); updateBalance(); if(isDemo && getCurrentBalance()<1){ demoBalanceFake=1000; updateBalance(); say('Demo reset $1000'); } showPopup("lose",`💥 ${dir} LOSS${isDemo?' [DEMO]':''}`,"📉",`Bot: ${activeBot}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`); }
    }
  },1000);
 }
