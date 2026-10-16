@@ -5,7 +5,7 @@ let trades = parseInt(localStorage.getItem('brix_trades')||'0');
 let wins = parseInt(localStorage.getItem('brix_wins')||'0');
 let isTrading = false;
 
-const bots = { scalper: { winRate: 0.20, time: 30 }, trend: { winRate: 0.18, time: 60 }, sniper: { winRate: 0.22, time: 120, vip: true } };
+const bots = { scalper: { winRate: 0.32, time: 30 }, trend: { winRate: 0.3, time: 60 }, sniper: { winRate: 0.37, time: 120, vip: true } };
 
 function save(){ 
   localStorage.setItem('brix_balance', balance); 
