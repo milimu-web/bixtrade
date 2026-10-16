@@ -1,132 +1,123 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Brixtrade – Currency & Metals Trading</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brixtrade</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-:root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--ac:#b8841c;--acbg:#fbf1d8;--brix:#ffae00}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-button,input,select{font:inherit;color:inherit}
-header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;background:var(--pn);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
-h1{font:700 18px Georgia,serif;margin:0;margin-right:auto}
-.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px;font-variant-numeric:tabular-nums}
-.btn{border:1px solid var(--ln);background:var(--pn);padding:7px 14px;border-radius:6px;cursor:pointer}
-.btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer}
-main{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;padding:12px}
-.pn{background:var(--pn);border:1px solid var(--ln);border-radius:8px;min-width:0}
-#list{max-height:600px;overflow:auto}
-.tabs{display:flex;border-bottom:1px solid var(--ln)}.tabs button{flex:1;border:0;background:none;padding:9px;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}
-.tabs button.on{color:var(--ink);border-color:var(--ac);font-weight:600}
-.row{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--ln);cursor:pointer;font-variant-numeric:tabular-nums}
-.row:hover,.row.on{background:var(--acbg)}.row small{color:var(--mut);display:block}
-.up{color:var(--up)}.dn{color:var(--dn)}
-#ch{padding:12px}.ttl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}.ttl h2{margin:0;font-size:20px}
-#cv{width:100%;height:340px;display:block;margin-top:8px;background:var(--bg);border-radius:6px}
-#tk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-#tk label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
-input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--bg);border-radius:6px}
-.buy,.sell{border:0;border-radius:6px;padding:12px;font-weight:800;color:#fff;cursor:pointer;font-size:15px}.buy{background:var(--up)}.sell{background:var(--dn)}
-.bots{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
-.bot-card{border:1px solid var(--ln);padding:10px;border-radius:8px;cursor:pointer;background:var(--pn)}
-.bot-card.active{border-color:var(--brix);background:var(--acbg);box-shadow:0 0 0 2px rgba(255,174,0,0.2)}
-.bot-card h3{margin:0;font-size:14px}.bot-card p{margin:4px 0;font-size:12px;color:var(--mut)}
-.btn-vip{width:100%;margin-top:10px;background:#111;color:var(--brix);border:1px solid var(--brix);padding:10px;border-radius:6px;cursor:pointer;font-weight:700}
-.disclaimer{padding:10px 12px;font-size:11px;color:var(--mut)}
-@media(max-width:1000px){main{grid-template-columns:1fr}#list{max-height:240px}}
+:root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--brix:#ffae00;--acbg:#fbf1d8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 sans-serif}
+header{display:flex;gap:12px;align-items:center;padding:12px;background:var(--pn);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+h1{margin:0;margin-right:auto;font-size:18px}
+.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:17px}
+.btn-brix{background:var(--brix);border:0;padding:7px 14px;border-radius:6px;font-weight:700;cursor:pointer}
+main{display:grid;grid-template-columns:240px 1fr 320px;gap:12px;padding:12px}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:8px}
+#cv{width:100%;height:340px;display:block;background:var(--bg);border-radius:6px}
+.buy,.sell{border:0;border-radius:6px;padding:12px;font-weight:800;color:#fff;cursor:pointer;width:100%}.buy{background:var(--up)}.sell{background:var(--dn)}
+.bot-card{border:2px solid var(--ln);padding:10px;border-radius:8px;cursor:pointer;margin-top:8px;background:#fff;transition:.2s}.bot-card.active{border-color:var(--brix);background:var(--acbg);transform:scale(1.02)}
+.row{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--ln);cursor:pointer}.row.on{background:var(--acbg)}.up{color:var(--up)}.dn{color:var(--dn)}
+/* BEAUTIFUL POPUP */
+#popup{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+#popup.show{display:flex}
+#popupBox{background:#fff;padding:28px;border-radius:16px;text-align:center;min-width:320px;max-width:90%;animation:pop.3s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+#popupBox.win{border-top:6px solid var(--up)}#popupBox.lose{border-top:6px solid var(--dn)}#popupBox.deposit{border-top:6px solid var(--brix)}#popupBox.withdraw{border-top:6px solid #3b82f6}
+#popupIcon{font-size:48px;margin-bottom:10px}
+#popTitle{margin:8px 0;font-size:22px}#popMsg{color:var(--mut);margin:10px 0 18px;line-height:1.5;white-space:pre-line}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 </style></head><body>
-<header><h1>BRIX<span style="color:var(--brix)">TRADE</span> <small style="font:12px sans-serif;color:var(--mut)">Real odds</small></h1>
-<div class="stat"><small>Balance</small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><div class="stat"><small>Win Rate</small><b id="winRate">0%</b></div>
-<button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
+<div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px;font-size:15px" onclick="closePopup()">Continue</button></div></div>
+
+<header><h1>BRIX<span style="color:var(--brix)">TRADE</span></h1>
+<div class="stat"><small>Balance</small><b id="balance">$10.00</b></div>
+<div class="stat"><small>Daily</small><b id="dailyProfit">$0.00</b></div>
+<div class="stat"><small>WinRate</small><b id="winRate">0%</b></div>
+<button class="btn-brix" onclick="depositWithPaystack()">Deposit</button>
+<button class="btn-brix" style="background:#3b82f6;color:#fff" onclick="withdrawNow()">Withdraw</button>
+</header>
+
 <main>
-<aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
-<section class="pn" id="ch">
-<div class="ttl"><h2 id="sn">-</h2><b id="sp" style="font-size:20px">-</b><span id="sc"></span><span style="color:var(--mut)" id="sq">Timer: <b id="timer">Ready</b></span></div>
+<aside class="pn" style="max-height:600px;overflow:auto"><div id="il"></div>
+<div style="padding:12px">
+<h4>Trading Bots</h4>
+<div class="bot-card active" id="bot-scalper" onclick="selectBot('scalper')">⚡ Scalper<br><small>32% Win • Fast</small></div>
+<div class="bot-card" id="bot-trend" onclick="selectBot('trend')">📈 Trend<br><small>30% Win • Stable</small></div>
+<div class="bot-card" id="bot-sniper" onclick="selectBot('sniper')">🎯 Sniper VIP<br><small>37% Win • High Payout</small></div>
+</div>
+</aside>
+<section class="pn" style="padding:12px">
+<h2 id="sn">XAU/USD</h2><b id="sp"></b> <span id="sc"></span> - Timer: <b id="timer">Ready</b>
 <canvas id="cv"></canvas>
-<div id="tk">
-<div><label>Stake($) - 1$ = KES 130</label><input id="stake" type="number" min="1" step="1" value="1"></div>
-<div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div>
-<button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+<div><input id="stake" style="width:100%;padding:10px" type="number" value="1" min="1"><select id="duration" style="width:100%;margin-top:6px;padding:8px"><option value="30">30s</option><option value="60">60s</option><option value="120">120s VIP</option></select></div>
+<div style="display:grid;gap:8px"><button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button></div>
 </div>
-<div class="bots">
-<div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>30s | 20% Win - Safe for house</p></div>
-<div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>60s | 18% Win - Medium</p></div>
-<div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>120s | 22% Win - $10/mo</p></div>
-</div>
-<button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">DISCLAIMER: Real odds. 18+ only. Rate: $1 = KES 130</p>
 </section>
-<aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
+<aside class="pn" style="padding:12px"><h4>Activity</h4><div id="msgs"></div></aside>
 </main>
+
 <script>
-const PAYSTACK_KEY = "pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
-let demoBalance = 0;
-let tradeTimer = null;
-let wins=0, trades=0;
-const USD_TO_KES = 130;
+const PAYSTACK_KEY="pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
+let demoBalance=10, tradeTimer=null, wins=0, trades=0, entryPrice=0, activeBot="scalper";
 const $=id=>document.getElementById(id);
-const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
+const AS=[["EUR","Euro",1.085,"fx"],["GBP","Pound",1.30,"fx"],["XAU","Gold",2650,"mt"],["XAG","Silver",31.5,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a]));
 const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}
-AS.forEach(a=>{a.s=[{o:a.p,h:a.p,l:a.p,c:a.p}];a.n=0;for(let i=0;i<400;i++){step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})}});
-let sel="XAU",flt="all";
-const fp=p=>p.toFixed(p>=100?2:p>=1?4:p>=.01?5:6);
-function ui_design(){
- $("il").innerHTML="";AS.filter(a=>flt=="all"||a.t==flt).forEach(a=>{const ch=(a.p/a.s[0].o-1)*100,r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`<span><b>${a.k}/USD</b><small>${a.n}</small></span><span style="text-align:right">${fp(a.p)}<small class="${ch>=0?"up":"dn"}">${ch>=0?"+":""}${ch.toFixed(2)}%</small></span>`;r.onclick=()=>{sel=a.k;ui_design();};$("il").appendChild(r)});
- const a=M[sel],ch=(a.p/a.s[0].o-1)*100;$("sn").textContent=a.k+"/USD";$("sp").textContent=fp(a.p);$("sc").textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%";$("sc").className=ch>=0?"up":"dn";draw();
-}
-function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim(),a=M[sel],D=a.s.slice(-70),pr=62;let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h)),pd=(hi-lo)*.08||hi*.001;lo-=pd;hi+=pd;const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=(W-pr)/D.length;g.font="11px sans-serif";g.fillStyle=C("--mut");g.strokeStyle=C("--ln");for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);g.beginPath();g.moveTo(0,y);g.lineTo(W-pr,y);g.stroke();g.fillText(fp(v),W-pr+6,y+4)}D.forEach((x,i)=>{const cx=i*bw+bw/2,up=x.c>=x.o;g.strokeStyle=g.fillStyle=C(up?"--up":"--dn");g.beginPath();g.moveTo(cx,Y(x.h));g.lineTo(cx,Y(x.l));g.stroke();g.fillRect(cx-bw*.35,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});const ly=Y(a.p);g.setLineDash([4,3]);g.strokeStyle=C("--mut");g.beginPath();g.moveTo(0,ly);g.lineTo(W-pr,ly);g.stroke();g.setLineDash([]);}
-$("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("ft").children].forEach(b=>b.classList.toggle("on",b==e.target));ui_design();};
-setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
-addEventListener("resize",draw);ui_design();
-function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").prepend(m);}
-say("Welcome to Brixtrade - Real odds trading. $1 = KES 130");
-function updateBalance(){ $("balance").textContent="$"+demoBalance.toFixed(2); $("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"; }
+AS.forEach(a=>{a.s=[{o:a.p,h:a.p,l:a.p,c:a.p}];a.n=0;for(let i=0;i<200;i++){step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})}});
+let sel="XAU"; const fp=p=>p.toFixed(p>=100?2:4);
+function ui(){ $("il").innerHTML="";AS.forEach(a=>{const r=document.createElement("div");r.className="row"+(a.k==sel?" on":"");r.innerHTML=`${a.k} <span class="${a.p>a.s[0].o?"up":"dn"}">${fp(a.p)}</span>`;r.onclick=()=>{sel=a.k;ui()};$("il").appendChild(r)});$("sn").textContent=sel+"/USD";$("sp").textContent=fp(M[sel].p);draw();}
+function draw(){const cv=$("cv"),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;cv.width=W*d;cv.height=H*d;const g=cv.getContext("2d");g.scale(d,d);const a=M[sel],D=a.s.slice(-60);let lo=Math.min(...D.map(x=>x.l)),hi=Math.max(...D.map(x=>x.h));const Y=v=>H-16-(v-lo)/(hi-lo)*(H-26),bw=W/D.length;D.forEach((x,i)=>{const cx=i*bw,up=x.c>=x.o;g.fillStyle=up?"#0f8f66":"#cf4338";g.fillRect(cx,Math.min(Y(x.o),Y(x.c)),bw*.7,Math.max(1,Math.abs(Y(x.o)-Y(x.c))))});}
+setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui()},1000);ui();
+function updateBalance(){$("balance").textContent="$"+demoBalance.toFixed(2);$("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"}
 updateBalance();
-function depositWithPaystack(){
- const usd = prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10');
- if(!usd) return;
- const usdVal = parseFloat(usd);
- if(isNaN(usdVal) || usdVal<=0){ say('Invalid amount'); return; }
- const kesAmount = Math.round(usdVal * USD_TO_KES);
- const handler=PaystackPop.setup({
-  key: PAYSTACK_KEY,
-  email: 'customer@brixtrade.com',
-  amount: kesAmount * 100,
-  currency: 'KES',
-  callback:function(res){
-   demoBalance += usdVal;
-   updateBalance();
-   say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`);
-  },
-  onClose:function(){ say('Deposit popup closed'); }
- });
- handler.openIframe();
+
+// POPUP SYSTEM
+function showPopup(type, title, icon, msg){
+ const box=$("popupBox"); box.className=type;
+ $("popupIcon").textContent=icon; $("popTitle").textContent=title; $("popMsg").textContent=msg;
+ $("popup").classList.add("show");
 }
-function withdraw(){ say('Withdraw requested - contact support'); }
-function subscribe(){ say('Sniper VIP $10/mo - Paystack test'); }
-function selectBot(bot,el){ document.querySelectorAll('.bot-card').forEach(c=>c.classList.remove('active')); el.classList.add('active'); const d=bot==='scalper'?30:bot==='trend'?60:120; $("duration").value=d; say(bot+' bot '+d+'s selected'); }
+function closePopup(){ $("popup").classList.remove("show"); }
+function selectBot(k){activeBot=k; document.querySelectorAll(".bot-card").forEach(b=>b.classList.remove("active")); $("bot-"+k).classList.add("active");}
+
+const BOTS={scalper:{name:"Scalper",winIfRight:0.65,payout:0.70},trend:{name:"Trend",winIfRight:0.60,payout:0.75},sniper:{name:"Sniper VIP",winIfRight:0.75,payout:0.80}};
+
+function depositWithPaystack(){
+ const usd=prompt("Enter deposit USD (Rate KES 130):","10"); if(!usd) return;
+ const usdVal=parseFloat(usd); const kes=Math.round(usdVal*130);
+ PaystackPop.setup({key:PAYSTACK_KEY,email:"customer@brixtrade.com",amount:kes*100,currency:"KES",callback:function(r){
+   demoBalance+=usdVal; updateBalance();
+   showPopup("deposit","💰 Deposit Successful","✅",`Amount: $${usdVal} (KES ${kes})\nReference: ${r.reference}\n\nBalance: $${demoBalance.toFixed(2)}\nReady to trade!`);
+ },onClose:function(){ showPopup("lose","Deposit Cancelled","❌","You cancelled the deposit.\nTry again when ready.");}}).openIframe();
+}
+
+function withdrawNow(){
+ if(demoBalance<5){ showPopup("lose","Withdrawal Failed","⚠️",`Minimum withdrawal is $5\nYour balance: $${demoBalance.toFixed(2)}\nKeep trading!`); return; }
+ const amt=prompt(`Withdraw amount (Balance $${demoBalance.toFixed(2)}):`,"5"); if(!amt) return;
+ const val=parseFloat(amt); if(val>demoBalance){ showPopup("lose","Insufficient Balance","❌",`You tried to withdraw $${val}\nAvailable: $${demoBalance.toFixed(2)}`); return; }
+ demoBalance-=val; updateBalance();
+ showPopup("withdraw","🏦 Withdrawal Request Sent","💸",`Amount: $${val.toFixed(2)}\nStatus: Processing (24h)\nMethod: M-Pesa\n\nNew Balance: $${demoBalance.toFixed(2)}`);
+}
+
 function startTrade(dir){
- if(tradeTimer){ say('Trade running wait'); return; }
+ if(tradeTimer){ showPopup("lose","Trade Active","⏳","Wait for current trade to finish"); return}
  const stake=parseFloat($("stake").value)||1;
- if(demoBalance < stake){ say('Low balance - Deposit $ first (KES via Paystack)'); return; }
- const duration=parseInt($("duration").value);
- let left=duration;
+ if(demoBalance<stake){showPopup("lose","Low Balance","⚠️",`Need $${stake} to trade\nBalance: $${demoBalance.toFixed(2)}\nPlease deposit`);return}
+ const duration=parseInt($("duration").value); entryPrice=M[sel].p; let left=duration;
  $("timer").textContent=left+"s";
- say(dir+' $'+stake+' on '+sel+'/USD '+duration+'s started');
  tradeTimer=setInterval(()=>{
    left--; $("timer").textContent=left+"s";
    if(left<=0){
-     clearInterval(tradeTimer); tradeTimer=null;
-     $("timer").textContent="Ready";
-     trades++;
-     const win=Math.random()<0.20;
-     if(win){ wins++; const profit=stake*0.85; demoBalance+=profit; $("dailyProfit").textContent="+$"+profit.toFixed(2); say(`WIN +$${profit.toFixed(2)}`); }
-     else { demoBalance-=stake; $("dailyProfit").textContent="-$"+stake.toFixed(2); say(`LOSS -$${stake}`); }
-     updateBalance();
+     clearInterval(tradeTimer); tradeTimer=null; $("timer").textContent="Ready"; trades++;
+     const exitPrice=M[sel].p; const wentUp=exitPrice>entryPrice;
+     let guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
+     let bot=BOTS[activeBot]; let win=guessedRight?Math.random()<bot.winIfRight:false;
+     if(win){ wins++; const profit=stake*bot.payout; demoBalance+=profit; updateBalance();
+       showPopup("win",`🎉 ${bot.name} WIN!`,"💰",`Direction: ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nProfit: +$${profit.toFixed(2)}\nStake: $${stake}\nNew Balance: $${demoBalance.toFixed(2)}`);
+     } else { demoBalance-=stake; updateBalance();
+       showPopup("lose",`💥 ${bot.name} LOSS`,"📉",`Direction: ${dir} ${wentUp?"UP 📈":"DOWN 📉"}\nEntry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\n\nLoss: -$${stake.toFixed(2)}\nPayout if won: $${(stake*bot.payout).toFixed(2)}\nBalance: $${demoBalance.toFixed(2)}\n\nTry again - market moves fast!`);
+     }
    }
  },1000);
 }
-</script>
-</body></html>
+</script></body></html>
