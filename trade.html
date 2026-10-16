@@ -44,7 +44,7 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 <div class="ttl"><h2 id="sn">-</h2><b id="sp" style="font-size:20px">-</b><span id="sc"></span><span style="color:var(--mut)" id="sq">Timer: <b id="timer">Ready</b></span></div>
 <canvas id="cv"></canvas>
 <div id="tk">
-<div><label>Stake($)</label><input id="stake" type="number" min="1" step="1" value="1"></div>
+<div><label>Stake($) - 1$ = KES 130</label><input id="stake" type="number" min="1" step="1" value="1"></div>
 <div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div>
 <button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button>
 </div>
@@ -54,7 +54,7 @@ input,select{width:100%;padding:9px;border:1px solid var(--ln);background:var(--
 <div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>120s | 22% Win - $10/mo</p></div>
 </div>
 <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">DISCLAIMER: Real odds. 18+ only trade like never before</p>
+<p class="disclaimer">DISCLAIMER: Real odds. 18+ only. Rate: $1 = KES 130</p>
 </section>
 <aside class="pn" style="padding:12px"><h3 style="margin:0 0 10px 0">Trade Assistant</h3><div id="msgs" style="display:flex;flex-direction:column;gap:8px;max-height:500px;overflow:auto"></div></aside>
 </main>
@@ -63,8 +63,9 @@ const PAYSTACK_KEY = "pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
 let demoBalance = 0;
 let tradeTimer = null;
 let wins=0, trades=0;
+const USD_TO_KES = 130; // main.js rate
 const $=id=>document.getElementById(id);
-const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
+const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k][n][p][t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a]));
 const rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}
@@ -80,23 +81,26 @@ $("ft").onclick=e=>{if(!e.target.dataset.f)return;flt=e.target.dataset.f;[...$("
 setInterval(()=>{AS.forEach(a=>{step(a);if(++a.n%5==0)a.s.push({o:a.p,h:a.p,l:a.p,c:a.p})});ui_design();},1000);
 addEventListener("resize",draw);ui_design();
 function say(t){const m=document.createElement("div");m.style.cssText="padding:8px 10px;border-radius:8px;background:var(--acbg)";m.textContent=t;$("msgs").prepend(m);}
-say("Welcome to Brixtrade - Real odds trading.");
+say("Welcome to Brixtrade - Real odds trading. $1 = KES 130");
 function updateBalance(){ $("balance").textContent="$"+demoBalance.toFixed(2); $("winRate").textContent=trades?Math.round(wins/trades*100)+"%":"0%"; }
 updateBalance();
 function depositWithPaystack(){
- const amount=prompt('Deposit amount in USD (e.g 10):','10');
- if(!amount) return;
+ const usd = prompt(`Deposit amount in USD (Rate $1 = KES ${USD_TO_KES}) e.g 10:`,'10');
+ if(!usd) return;
+ const usdVal = parseFloat(usd);
+ if(isNaN(usdVal) || usdVal<=0){ say('Invalid amount'); return; }
+ const kesAmount = Math.round(usdVal * USD_TO_KES);
  const handler=PaystackPop.setup({
   key: PAYSTACK_KEY,
   email: 'customer@brixtrade.com',
-  amount: Math.round(parseFloat(amount)*100),
-  currency: 'USD',
+  amount: kesAmount * 100,
+  currency: 'KES',
   callback:function(res){
-   demoBalance+=parseFloat(amount);
+   demoBalance += usdVal;
    updateBalance();
-   say(`Deposit SUCCESS $${amount} Ref:${res.reference} - Paystack test mode`);
+   say(`Deposit SUCCESS $${usdVal} = KES ${kesAmount} Ref:${res.reference}`);
   },
-  onClose:function(){ say('Deposit closed'); }
+  onClose:function(){ say('Deposit popup closed'); }
  });
  handler.openIframe();
 }
@@ -106,7 +110,7 @@ function selectBot(bot,el){ document.querySelectorAll('.bot-card').forEach(c=>c.
 function startTrade(dir){
  if(tradeTimer){ say('Trade running wait'); return; }
  const stake=parseFloat($("stake").value)||1;
- if(demoBalance < stake){ say('Low balance - Deposit USD first'); return; }
+ if(demoBalance < stake){ say('Low balance - Deposit $ first (KES via Paystack)'); return; }
  const duration=parseInt($("duration").value);
  let left=duration;
  $("timer").textContent=left+"s";

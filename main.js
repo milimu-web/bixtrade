@@ -5,7 +5,11 @@ let trades = parseInt(localStorage.getItem('brix_trades')||'0');
 let wins = parseInt(localStorage.getItem('brix_wins')||'0');
 let isTrading = false;
 
-const bots = { scalper: { winRate: 0.20, time: 30 }, trend: { winRate: 0.18, time: 60 }, sniper: { winRate: 0.22, time: 120, vip: true } };
+const bots = { 
+  scalper: { winRate: 0.20, time: 30 }, 
+  trend: { winRate: 0.18, time: 60 }, 
+  sniper: { winRate: 0.22, time: 120, vip: true } 
+};
 
 function save(){ 
   localStorage.setItem('brix_balance', balance); 
@@ -46,22 +50,30 @@ function startTrade(dir){
   if(selectedBot==='sniper' && localStorage.getItem('brix_vip')!=='true'){ alert('Unlock VIP first'); return; } 
   balance-=stake; save(); isTrading=true; 
   let t=dur; document.getElementById('timer').innerText=t+'s'; 
-  let iv=setInterval(()=>{ t--; document.getElementById('timer').innerText=t+'s'; if(t<=0){ clearInterval(iv); finishTrade(stake,dir); } },1000); 
+  let iv=setInterval(()=>{
+    t--; 
+    document.getElementById('timer').innerText=t+'s'; 
+    if(t<=0){ clearInterval(iv); finishTrade(stake,dir); } 
+  },1000); 
 }
 
 function finishTrade(stake,dir){ 
   trades++; 
   const win=Math.random()<bots[selectedBot].winRate; 
   if(win){ 
-    let p=stake*0.7; balance+=stake+p; dailyProfit+=p; wins++; 
+    let p=stake*0.7; 
+    balance+=stake+p; 
+    dailyProfit+=p; 
+    wins++; 
     alert(`WIN! +$${p.toFixed(2)} ${dir}`); 
   } else { 
     alert(`LOSS! -$${stake.toFixed(2)} ${dir}`); 
   } 
-  isTrading=false; document.getElementById('timer').innerText='Ready'; save(); 
+  isTrading=false; 
+  document.getElementById('timer').innerText='Ready'; 
+  save(); 
 }
 
-// REAL PAYSTACK WITH YOUR KEY
 function depositWithPaystack(){ 
   const user = JSON.parse(localStorage.getItem('brix_current_user')||'{"email":"user@brixtrade.com"}');
   let a=prompt('Deposit amount USD min $1 (Paystack will charge KES):','10'); 
@@ -69,14 +81,13 @@ function depositWithPaystack(){
   a=parseFloat(a); 
   if(a<1){alert('Min $1');return;} 
   
-  // USD to KES rate ~130
   let kesAmount = Math.round(a * 130);
 
   if(typeof PaystackPop !== 'undefined'){ 
     let h=PaystackPop.setup({
-      key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2', // YOUR REAL TEST KEY
+      key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
       email: user.email || 'user@brixtrade.com',
-      amount: kesAmount * 100, // Paystack uses kobo
+      amount: kesAmount * 100,
       currency:'KES',
       channels: ['card','mobile_money','bank'],
       ref: 'BRIX-'+Date.now(),
@@ -89,13 +100,16 @@ function depositWithPaystack(){
     }); 
     h.openIframe(); 
   } else { 
-    balance+=a; save(); alert(`[TEST MODE - Paystack script not loaded] Deposited $${a}`); 
+    balance+=a; 
+    save(); 
+    alert(`[TEST MODE - Paystack script not loaded] Deposited $${a}`); 
   } 
 }
 
 function withdraw(){ 
   let a=prompt(`Withdraw Balance $${balance.toFixed(2)}:`, '5'); 
-  if(!a) return; a=parseFloat(a); 
+  if(!a) return; 
+  a=parseFloat(a); 
   if(a>balance){alert('Insufficient');return;} 
   balance-=a; save(); 
   alert(`Withdrawal $${a} sent to M-Pesa. Check phone.`); 
@@ -105,12 +119,11 @@ function subscribe(){
   if(localStorage.getItem('brix_vip')==='true'){alert('Already VIP');return;} 
   if(!confirm('Unlock Sniper VIP $10/mo via Paystack?')) return; 
   
-  // Pay VIP via Paystack too
   const user = JSON.parse(localStorage.getItem('brix_current_user')||'{"email":"user@brixtrade.com"}');
   let h=PaystackPop.setup({
     key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
     email: user.email || 'user@brixtrade.com',
-    amount: 1300 * 100, // $10 = 1300 KES
+    amount: 1300 * 100,
     currency:'KES',
     ref: 'BRIX-VIP-'+Date.now(),
     callback:function(r){
