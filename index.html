@@ -4,92 +4,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Brixtrade - Trade Currencies & Metals</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#eaf0f5;--pn:#fff;--ink:#12202c;--mut:#5d6f7f;--ln:#d5dee6;--up:#0f8f66;--dn:#cf4338;--ac:#b8841c;--acbg:#fbf1d8;--brix:#ffae00;--dark:#0d1620}
+:root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",Roboto,sans-serif}
+body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.6 Inter,sans-serif;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
-.nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
-.logo{font:800 22px Georgia,serif}.logo span{color:var(--brix)}
+.nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(15,21,32,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln)}
+.logo{font:800 22px Sora,serif;letter-spacing:.1em}.logo span{color:var(--ac)}
 .nav-links{display:flex;gap:14px;align-items:center}
-.nav-links a.nav-about{font-weight:700;font-size:14px;padding:8px 12px;border-radius:8px}
-.nav-links a.nav-about:hover{background:var(--bg)}
-.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--ln);background:var(--pn);cursor:pointer;font-weight:600}
-.btn-brix{background:var(--brix);border-color:var(--brix);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;cursor:pointer}
+.nav-links a.nav-about{font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;color:var(--mut)} .nav-links a.nav-about:hover{background:var(--acbg);color:var(--ac)}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--ln);background:var(--pn2);cursor:pointer;font-weight:600;color:var(--ink);transition:.15s}
+.btn:hover{border-color:var(--ac);background:var(--acbg)}
+.btn-brix{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#fff;font-weight:800;padding:10px 22px;border-radius:8px;cursor:pointer;box-shadow:0 6px 18px rgba(99,102,241,.35)} .btn-brix:hover{filter:brightness(1.1)}
 .hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:32px;align-items:center;max-width:1200px;margin:0 auto;padding:60px 24px}
-.hero h1{font:800 48px/1.1 Georgia,serif;margin-bottom:16px}.hero h1 span{color:var(--brix)}
+.hero h1{font:800 48px/1.1 Sora,serif;margin-bottom:16px} .hero h1 span{color:var(--ac)}
 .hero p{color:var(--mut);font-size:18px;margin-bottom:24px}
-.card{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:20px}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:20px;box-shadow:var(--sh)}
 .bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.bot{border:2px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center}
-.bot.active{border-color:var(--brix);background:var(--acbg)}
-.about{max-width:1200px;margin:0 auto;padding:60px 24px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;margin-top:30px}
+.bot{border:1px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center;transition:.15s}
+.bot:hover{border-color:#34405a} .bot.active{border-color:var(--ac);background:var(--acbg)}
+.about{max-width:1200px;margin:0 auto;padding:40px 24px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;margin-top:30px}
 .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
-.about-box{background:var(--bg);border:1px solid var(--ln);padding:20px;border-radius:12px}
-.about-box h3{font-size:16px;margin-bottom:6px}
-.about-box p{color:var(--mut);font-size:14px}
+.about-box{background:var(--bg2);border:1px solid var(--ln);padding:20px;border-radius:12px}
+.about-box h3{font:600 15px Sora;margin-bottom:6px} .about-box p{color:var(--mut);font-size:13px}
 .socials{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
-.social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg);font-weight:700;font-size:13px}
+.social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg2);font-weight:700;font-size:13px}
+.social:hover{border-color:var(--ac);background:var(--acbg)}
 .pay-logos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-#authModal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;place-items:center;z-index:99}
+#authModal{position:fixed;inset:0;background:rgba(3,6,12,.75);display:none;place-items:center;z-index:99;backdrop-filter:blur(5px)}
 #authModal.on{display:grid}
-.authBox{background:var(--pn);padding:28px;border-radius:16px;width:min(380px,90vw);display:grid;gap:12px}
-.authBox input{padding:12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);width:100%}
-.tabs2{display:flex;border-bottom:1px solid var(--ln)}.tabs2 button{flex:1;padding:10px;border:0;background:none;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}.tabs2 button.on{color:var(--ink);border-color:var(--brix);font-weight:700}
-.brix-footer{background:#111618;color:#aab7c1;padding:40px 24px 30px;font:14px/1.6 "Segoe UI",sans-serif;margin-top:50px}
+.authBox{background:var(--pn);border:1px solid var(--ln);padding:28px;border-radius:18px;width:min(420px,92vw);display:grid;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.6);max-height:90vh;overflow:auto}
+.authBox input{padding:12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2);width:100%;color:var(--ink)} .authBox input:focus{border-color:var(--ac);outline:none}
+.tabs2{display:flex;border-bottom:1px solid var(--ln)}.tabs2 button{flex:1;padding:10px;border:0;background:none;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent;font-weight:600}.tabs2 button.on{color:var(--ac);border-color:var(--ac);font-weight:700}
+.terms-box{height:130px;overflow-y:auto;border:1px solid var(--ln);padding:10px;border-radius:8px;background:var(--bg2);font-size:11px;line-height:1.6;color:var(--mut);margin:8px 0}
+.terms-check{display:flex;gap:10px;font-size:12px;color:var(--ink);cursor:pointer;margin:8px 0}
+.terms-check input{width:16px;height:16px;accent-color:var(--ac)}
+.brix-footer{background:#080c14;color:#8fa0ad;padding:40px 24px 30px;font:13px/1.6 Inter, sans-serif;margin-top:50px;border-top:1px solid var(--ln)}
 .brix-footer-wrap{max-width:1300px;margin:0 auto}
 .brix-footer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
-.brix-footer-logo{font:800 26px "Segoe UI",sans-serif;letter-spacing:-0.5px;color:#fff}
-.brix-footer-logo span{color:#00c2a8}
-.brix-footer-socials{display:flex;gap:18px}
-.brix-footer-socials a{color:#aab7c1;font-size:20px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%}
-.brix-footer-socials a:hover{color:#fff}
+.brix-footer-logo{font:800 26px Sora;letter-spacing:-0.5px;color:#fff} .brix-footer-logo span{color:var(--ac)}
+.brix-footer-socials{display:flex;gap:18px} .brix-footer-socials a{color:#8fa0ad;font-size:18px} .brix-footer-socials a:hover{color:#fff}
 .brix-footer-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px}
-.brix-footer-col h4{color:#e6eef3;font-size:13px;font-weight:700;margin-bottom:14px;border-bottom:1px solid #1e2a31;padding-bottom:8px}
-.brix-footer-col a{display:block;color:#8fa0ad;font-size:13px;margin-bottom:8px;text-decoration:underline;text-underline-offset:2px}
-.brix-footer-col a:hover{color:#fff}
-.brix-footer-col.sup-item{display:flex;gap:8px;margin-bottom:14px;font-size:12.5px}
-.brix-footer-col.sup-item b{color:#cbd8e0;font-weight:600;text-decoration:underline;display:block}
-.brix-footer-col.sup-item span{color:#7a8c98;font-size:11.5px}
-.brix-footer-bottom{margin-top:50px;border-top:1px solid #1a262d;padding-top:24px}
-.brix-footer-bottom b{color:#e6eef3;font-size:12px}
-.brix-footer-bottom a{color:#8fa0ad;font-size:13px;display:flex;align-items:center;gap:6px;margin-top:8px}
-@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}.brix-footer-grid.sup{grid-column:span 2}.hero h1{font-size:36px}}
-@media(max-width:500px){.brix-footer-grid{grid-template-columns:1fr}}
-/* TERMS MODAL - TINY LEGIT */
-#termsModal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:none;align-items:center;justify-content:center;padding:15px}
-#termsModal.on{display:flex}
+.brix-footer-col h4{color:var(--ink);font-size:12px;font-weight:700;margin-bottom:14px;border-bottom:1px solid var(--ln);padding-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.brix-footer-col a{display:block;color:var(--mut);font-size:12px;margin-bottom:8px;text-decoration:underline;text-underline-offset:2px} .brix-footer-col a:hover{color:#fff}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:36px}}
 </style>
 </head>
 <body>
-
-<!-- TERMS MODAL - SHOWS BEFORE LOGIN -->
-<div id="termsModal">
-  <div style="background:#0d1620;border:1px solid #1e2a31;border-radius:12px;max-width:460px;max-height:82vh;overflow-y:auto;padding:20px;color:#fff;font-family:Arial;">
-    <h2 style="color:#ffae00;margin:0 0 10px;font-size:18px;">BRIXTRADE Terms</h2>
-    <div style="font-size:11.5px;line-height:1.6;color:#aab7c1;height:260px;overflow-y:auto;border:1px solid #1e2a31;padding:10px;border-radius:8px;background:#111618;">
-      <p><b>1. Acceptance:</b> By using BRIXTRADE you agree to these Terms.</p>
-      <p><b>2. BRIXTRADE is simulated educational platform for entertainment.</b> Not a licensed broker, bank or CMA regulated entity. Charts/bots (Scalper, Trend, Sniper) are for trading purposes only.</p>
-      <p><b>3. Outcome Management:</b> Platform uses algorithmic outcome management for sustainability and learning variance. Past performance not guarantee.</p>
-      <p><b>4. Credits:</b> Deposits via Paystack/M-Pesa are platform credits. Credits have no real value except per withdrawal policy.</p>
-      <p><b>5. Risk:</b> You may lose credits. $15 daily profit limit & stake limits apply for risk management. 18+ only. Play responsibly.</p>
-      <p><b>6. VIP $10/month non-refundable.</b> One account per user. Fraud/chargeback = ban + forfeiture.</p>
-      <p><b>7. Liability:</b> BRIXTRADE not liable for losses. May suspend service anytime. Nairobi, KE. support@brixtrade.co.ke</p>
-    </div>
-    <label style="display:flex;gap:10px;margin:14px 0;font-size:12px;cursor:pointer;color:#cbd8e0;">
-      <input type="checkbox" id="agreeCheck" style="width:16px;height:16px;margin-top:2px;">
-      <span>I am 18+, I understand BRIXTRADE is a broker, and I agree to Terms.</span>
-    </label>
-    <button id="agreeBtn" disabled style="width:100%;padding:12px;background:#333;color:#666;border:none;border-radius:8px;font-weight:800;cursor:not-allowed;">Agree & Continue</button>
-    <p style="font-size:9px;text-align:center;color:#555;margin-top:8px;">©2026 BRIXTRADE - edu-simulation</p>
-  </div>
-</div>
 
 <div class="nav">
   <div class="logo">BRIX<span>TRADE</span></div>
   <div class="nav-links">
     <a href="#about" class="nav-about">About Us</a>
-    <span id="userName" style="font-weight:700;display:none"></span>
+    <span id="userName" style="font-weight:700;display:none;font-family:JetBrains Mono"></span>
     <button class="btn" id="loginBtn" onclick="openAuth()">Log in</button>
     <button class="btn-brix" onclick="openAuth('register')">Get Started</button>
     <button class="btn" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
@@ -98,38 +66,38 @@ a{text-decoration:none;color:inherit}
 
 <div class="hero">
   <div>
-    <div style="display:inline-block;background:var(--acbg);border:1px solid var(--ac);padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:12px">● LIVE MARKET</div>
+    <div style="display:inline-block;background:var(--acbg);border:1px solid var(--ac);color:var(--ac);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px;letter-spacing:.06em">● LIVE MARKET • STP</div>
     <h1>Trade Currencies & <span>Metals</span> Like a Pro</h1>
-    <p>25 assets: EUR, GBP, JPY, KES, XAU Gold, XAG Silver, Platinum & more.</p>
+    <p>25 assets: EUR, GBP, JPY, KES, XAU Gold, XAG Silver, Platinum & more. Simulated pricing, 80% payout.</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <button class="btn-brix" style="font-size:18px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
+      <button class="btn-brix" style="font-size:16px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
     </div>
   </div>
-  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b>XAU/USD Gold</b><b style="color:var(--up)">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg);border:1px solid var(--ln);border-radius:8px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);font-family:JetBrains Mono">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg2);border:1px solid var(--ln);border-radius:10px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
 </div>
 
 <div class="bots" id="bots">
-  <div class="bot"><h3>⚡ Scalper</h3><p>30s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
-  <div class="bot"><h3>📈 Trend</h3><p>60s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
-  <div class="bot active"><h3>🎯 Sniper VIP</h3><p>$10/mo</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
+  <div class="bot"><h3 style="font-family:Sora">⚡ Scalper</h3><p>30s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
+  <div class="bot"><h3 style="font-family:Sora">📈 Trend</h3><p>60s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
+  <div class="bot active"><h3 style="font-family:Sora">🎯 Sniper VIP</h3><p>$10/mo</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
 </div>
 
 <section class="about" id="about">
-  <p style="color:var(--brix);font-size:12px;font-weight:800;letter-spacing:1px">MEET BRIXTRADE</p>
-  <h2 style="font:800 32px Georgia,serif;margin-top:6px">Why choose BRIXTRADE?</h2>
+  <p style="color:var(--ac);font-size:11px;font-weight:800;letter-spacing:1px">MEET BRIXTRADE</p>
+  <h2 style="font:800 32px Sora;margin-top:6px">Why choose BRIXTRADE?</h2>
   <p style="color:var(--mut);margin-top:8px;max-width:700px">We exist to make online trading simple for every Kenyan. From Nairobi to Mombasa, BRIXTRADE gives you fast M-Pesa, clean charts and a local team that actually answers.</p>
   <div class="about-grid">
-    <div class="about-box"><h3>👥 People-first trading</h3><p>Our local support team helps Kenyan traders daily via WhatsApp. We speak your language and solve problems fast.</p></div>
-    <div class="about-box"><h3>💻 Tech obsessed</h3><p>Our trading technology makes financial markets simple to use on phone or PC. Fast execution, zero lag, works on low data.</p></div>
-    <div class="about-box"><h3>⚡ Instant M-Pesa</h3><p>Deposit and withdraw via M-Pesa & Airtel Money in seconds. No bank delays, available 24/7.</p></div>
-    <div class="about-box"><h3>📦 Products for days</h3><p>Trade 100+ markets: Forex, Gold, Silver, Indices, Crypto from one app. One balance for everything.</p></div>
-    <div class="about-box"><h3>🤝 Community builders</h3><p>Join 10,000+ Kenyans in BRIXTRADE Telegram & WhatsApp for free signals, live sessions and weekly breakdowns.</p></div>
-    <div class="about-box"><h3>🎓 Free education</h3><p>We offer daily free lessons, beginner guides and demo account with KES 10,000. No experience needed.</p></div>
+    <div class="about-box"><h3>👥 People-first trading</h3><p>Our local support team helps Kenyan traders daily via WhatsApp.</p></div>
+    <div class="about-box"><h3>💻 Tech obsessed</h3><p>Fast execution, zero lag, works on low data phone or PC.</p></div>
+    <div class="about-box"><h3>⚡ Instant M-Pesa</h3><p>Deposit and withdraw via M-Pesa & Airtel Money in seconds.</p></div>
+    <div class="about-box"><h3>📦 Products for days</h3><p>Trade 100+ markets: Forex, Gold, Silver, Indices, Crypto.</p></div>
+    <div class="about-box"><h3>🤝 Community builders</h3><p>Join 10,000+ Kenyans in BRIXTRADE Telegram & WhatsApp.</p></div>
+    <div class="about-box"><h3>🎓 Free education</h3><p>Daily free lessons, beginner guides and demo KES 10,000.</p></div>
   </div>
   <div style="margin-top:50px">
-    <p style="color:var(--brix);font-size:12px;font-weight:800;letter-spacing:1px">FOLLOW US</p>
-    <h3 style="font:700 22px Georgia,serif;margin-top:4px">Fresh off the press</h3>
-    <p style="color:var(--mut);font-size:14px">Follow BRIXTRADE for latest news, bonuses and market signals.</p>
+    <p style="color:var(--ac);font-size:11px;font-weight:800;letter-spacing:1px">FOLLOW US</p>
+    <h3 style="font:700 22px Sora;margin-top:4px">Fresh off the press</h3>
+    <p style="color:var(--mut);font-size:13px">Follow BRIXTRADE for latest news, bonuses and market signals.</p>
     <div class="socials">
       <a class="social" href="#">f<br><span style="color:var(--mut)">Facebook</span></a>
       <a class="social" href="#">𝕏<br><span style="color:var(--mut)">X / Twitter</span></a>
@@ -139,136 +107,109 @@ a{text-decoration:none;color:inherit}
       <a class="social" href="#">WA<br><span style="color:var(--mut)">WhatsApp</span></a>
     </div>
   </div>
-  <div style="margin-top:50px;background:var(--bg);border:1px solid var(--ln);padding:36px;border-radius:16px;text-align:center">
-    <p style="color:var(--brix);font-size:12px;font-weight:800">SIMPLE TRADING FOR KENYA</p>
-    <h2 style="font:800 28px Georgia,serif;margin-top:6px">Start trading online with BRIXTRADE</h2>
+  <div style="margin-top:50px;background:var(--bg2);border:1px solid var(--ln);padding:36px;border-radius:16px;text-align:center">
+    <p style="color:var(--ac);font-size:11px;font-weight:800">SIMPLE TRADING FOR KENYA</p>
+    <h2 style="font:800 28px Sora;margin-top:6px">Start trading online with BRIXTRADE</h2>
     <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
       <button class="btn-brix" style="padding:14px 28px;font-size:16px" onclick="handleStart()">START TRADING</button>
       <button class="btn" style="padding:14px 28px;font-size:16px" onclick="handleStart()">Demo</button>
     </div>
     <div class="pay-logos">
-      <span style="background:#00a651;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px">M-PESA</span>
-      <span style="background:#e90000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px">Airtel Money</span>
-      <span style="background:#fff;border:1px solid #1a1f71;color:#1a1f71;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px;font-style:italic">VISA</span>
-      <span style="background:#000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:14px"><span style="color:#eb001b">●</span><span style="color:#f79e1b">●</span> Mastercard</span>
+      <span style="background:#00a651;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px">M-PESA</span>
+      <span style="background:#e90000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px">Airtel Money</span>
+      <span style="background:#fff;border:1px solid #1a1f71;color:#1a1f71;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px;font-style:italic">VISA</span>
+      <span style="background:#000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px"><span style="color:#eb001b">●</span><span style="color:#f79e1b">●</span> Mastercard</span>
     </div>
   </div>
 </section>
 
-<!-- TINY LEGIT FOOTER LINE - 8px invisible but covers you -->
-<p style="font-size:8px;color:#333;text-align:center;opacity:0.6;padding:12px 10px 0;margin:0;">
-  BRIXTRADE edu-simulation for entertainment, not licensed broker. 18+ Play responsibly. <a href="terms.html" style="color:#333;text-decoration:underline;">Terms</a> | Risk | Privacy | support@brixtrade.co.ke
+<p style="font-size:8px;color:#334;text-align:center;opacity:0.6;padding:12px 10px 0;margin:0;">
+  BRIXTRADE edu-simulation for entertainment, not licensed broker. 18+ Play responsibly. Terms | Risk | Privacy | support@brixtrade.co.ke
 </p>
 
 <footer class="brix-footer">
   <div class="brix-footer-wrap">
     <div class="brix-footer-top">
       <div class="brix-footer-logo">BRIX<span>TRADE</span></div>
-      <div class="brix-footer-socials">
-        <a href="#">f</a><a href="#">𝕏</a><a href="#">◉</a><a href="#">in</a><a href="#">♫</a>
-      </div>
+      <div class="brix-footer-socials"><a href="#">f</a><a href="#">𝕏</a><a href="#">◉</a><a href="#">in</a><a href="#">♫</a></div>
     </div>
     <div class="brix-footer-grid">
-      <div class="brix-footer-col"><h4>Products</h4><a href="#">Forex</a><a href="#">Indices</a><a href="#">Commodities</a><a href="#">Shares</a><a href="#">ETFs</a><a href="#">All products</a></div>
-      <div class="brix-footer-col"><h4>Platforms</h4><a href="#">MetaTrader 4</a><a href="#">MetaTrader 5</a><a href="#">BrixTrader App</a><a href="#">All platforms</a></div>
+      <div class="brix-footer-col"><h4>Products</h4><a href="#">Forex</a><a href="#">Indices</a><a href="#">Commodities</a><a href="#">Shares</a><a href="#">ETFs</a></div>
+      <div class="brix-footer-col"><h4>Platforms</h4><a href="#">MetaTrader 4</a><a href="#">MetaTrader 5</a><a href="#">BrixTrader App</a></div>
       <div class="brix-footer-col"><h4>Accounts</h4><a href="#">Copy trading</a><a href="#">Demo</a><a href="#">All accounts</a></div>
       <div class="brix-footer-col"><h4>Partnerships</h4><a href="#">Partner with us</a><a href="#">Refer a friend</a></div>
       <div class="brix-footer-col"><h4>About BRIXTRADE</h4><a href="#">About us</a><a href="#">Careers</a><a href="#">Media releases</a></div>
-      <div class="brix-footer-col sup"><h4>Support</h4>
-        <div class="sup-item"><span>📞</span><div><b>Phone (Toll-Free Kenya)</b><span>0800-211-185</span></div></div>
-        <div class="sup-item"><span>📞</span><div><b>WhatsApp</b><span>+254-102-252-424</span></div></div>
-        <div class="sup-item"><span>📞</span><div><b>Phone (International)</b><span></span></div></div>
-        <div class="sup-item"><span>@</span><div><b>Email</b></div></div>
-        <div class="sup-item"><span>📍</span><div><b>,</b><b>,</b><b>,</b><b>Westlands</b></div></div>
-        <div class="sup-item"><span>?</span><div><b>FAQs</b></div></div>
-      </div>
+      <div class="brix-footer-col"><h4>Support</h4><a>Phone Kenya 0800-211-185</a><a>WhatsApp +254-102-252-424</a><a>Email</a><a>Westlands</a><a>FAQs</a></div>
     </div>
-    <div class="brix-footer-bottom"><b>Region & language</b><a href="#">🌐 Change country</a></div>
+    <div style="margin-top:40px;border-top:1px solid #1a262d;padding-top:20px"><b style="color:#e6eef3;font-size:11px">Region & language</b><a style="color:var(--mut);display:flex;gap:6px;margin-top:8px;font-size:12px">🌐 Change country</a></div>
   </div>
 </footer>
 
 <div id="authModal"><div class="authBox">
   <div class="tabs2"><button id="tabLogin" class="on" onclick="switchTab('login')">Log in</button><button id="tabReg" onclick="switchTab('register')">Create Account</button></div>
-  <div id="loginForm">
+  <div id="loginForm" style="display:grid;gap:10px">
     <input id="lEmail" placeholder="Email">
     <input id="lPass" type="password" placeholder="Password">
     <button class="btn-brix" style="width:100%;margin-top:8px" onclick="login()">Log in</button>
   </div>
-  <div id="regForm" style="display:none">
+  <div id="regForm" style="display:none;gap:10px">
     <input id="rName" placeholder="Full Name">
     <input id="rEmail" placeholder="Email">
     <input id="rPass" type="password" placeholder="Password (min 6)">
-    <button class="btn-brix" style="width:100%;margin-top:8px" onclick="register()">Create Account</button>
+    
+    <!-- TERMS INSIDE CREATE ACCOUNT -->
+    <div style="margin-top:6px">
+      <p style="font:700 11px Sora;color:var(--ac);letter-spacing:.06em;margin-bottom:6px">TERMS & CONDITIONS</p>
+      <div class="terms-box">
+        <p><b>1. Acceptance:</b> By creating account you agree to Terms.</p><br>
+        <p><b>2. BRIXTRADE is simulated educational platform.</b> Not licensed broker/bank. Charts/bots (Scalper, Trend, Sniper) are for simulation only.</p><br>
+        <p><b>3. Outcome Management:</b> Platform uses algorithmic outcome management for sustainability. Past performance not guarantee.</p><br>
+        <p><b>4. Credits:</b> Deposits via Paystack/M-Pesa are platform credits. No real value except per withdrawal policy.</p><br>
+        <p><b>5. Risk:</b> You may lose credits. $15 daily profit limit & stake limits apply. 18+ only. Play responsibly.</p><br>
+        <p><b>6. VIP $10/mo non-refundable.</b> One account per user. Fraud/chargeback = ban.</p><br>
+        <p><b>7. Liability:</b> BRIXTRADE not liable for losses. May suspend anytime. Nairobi KE. support@brixtrade.co.ke</p>
+      </div>
+      <label class="terms-check">
+        <input type="checkbox" id="agreeCheck">
+        <span>I am 18+, I understand BRIXTRADE is simulated educational platform, and I agree to Terms & Risk.</span>
+      </label>
+    </div>
+
+    <button class="btn-brix" style="width:100%;margin-top:4px" onclick="register()">Create Account</button>
   </div>
   <button class="btn" style="width:100%" onclick="closeAuth()">Cancel</button>
 </div></div>
 
 <script>
 let currentTab='login';
-const termsModal=document.getElementById('termsModal');
-const agreeCheck=document.getElementById('agreeCheck');
-const agreeBtn=document.getElementById('agreeBtn');
-
-// Show terms if not agreed
-function checkTerms(){
-  if(localStorage.getItem('brix_terms_agreed')!=='true'){
-    termsModal.classList.add('on');
-    return false;
-  }
-  return true;
-}
-// On load, check once
-if(localStorage.getItem('brix_terms_agreed')!=='true'){
-  // auto show after 1 sec for better UX
-  setTimeout(()=>termsModal.classList.add('on'),800);
-}
-
-agreeCheck?.addEventListener('change',()=>{
-  if(agreeCheck.checked){
-    agreeBtn.disabled=false;
-    agreeBtn.style.background='#ffae00';
-    agreeBtn.style.color='#000';
-    agreeBtn.style.cursor='pointer';
-  } else {
-    agreeBtn.disabled=true;
-    agreeBtn.style.background='#333';
-    agreeBtn.style.color='#666';
-    agreeBtn.style.cursor='not-allowed';
-  }
-});
-agreeBtn?.addEventListener('click',()=>{
-  if(!agreeCheck.checked) return;
-  localStorage.setItem('brix_terms_agreed','true');
-  termsModal.classList.remove('on');
-});
 
 function openAuth(tab='login'){
-  if(!checkTerms()) return;
   currentTab=tab;switchTab(tab);document.getElementById('authModal').classList.add('on');
 }
 function closeAuth(){document.getElementById('authModal').classList.remove('on');}
 function switchTab(t){currentTab=t;document.getElementById('tabLogin').classList.toggle('on',t==='login');document.getElementById('tabReg').classList.toggle('on',t==='register');document.getElementById('loginForm').style.display=t==='login'?'grid':'none';document.getElementById('regForm').style.display=t==='register'?'grid':'none';}
 function register(){
-  if(!checkTerms()) return;
   const name=document.getElementById('rName').value.trim();
   const email=document.getElementById('rEmail').value.trim().toLowerCase();
   const pass=document.getElementById('rPass').value;
+  const agree=document.getElementById('agreeCheck').checked;
   if(!name||!email||pass.length<6){alert('Fill all, password min 6');return;}
+  if(!agree){alert('You must agree to Terms & Conditions to create account');return;}
   let users=JSON.parse(localStorage.getItem('brix_users')||'[]');
   if(users.find(u=>u.email===email)){alert('Account exists, log in');switchTab('login');return;}
   users.push({name,email,pass}); localStorage.setItem('brix_users',JSON.stringify(users));
   localStorage.setItem('brix_current_user',JSON.stringify({name,email}));
+  localStorage.setItem('brix_terms_agreed','true');
   alert('Account created! Welcome '+name); closeAuth(); updateNav();
 }
 function login(){
-  if(!checkTerms()) return;
   const email=document.getElementById('lEmail').value.trim().toLowerCase();
   const pass=document.getElementById('lPass').value;
   let users=JSON.parse(localStorage.getItem('brix_users')||'[]');
   const u=users.find(u=>u.email===email && u.pass===pass);
   if(!u){alert('Wrong email or password');return;}
   localStorage.setItem('brix_current_user',JSON.stringify({name:u.name,email:u.email}));
-  closeAuth(); updateNav(); alert('Welcome back '+u.name);
+  closeAuth(); updateNav();
 }
 function logout(){localStorage.removeItem('brix_current_user');updateNav();}
 function updateNav(){
@@ -277,14 +218,13 @@ function updateNav(){
   if(cur){ln.style.display='none';lo.style.display='inline-block';un.style.display='inline-block';un.innerText='Hi, '+cur.name.split(' ')[0];} else {ln.style.display='inline-block';lo.style.display='none';un.style.display='none';}
 }
 function handleStart(){
-  if(!checkTerms()) return;
   const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');
   if(!cur){openAuth('register'); return;}
   location.href='trade.html';
 }
 updateNav();
 document.getElementById('authModal').onclick=e=>{if(e.target.id==='authModal')closeAuth();}
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:'smooth'});});});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t) t.scrollIntoView({behavior:'smooth'});});});
 </script>
 </body>
 </html>
