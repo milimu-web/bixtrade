@@ -187,7 +187,7 @@ function startTrade(dir){
   if(exitPrice===entryPrice){say("PUSH - stake returned");showPopup("deposit","Push"+tag,"↔️",`Price did not move.\nStake returned.\nBalance: $${getCurrentBalance().toFixed(2)}`);return}
   const wentUp=exitPrice>entryPrice,guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
   let win;
-  if(isDemo){ win=guessedRight; } // demo favoured 100/100 guarantee
+  if(isDemo){ win=guessedRight; } // demo favoured 90/10 guarantee
   else {
     let history=getForcedTradeHistory();if(history.length>=10)history=[];
     let winsInHistory=history.filter(v=>v===1).length;
