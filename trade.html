@@ -103,14 +103,14 @@ input:focus,select:focus{border-color:var(--ac);outline:none}
 <div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • 120s preset</p></div>
 </div>
 <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">Prices are simulated. A trade wins only if the simulated price moves in your direction before the timer ends; a win pays 80% of the stake and a loss costs the stake. Trading carries risk. 18+ only. Rate: $1 = KES 130</p>
+<p class="disclaimer">Prices are simulated. A trade wins only if the simulated price moves in your direction before the timer ends; a win pays 70% of the stake and a loss costs the stake. Trading carries risk. 18+ only. Rate: $1 = KES 130</p>
 </section>
 <aside class="pn" style="padding:16px"><h3 style="margin:0 0 12px 0;font-size:15px;font-family:Sora">Trade Assistant</h3><div id="msgs"></div></aside>
 </main>
 <script>
 const PAYSTACK_KEY="pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2";
 let demoBalance=0,isDemo=false,demoBalanceFake=1000,tradeTimer=null,wins=0,trades=0,entryPrice=0,dailyProfitAmount=0,demoDailyProfit=0,lastProfitReset=new Date().toDateString(),activeBot="scalper";
-const USD_TO_KES=130,PAYOUT=0.8,$=id=>document.getElementById(id);
+const USD_TO_KES=130,PAYOUT=0.7,$=id=>document.getElementById(id);
 const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a])),rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
 function step(a){a.p*=Math.exp(a.v*rn()-.0005*Math.log(a.p/a.p0));const c=a.s[a.s.length-1];c.c=a.p;c.h=Math.max(c.h,a.p);c.l=Math.min(c.l,a.p)}

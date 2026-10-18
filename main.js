@@ -7,9 +7,9 @@ let isTrading = false;
 
 // MATCHED TO trade.html - 10K SAFE 40% = 4 WIN / 6 LOSS per 10
 const bots = { 
-  scalper: { winRate: 0.80, time: 30 }, 
-  trend: { winRate: 0.80, time: 60 }, 
-  sniper: { winRate: 0.80, time: 120, vip: true } 
+  scalper: { winRate: 0.70, time: 30 }, 
+  trend: { winRate: 0.70, time: 60 }, 
+  sniper: { winRate: 0.70, time: 120, vip: true } 
 };
 
 function save(){ 
@@ -79,7 +79,7 @@ function finishTrade(stake,dir){
   if(history.length===10){ setTimeout(()=>saveForcedTradeHistory([]),100); }
 
   if(win){ 
-    let p=stake*0.8; balance+=stake+p; dailyProfit+=p; wins++; 
+    let p=stake*0.7; balance+=stake+p; dailyProfit+=p; wins++; 
     alert(`WIN! +$${p.toFixed(2)} ${dir}`); 
   } else { 
     alert(`LOSS! -$${stake.toFixed(2)} ${dir}`); 
