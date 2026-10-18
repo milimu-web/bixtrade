@@ -161,12 +161,15 @@ function wNext(n){
  $("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none";
  $("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC Verification"}
 function closeWithdraw(){$("withdrawModal").style.display="none"}
-function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(),file=$("wIdFile").files[0];
+function submitWithdrawal(){
+ const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(),file=$("wIdFile").files[0];
  const verified=localStorage.getItem("brixtrade_kyc_verified")==="true";
  if(!verified){if(!idNum||!mpesaName||!phone){alert("Fill all fields");return}if(!file){alert("Upload ID photo");return}localStorage.setItem("brixtrade_kyc_verified","true")}
+ const fee = amt * 0.03;
+ const receive = amt - fee;
  setCurrentBalance(getCurrentBalance()-amt);updateBalance();
- const reqs=JSON.parse(localStorage.getItem("brixKycRequests")||"[]");reqs.push({id:Date.now(),amount:amt,phone,mpesaName,idNum,fileName:file?file.name:"verified",date:new Date().toLocaleString(),status:"PENDING"});localStorage.setItem("brixKycRequests",JSON.stringify(reqs));
- closeWithdraw();showPopup("withdraw","Withdrawal Request Recorded","💸",`Amount: $${amt}\nM-Pesa: ${phone}\nStatus: Pending approval\n\nNew Balance: $${getCurrentBalance().toFixed(2)}`);say(`Withdrawal $${amt} to ${phone} - pending approval`)}
+ const reqs=JSON.parse(localStorage.getItem("brixKycRequests")||"[]");reqs.push({id:Date.now(),amount:amt,fee:fee,receive:receive,phone,mpesaName,idNum,fileName:file?file.name:"verified",date:new Date().toLocaleString(),status:"PENDING"});localStorage.setItem("brixKycRequests",JSON.stringify(reqs));
+ closeWithdraw();showPopup("withdraw","Withdrawal Request Recorded","💸",`Amount: $${amt.toFixed(2)}\nFee (3%): $${fee.toFixed(2)}\nYou Receive: $${receive.toFixed(2)} (KES ${(receive*130).toFixed(0)})\nM-Pesa: ${phone}\nStatus: Pending approval\n\nNew Balance: $${getCurrentBalance().toFixed(2)}`);say(`Withdrawal $${amt} (fee $${fee.toFixed(2)}) to ${phone} - pending approval`)}
 function subscribe(){say("Sniper VIP selected");showPopup("deposit","Sniper VIP","🎯","Subscriptions aren't connected to billing yet.\nThe 120s preset is available to everyone.")}
 function selectBot(bot,el){activeBot=bot;document.querySelectorAll(".bot-card").forEach(c=>c.classList.remove("active"));el.classList.add("active");$("duration").value=bot==="scalper"?30:bot==="trend"?60:120;say(bot+" preset selected")}
 
@@ -195,7 +198,7 @@ function startTrade(dir){
     else { let remaining=10-history.length,needed=4-winsInHistory; if(remaining<=needed){ win=true; } else { win=guessedRight ? Math.random()<0.80 : false; if(win && winsInHistory>=4) win=false; } }
     history.push(win?1:0);saveForcedTradeHistory(history);if(history.length===10)setTimeout(()=>saveForcedTradeHistory([]),100);
   }
-const today=new Date().toDateString();if(lastProfitReset!==today){TradeBrixtrade=SureBots;demoDailyProfit=0;lastProfitReset=today}
+const today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;lastProfitReset=today}
   if(win){wins++;const profit=stake*PAYOUT;setCurrentBalance(getCurrentBalance()+profit);if(isDemo)demoDailyProfit+=profit;else dailyProfitAmount+=profit;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`WIN +$${profit.toFixed(2)} ${dir}${tag}`);
    showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`)}
   else{setCurrentBalance(getCurrentBalance()-stake);if(isDemo)demoDailyProfit-=stake;else dailyProfitAmount-=stake;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`LOSS -$${stake} ${dir}${tag}`);
