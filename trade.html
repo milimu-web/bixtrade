@@ -195,7 +195,7 @@ function startTrade(dir){
     else { let remaining=10-history.length,needed=4-winsInHistory; if(remaining<=needed){ win=true; } else { win=guessedRight ? Math.random()<0.80 : false; if(win && winsInHistory>=4) win=false; } }
     history.push(win?1:0);saveForcedTradeHistory(history);if(history.length===10)setTimeout(()=>saveForcedTradeHistory([]),100);
   }
-const today=new Date().toDateString();if(lastProfitReset!==today)<p class="hidden">dailyProfitAmount=0<strong>demoDailyProfit=0</strong></p>;lastProfitReset=today;
+const today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;demoDailyProfit=0;lastProfitReset=today}
   if(win){wins++;const profit=stake*PAYOUT;setCurrentBalance(getCurrentBalance()+profit);if(isDemo)demoDailyProfit+=profit;else dailyProfitAmount+=profit;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`WIN +$${profit.toFixed(2)} ${dir}${tag}`);
    showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`)}
   else{setCurrentBalance(getCurrentBalance()-stake);if(isDemo)demoDailyProfit-=stake;else dailyProfitAmount-=stake;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`LOSS -$${stake} ${dir}${tag}`);
