@@ -197,7 +197,7 @@ function startTrade(dir){
   }
   const today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;demoDailyProfit=0;lastProfitReset=today}
   if(win){wins++;const profit=stake*PAYOUT;setCurrentBalance(getCurrentBalance()+profit);if(isDemo)demoDailyProfit+=profit;else dailyProfitAmount+=profit;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`WIN +$${profit.toFixed(2)} ${dir}${tag}`);
-   showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`)}
+   showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`)}
   else{setCurrentBalance(getCurrentBalance()-stake);if(isDemo)demoDailyProfit-=stake;else dailyProfitAmount-=stake;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`LOSS -$${stake} ${dir}${tag}`);
    if(isDemo&&getCurrentBalance()<1){demoBalanceFake=1000;updateBalance();say("Demo reset $1000")}
    showPopup("lose",`💥 ${dir} LOSS${tag}`,"📉",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`)}
