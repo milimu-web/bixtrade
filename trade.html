@@ -177,7 +177,7 @@ function startTrade(dir){
  if(tradeTimer){say("Trade running, wait");showPopup("lose","Trade Active","⏳","Wait for current trade to finish");return}
  const stake=parseFloat($("stake").value)||1;const bal=getCurrentBalance();
  if(bal<stake){if(isDemo){demoBalanceFake=1000;updateBalance();say("Demo reset to $1000")}else{say("Low balance - Deposit");showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`);return}}
- // Daily $15 limit check for real mode before trade
+ // Daily $15 limit check for real mode before trade-hidden from user in the screen, but enforced here
  if(!isDemo){let today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;lastProfitReset=today;setPnl(0)} if(dailyProfitAmount>=15){showPopup("lose","Daily Limit Reached","⏰",`You made $15 today!\nMax $15/day profit\nCome tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);say('Daily $15 limit reached');return;}}
  const duration=parseInt($("duration").value);entryPrice=M[sel].p;let left=duration;$("timer").textContent=left+"s";
  say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [DEMO]":""));
