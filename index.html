@@ -26,6 +26,7 @@ const db = firebase.firestore();
 :root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.6 Inter,sans-serif;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
 .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(15,21,32,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln)}
 .logo{font:800 22px Sora,serif;letter-spacing:.1em}.logo span{color:var(--ac)}
 .nav-links{display:flex;gap:14px;align-items:center}
@@ -38,69 +39,75 @@ body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),
 .hero p{color:var(--mut);font-size:18px;margin-bottom:24px}
 .card{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:20px;box-shadow:var(--sh)}
 .bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.bot{border:1px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center}
-.bot.active{border-color:var(--ac);background:var(--acbg)}
+.bot{border:1px solid var(--ln);border-radius:12px;padding:20px;background:var(--pn);text-align:center;transition:.15s}
+.bot:hover{border-color:#34405a} .bot.active{border-color:var(--ac);background:var(--acbg)}
 .about{max-width:1200px;margin:0 auto;padding:40px 24px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;margin-top:30px}
 .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
 .about-box{background:var(--bg2);border:1px solid var(--ln);padding:20px;border-radius:12px}
+.about-box h3{font:600 15px Sora;margin-bottom:6px} .about-box p{color:var(--mut);font-size:13px}
 .socials{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
 .social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg2);font-weight:700;font-size:13px}
+.social:hover{border-color:var(--ac);background:var(--acbg)}
 .pay-logos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
 
-/* PROFESSIONAL AUTH */
-#authModal{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;place-items:center;z-index:99;backdrop-filter:blur(8px)}
+/* YOUR FOOTER - KEPT 100% */
+.brix-footer{background:#080c14;color:#8fa0ad;padding:40px 24px 30px;font:13px/1.6 Inter, sans-serif;margin-top:50px;border-top:1px solid var(--ln)}
+.brix-footer-wrap{max-width:1300px;margin:0 auto}
+.brix-footer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.brix-footer-logo{font:800 26px Sora;letter-spacing:-0.5px;color:#fff} .brix-footer-logo span{color:var(--ac)}
+.brix-footer-socials{display:flex;gap:18px} .brix-footer-socials a{color:#8fa0ad;font-size:18px} .brix-footer-socials a:hover{color:#fff}
+.brix-footer-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px}
+.brix-footer-col h4{color:var(--ink);font-size:12px;font-weight:700;margin-bottom:14px;border-bottom:1px solid var(--ln);padding-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.brix-footer-col a{display:block;color:var(--mut);font-size:12px;margin-bottom:8px;text-decoration:underline;text-underline-offset:2px} .brix-footer-col a:hover{color:#fff}
+
+/* PROFESSIONAL LOGIN - MONEY PLATFORM STYLE */
+#authModal{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;place-items:center;z-index:99;backdrop-filter:blur(10px)}
 #authModal.on{display:grid}
-.authBox{background:#0f1520;border:1px solid #222d40;padding:0;border-radius:16px;width:min(440px,94vw);box-shadow:0 24px 80px rgba(0,0,0,.7);overflow:hidden;max-height:95vh;overflow-y:auto}
-.authHeader{padding:24px 28px 18px;background:linear-gradient(180deg,#121927,#0f1520);border-bottom:1px solid var(--ln);text-align:center}
-.authHeader .logo{font-size:20px}
-.authHeader p{color:var(--mut);font-size:12px;margin-top:6px;display:flex;gap:6px;justify-content:center;align-items:center}
-.authBody{padding:22px 26px;display:grid;gap:14px}
-.tabs2{display:flex;background:var(--bg2);border-radius:10px;padding:4px;border:1px solid var(--ln)}
-.tabs2 button{flex:1;padding:10px;border:0;background:none;cursor:pointer;color:var(--mut);border-radius:8px;font-weight:600;transition:.15s}
-.tabs2 button.on{background:var(--pn);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.2);border:1px solid var(--ln)}
-.btn-google{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;background:#fff;color:#111;display:flex;justify-content:center;align-items:center;gap:10px;font-weight:600;cursor:pointer;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.btn-google:hover{background:#f9fafb}
-.divider{display:flex;align-items:center;gap:12px;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.authBox{background:#0e1420;border:1px solid #232e45;border-radius:16px;width:min(440px,94vw);box-shadow:0 30px 90px rgba(0,0,0,.8);overflow:hidden;max-height:95vh;overflow-y:auto}
+.authHead{padding:18px 24px;background:linear-gradient(180deg,#141c2c 0%,#0e1420 100%);border-bottom:1px solid #232e45;display:flex;justify-content:space-between;align-items:center}
+.authHeadLeft{display:flex;gap:10px;align-items:center}
+.authShield{width:34px;height:34px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:9px;display:grid;place-items:center;font-size:16px}
+.authHead h3{font:700 13px Sora} .authHead p{font-size:11px;color:var(--up);font-weight:600;margin-top:1px}
+.authClose{width:26px;height:26px;border-radius:7px;border:1px solid var(--ln);background:var(--bg2);color:var(--mut);cursor:pointer}
+.authBody{padding:18px 22px;display:grid;gap:14px;background:var(--bg2)}
+.tabsPro{display:flex;background:#0a0e16;border:1px solid var(--ln);border-radius:10px;padding:3px}
+.tabsPro button{flex:1;padding:8px;border:0;background:transparent;color:var(--mut);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer}
+.tabsPro button.on{background:var(--pn2);color:var(--ink);border:1px solid var(--ln);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.btnGoogle{width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;background:#fff;color:#111;display:flex;justify-content:center;align-items:center;gap:8px;font-weight:600;font-size:13px;cursor:pointer}
+.divider{display:flex;align-items:center;gap:10px;color:#4b5a6e;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--ln)}
-.input-group{position:relative;display:grid;gap:6px}
-.input-group label{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
-.input-group input{padding:12px 14px 12px 40px;border:1px solid var(--ln);border-radius:10px;background:var(--bg2);width:100%;color:var(--ink);font-size:14px}
-.input-group input:focus{border-color:var(--ac);outline:none;background:var(--pn)}
-.input-icon{position:absolute;left:12px;bottom:13px;color:var(--mut);font-size:14px;pointer-events:none}
-.pass-wrap{position:relative}
-.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px;padding:4px}
-.strength-bar{height:4px;background:var(--ln);border-radius:2px;overflow:hidden;display:none;margin-top:6px}
-.strength-fill{height:100%;width:0%;transition:.3s}
-.strength-text{font-size:11px;margin-top:4px;display:none;font-weight:600}
-.pass-tips{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.5;background:var(--acbg);border:1px solid rgba(139,141,255,.15);padding:8px 10px;border-radius:8px;display:none}
-.link-forgot{color:var(--ac);font-size:12px;cursor:pointer;text-align:right;font-weight:600}
-.link-forgot:hover{text-decoration:underline}
-.terms-box{height:90px;overflow-y:auto;border:1px solid var(--ln);padding:10px;border-radius:8px;background:var(--bg2);font-size:11px;line-height:1.6;color:var(--mut)}
-.terms-check{display:flex;gap:10px;font-size:12px;color:var(--ink);cursor:pointer;margin:4px 0;line-height:1.4}
-.authFooter{padding:12px 26px 18px;border-top:1px solid var(--ln);background:var(--bg2);text-align:center;font-size:11px;color:var(--mut)}
-.authFooter span{color:var(--ac)}
+.fGroup{display:grid;gap:5px}
+.fGroup label{font-size:10px;font-weight:700;color:#9aa8bb;letter-spacing:.06em;text-transform:uppercase}
+.fInput{position:relative}
+.fInput input{width:100%;padding:11px 40px 11px 12px;border:1px solid #232e45;border-radius:10px;background:#0a0e16;color:var(--ink);font-size:13px;outline:none}
+.fInput input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(139,141,255,.15)}
+.fInput .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#5a6b82;cursor:pointer;font-size:15px;width:28px;height:28px}
+.fLink{font-size:11px;color:var(--ac);font-weight:600;cursor:pointer;text-align:right}
+.strength{height:4px;background:#0a0e16;border-radius:99px;overflow:hidden;display:none;border:1px solid var(--ln);margin-top:4px}
+.strength i{display:block;height:100%;width:0%;transition:.4s}
+.strText{font-size:11px;font-weight:600;display:none}
+.tips{font-size:11px;line-height:1.4;color:var(--mut);background:rgba(139,141,255,.08);border:1px solid rgba(139,141,255,.15);padding:7px 9px;border-radius:8px;display:none}
+.tBox{height:84px;overflow-y:auto;background:#0a0e16;border:1px solid #232e45;border-radius:8px;padding:9px;font-size:11px;line-height:1.6;color:var(--mut)}
+.check{display:flex;gap:8px;font-size:11px;line-height:1.4;cursor:pointer}
+.check input{width:14px;height:14px;accent-color:var(--ac);margin-top:2px}
+.fFooter{padding:10px 22px;background:#0a0e16;border-top:1px solid #232e45;display:flex;gap:8px;justify-content:center;font-size:10px;color:#4b5a6e}
+#authMsg{text-align:center;font-size:11px;font-weight:600;min-height:14px}
 
 /* PROFESSIONAL WELCOME POPUP */
-#welcomePopup{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(10px)}
+#welcomePopup{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(12px)}
 #welcomePopup.on{display:flex}
-.welcomeCard{background:#0f1520;border:1px solid #222d40;padding:0;border-radius:20px;text-align:center;width:400px;max-width:92%;box-shadow:0 32px 80px rgba(0,0,0,.7);overflow:hidden;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
-.welcomeTop{padding:28px 28px 20px;background:linear-gradient(180deg,#121927,#0f1520);border-bottom:1px solid var(--ln)}
-.welcomeIcon{width:64px;height:64px;background:linear-gradient(135deg,var(--ac),var(--ac2));border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;font-size:28px;color:#fff;box-shadow:0 8px 20px rgba(99,102,241,.35)}
-.welcomeCard h2{font:800 24px Sora;margin:0}
-.welcomeCard h2 span{color:var(--ac)}
-.welcomeBadge{display:inline-flex;gap:6px;align-items:center;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--up);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:10px}
-.welcomeBody{padding:20px 28px 26px;display:grid;gap:12px;text-align:left}
-.welcomeRow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px}
-.welcomeRow b{color:var(--mut);font-weight:500} .welcomeRow span{font-weight:700;color:var(--ink);font-family:JetBrains Mono}
-.welcomeBody p{color:var(--mut);font-size:13px;text-align:center;margin-top:4px}
-
-.brix-footer{background:#080c14;color:#8fa0ad;padding:40px 24px 30px;font:13px/1.6 Inter;margin-top:50px;border-top:1px solid var(--ln)}
-.brix-footer-wrap{max-width:1300px;margin:0 auto}
-.brix-footer-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px}
-.brix-footer-col h4{color:var(--ink);font-size:11px;font-weight:700;margin-bottom:12px;text-transform:uppercase}
-.brix-footer-col a{display:block;color:var(--mut);font-size:12px;margin-bottom:6px}
-@keyframes pop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
-@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}}
+.wCard{background:#0e1420;border:1px solid #232e45;border-radius:20px;width:410px;max-width:94vw;box-shadow:0 30px 100px rgba(0,0,0,.85);overflow:hidden;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
+.wTop{padding:24px 22px 16px;background:linear-gradient(180deg,#141c2c 0%,#0e1420 100%);text-align:center;border-bottom:1px solid #232e45;position:relative}
+.wTop::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ac),var(--ac2),#34d399)}
+.wIcon{width:68px;height:68px;margin:0 auto 12px;background:linear-gradient(135deg,#8b8dff,#6366f1);border-radius:50%;display:grid;place-items:center;font-size:30px;color:#fff;box-shadow:0 10px 24px rgba(99,102,241,.4)}
+.wTop h2{font:800 20px Sora} .wTop h2 span{color:var(--ac)}
+.wVerified{display:inline-flex;gap:6px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:var(--up);padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-top:8px}
+.wBody{padding:16px 20px;background:var(--bg2);display:grid;gap:10px}
+.wRow{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;background:#0a0e16;border:1px solid #1c2538;border-radius:9px;font-size:12px}
+.wRow b{font-weight:500;color:#7a8aa0;font-size:11px} .wRow span{font-weight:700;font-family:JetBrains Mono;color:var(--ink);font-size:12px}
+.wNote{text-align:center;font-size:11px;color:var(--mut);line-height:1.5}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:36px}}
 </style>
 </head>
 <body>
@@ -109,7 +116,7 @@ body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),
   <div class="logo">BRIX<span>TRADE</span></div>
   <div class="nav-links">
     <a href="#about" class="nav-about">About Us</a>
-    <span id="userName" style="font-weight:700;display:none;font-family:JetBrains Mono"></span>
+    <span id="userName" style="font-weight:700;display:none;font-family:JetBrains Mono;font-size:12px;background:var(--acbg);border:1px solid var(--ac);padding:5px 10px;border-radius:20px"></span>
     <button class="btn" id="loginBtn" onclick="openAuth()">Log in</button>
     <button class="btn-brix" onclick="openAuth('register')">Get Started</button>
     <button class="btn" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
@@ -118,92 +125,147 @@ body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),
 
 <div class="hero">
   <div>
-    <div style="display:inline-block;background:var(--acbg);border:1px solid var(--ac);color:var(--ac);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px">● LIVE MARKET • STP</div>
+    <div style="display:inline-block;background:var(--acbg);border:1px solid var(--ac);color:var(--ac);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px;letter-spacing:.06em">● LIVE MARKET • STP</div>
     <h1>Trade Currencies & <span>Metals</span> Like a Pro</h1>
     <p>25 assets: EUR, GBP, JPY, KES, XAU Gold, XAG Silver, Platinum & more. Simulated pricing, 80% payout.</p>
-    <button class="btn-brix" style="font-size:16px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn-brix" style="font-size:16px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
+    </div>
   </div>
-  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);font-family:JetBrains Mono">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg2);border:1px solid var(--ln);border-radius:10px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph</div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);font-family:JetBrains Mono">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg2);border:1px solid var(--ln);border-radius:10px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
 </div>
 
-<div class="bots">
-  <div class="bot"><h3>⚡ Scalper</h3><p>30s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
-  <div class="bot"><h3>📈 Trend</h3><p>60s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
-  <div class="bot active"><h3>🎯 Sniper VIP</h3><p>$10/mo</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
+<div class="bots" id="bots">
+  <div class="bot"><h3 style="font-family:Sora">⚡ Scalper</h3><p>30s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
+  <div class="bot"><h3 style="font-family:Sora">📈 Trend</h3><p>60s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
+  <div class="bot active"><h3 style="font-family:Sora">🎯 Sniper VIP</h3><p>$10/mo</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
 </div>
 
 <section class="about" id="about">
-  <h2 style="font:800 32px Sora">Why choose BRIXTRADE?</h2>
-  <p style="color:var(--mut);margin-top:8px">We exist to make online trading simple for every Kenyan.</p>
+  <p style="color:var(--ac);font-size:11px;font-weight:800;letter-spacing:1px">MEET BRIXTRADE</p>
+  <h2 style="font:800 32px Sora;margin-top:6px">Why choose BRIXTRADE?</h2>
+  <p style="color:var(--mut);margin-top:8px;max-width:700px">We exist to make online trading simple for every Kenyan. From Nairobi to Mombasa, BRIXTRADE gives you fast M-Pesa, clean charts and a local team that actually answers.</p>
   <div class="about-grid">
-    <div class="about-box"><h3>👥 People-first</h3><p>Local support via WhatsApp daily.</p></div>
-    <div class="about-box"><h3>💻 Tech obsessed</h3><p>Fast execution, works on low data.</p></div>
-    <div class="about-box"><h3>⚡ Instant M-Pesa</h3><p>Deposit/withdraw via M-Pesa in seconds.</p></div>
+    <div class="about-box"><h3>👥 People-first trading</h3><p>Our local support team helps Kenyan traders daily via WhatsApp.</p></div>
+    <div class="about-box"><h3>💻 Tech obsessed</h3><p>Fast execution, zero lag, works on low data phone or PC.</p></div>
+    <div class="about-box"><h3>⚡ Instant M-Pesa</h3><p>Deposit and withdraw via M-Pesa & Airtel Money in seconds.</p></div>
+    <div class="about-box"><h3>📦 Products for days</h3><p>Trade 100+ markets: Forex, Gold, Silver, Indices, Crypto.</p></div>
+    <div class="about-box"><h3>🤝 Community builders</h3><p>Join 10,000+ Kenyans in BRIXTRADE Telegram & WhatsApp.</p></div>
+    <div class="about-box"><h3>🎓 Free education</h3><p>Daily free lessons, beginner guides and demo KES 10,000.</p></div>
+  </div>
+  <div style="margin-top:50px">
+    <p style="color:var(--ac);font-size:11px;font-weight:800;letter-spacing:1px">FOLLOW US</p>
+    <h3 style="font:700 22px Sora;margin-top:4px">Fresh off the press</h3>
+    <p style="color:var(--mut);font-size:13px">Follow BRIXTRADE for latest news, bonuses and market signals.</p>
+    <div class="socials">
+      <a class="social" href="#">f<br><span style="color:var(--mut)">Facebook</span></a>
+      <a class="social" href="#">𝕏<br><span style="color:var(--mut)">X / Twitter</span></a>
+      <a class="social" href="#">IG<br><span style="color:var(--mut)">Instagram</span></a>
+      <a class="social" href="#">TikTok<br><span style="color:var(--mut)">TikTok</span></a>
+      <a class="social" href="#">✈<br><span style="color:var(--mut)">Telegram</span></a>
+      <a class="social" href="#">WA<br><span style="color:var(--mut)">WhatsApp</span></a>
+    </div>
+  </div>
+  <div style="margin-top:50px;background:var(--bg2);border:1px solid var(--ln);padding:36px;border-radius:16px;text-align:center">
+    <p style="color:var(--ac);font-size:11px;font-weight:800">SIMPLE TRADING FOR KENYA</p>
+    <h2 style="font:800 28px Sora;margin-top:6px">Start trading online with BRIXTRADE</h2>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+      <button class="btn-brix" style="padding:14px 28px;font-size:16px" onclick="handleStart()">START TRADING</button>
+      <button class="btn" style="padding:14px 28px;font-size:16px" onclick="handleStart()">Demo</button>
+    </div>
+    <div class="pay-logos">
+      <span style="background:#00a651;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px">M-PESA</span>
+      <span style="background:#e90000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px">Airtel Money</span>
+      <span style="background:#fff;border:1px solid #1a1f71;color:#1a1f71;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px;font-style:italic">VISA</span>
+      <span style="background:#000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px"><span style="color:#eb001b">●</span><span style="color:#f79e1b">●</span> Mastercard</span>
+    </div>
   </div>
 </section>
 
-<footer class="brix-footer"><div class="brix-footer-wrap"><div class="brix-footer-grid"><div class="brix-footer-col"><h4>Products</h4><a>Forex</a><a>Gold</a></div><div class="brix-footer-col"><h4>Support</h4><a>WhatsApp +254</a></div></div></div></footer>
+<p style="font-size:8px;color:#334;text-align:center;opacity:0.6;padding:12px 10px 0;margin:0;">
+  BRIXTRADE edu-simulation for entertainment, not licensed broker. 18+ Play responsibly. Terms | Risk | Privacy | support@brixtrade.co.ke
+</p>
+
+<!-- FOOTER KEPT EXACTLY -->
+<footer class="brix-footer">
+  <div class="brix-footer-wrap">
+    <div class="brix-footer-top">
+      <div class="brix-footer-logo">BRIX<span>TRADE</span></div>
+      <div class="brix-footer-socials"><a href="#">f</a><a href="#">𝕏</a><a href="#">◉</a><a href="#">in</a><a href="#">♫</a></div>
+    </div>
+    <div class="brix-footer-grid">
+      <div class="brix-footer-col"><h4>Products</h4><a href="#">Forex</a><a href="#">Indices</a><a href="#">Commodities</a><a href="#">Shares</a><a href="#">ETFs</a></div>
+      <div class="brix-footer-col"><h4>Platforms</h4><a href="#">MetaTrader 4</a><a href="#">MetaTrader 5</a><a href="#">BrixTrader App</a></div>
+      <div class="brix-footer-col"><h4>Accounts</h4><a href="#">Copy trading</a><a href="#">Demo</a><a href="#">All accounts</a></div>
+      <div class="brix-footer-col"><h4>Partnerships</h4><a href="#">Partner with us</a><a href="#">Refer a friend</a></div>
+      <div class="brix-footer-col"><h4>About BRIXTRADE</h4><a href="#">About us</a><a href="#">Careers</a><a href="#">Media releases</a></div>
+      <div class="brix-footer-col"><h4>Support</h4><a>Phone Kenya 0800-211-185</a><a>WhatsApp +254-102-252-424</a><a>Email</a><a>Westlands</a><a>FAQs</a></div>
+    </div>
+    <div style="margin-top:40px;border-top:1px solid #1a262d;padding-top:20px"><b style="color:#e6eef3;font-size:11px">Region & language</b><a style="color:var(--mut);display:flex;gap:6px;margin-top:8px;font-size:12px">🌐 Change country</a></div>
+  </div>
+</footer>
 
 <!-- PROFESSIONAL AUTH MODAL -->
 <div id="authModal"><div class="authBox">
-  <div class="authHeader">
-    <div class="logo">BRIX<span>TRADE</span></div>
-    <p>🔒 Secure • Encrypted • Bank-level security</p>
+  <div class="authHead">
+    <div class="authHeadLeft"><div class="authShield">🛡️</div><div><h3>Secure Access</h3><p>● Encrypted • Verified</p></div></div>
+    <button class="authClose" onclick="closeAuth()">✕</button>
   </div>
   <div class="authBody">
-    <div class="tabs2"><button id="tabLogin" class="on" onclick="switchTab('login')">Log in</button><button id="tabReg" onclick="switchTab('register')">Create Account</button></div>
-    <button class="btn-google" onclick="googleLogin()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Continue with Google</button>
-    <div class="divider">or continue with email</div>
+    <div class="tabsPro"><button id="tabLogin" class="on" onclick="switchTab('login')">Log In</button><button id="tabReg" onclick="switchTab('register')">Create Account</button></div>
+    <button class="btnGoogle" onclick="googleLogin()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Continue with Google</button>
+    <div class="divider">Or continue with email</div>
 
-    <div id="loginForm" style="display:grid;gap:14px">
-      <div class="input-group"><label>Email Address</label><span class="input-icon">✉</span><input id="lEmail" placeholder="you@example.com" type="email"></div>
-      <div class="input-group"><label>Password</label><span class="input-icon">🔒</span><div class="pass-wrap"><input id="lPass" type="password" placeholder="Enter your password" style="padding-left:40px"><button type="button" class="eye-btn" onclick="toggleEye('lPass')">👁</button></div></div>
-      <span class="link-forgot" onclick="showForgot()">Forgot password?</span>
-      <button class="btn-brix" style="width:100%;padding:13px;font-size:14px" onclick="login()">Log in to Brixtrade →</button>
+    <div id="loginForm" style="display:grid;gap:12px">
+      <div class="fGroup"><label>Email Address</label><div class="fInput"><input id="lEmail" placeholder="you@example.com" type="email"></div></div>
+      <div class="fGroup"><label>Password</label><div class="fInput"><input id="lPass" type="password" placeholder="••••••••"><button class="eye" type="button" onclick="toggleEye('lPass')">👁</button></div></div>
+      <div style="display:flex;justify-content:flex-end"><span class="fLink" onclick="showForgot()">Forgot password?</span></div>
+      <button class="btn-brix" style="width:100%;padding:12px" onclick="login()">Log In Securely →</button>
     </div>
 
-    <div id="regForm" style="display:none;gap:14px">
-      <div class="input-group"><label>Full Name</label><span class="input-icon">👤</span><input id="rName" placeholder="John Doe"></div>
-      <div class="input-group"><label>Email Address</label><span class="input-icon">✉</span><input id="rEmail" placeholder="you@example.com" type="email"></div>
-      <div class="input-group">
-        <label>Password</label><span class="input-icon">🔒</span>
-        <div class="pass-wrap"><input id="rPass" type="password" placeholder="Create strong password" oninput="checkStrength(this.value)" style="padding-left:40px"><button type="button" class="eye-btn" onclick="toggleEye('rPass')">👁</button></div>
-        <div class="strength-bar" id="strengthBar"><div class="strength-fill" id="strengthFill"></div></div>
-        <div class="strength-text" id="strengthText"></div>
-        <div class="pass-tips" id="passTips">Strong password must contain: <b>8+ characters, uppercase, number, symbol (!@#$)</b><br>Example: <b style="color:var(--up)">BrixTrade@2024</b> <button type="button" style="background:var(--pn2);border:1px solid var(--ln);color:var(--ink);padding:4px 8px;border-radius:6px;font-size:11px;margin-left:6px;cursor:pointer" onclick="suggestPassword()">Generate</button></div>
+    <div id="regForm" style="display:none;gap:12px">
+      <div class="fGroup"><label>Full Name</label><div class="fInput"><input id="rName" placeholder="John Kamau"></div></div>
+      <div class="fGroup"><label>Email Address</label><div class="fInput"><input id="rEmail" placeholder="you@example.com" type="email"></div></div>
+      <div class="fGroup">
+        <label>Password — Must be strong</label>
+        <div class="fInput"><input id="rPass" type="password" placeholder="Min 8 chars, Upper, Number, Symbol" oninput="checkStrength(this.value)"><button class="eye" type="button" onclick="toggleEye('rPass')">👁</button></div>
+        <div class="strength" id="strengthBar"><i id="strengthFill"></i></div>
+        <div class="strText" id="strengthText"></div>
+        <div class="tips" id="passTips">Strong: <b>8+ chars, uppercase, number, symbol</b> e.g. <b style="color:var(--up)">Brix@2024!Secure</b> <span style="display:inline-block;margin-left:6px;background:#182131;border:1px solid var(--ln);padding:3px 7px;border-radius:6px;cursor:pointer" onclick="suggestPassword()">Generate</span></div>
       </div>
-      <div class="terms-box">BRIXTRADE is simulated educational trading platform. Not a licensed broker. Outcome management applies for sustainability. Deposits are platform credits. 18+ only. VIP $10/mo non-refundable. Risk: you may lose credits.</div>
-      <label class="terms-check"><input type="checkbox" id="agreeCheck"><span>I am 18+, I understand BRIXTRADE is educational simulation and I agree to Terms & Risk Disclosure</span></label>
-      <button class="btn-brix" style="width:100%;padding:13px;font-size:14px" onclick="register()">Create Secure Account →</button>
+      <div class="tBox">BRIXTRADE is simulated educational platform. Not licensed broker. Charts/bots are simulation only. Outcome Management applies for sustainability. Credits have no real value except per withdrawal policy. 18+ only. VIP $10/mo non-refundable. Risk: you may lose credits. Nairobi KE. support@brixtrade.co.ke</div>
+      <label class="check"><input type="checkbox" id="agreeCheck"><span>I am 18+, I understand BRIXTRADE is simulated educational platform, and I agree to Terms & Risk.</span></label>
+      <button class="btn-brix" style="width:100%;padding:12px" onclick="register()">Create Secured Account →</button>
     </div>
 
-    <div id="forgotForm" style="display:none;gap:14px">
-      <div class="input-group"><label>Reset Password</label><span class="input-icon">✉</span><input id="fEmail" placeholder="Enter your email" type="email"></div>
-      <p style="font-size:12px;color:var(--mut);line-height:1.5">We will send you a secure link to reset your password. Link expires in 1 hour.</p>
-      <button class="btn-brix" style="width:100%;padding:13px" onclick="forgotPassword()">Send Reset Link</button>
-      <span class="link-forgot" style="text-align:center" onclick="switchTab('login')">← Back to login</span>
+    <div id="forgotForm" style="display:none;gap:12px">
+      <div class="fGroup"><label>Password Reset — Secure Link</label><div class="fInput"><input id="fEmail" placeholder="Enter your registered email" type="email"></div></div>
+      <p style="font-size:11px;color:var(--mut);line-height:1.5;background:#0a0e16;border:1px solid var(--ln);padding:9px;border-radius:8px">Secure reset link valid for 60 minutes, one-time use only.</p>
+      <button class="btn-brix" style="width:100%;padding:12px" onclick="forgotPassword()">Send Secure Reset Link</button>
+      <div style="text-align:center"><span class="fLink" onclick="switchTab('login')">← Back to login</span></div>
     </div>
 
-    <p id="authMsg" style="font-size:12px;text-align:center;min-height:16px;font-weight:600"></p>
+    <div id="authMsg"></div>
   </div>
-  <div class="authFooter">🔐 Protected by Firebase • SSL Encrypted • <span>support@brixtrade.co.ke</span></div>
+  <div class="fFooter">🔒 Protected by Firebase • 256-bit SSL • Encrypted</div>
 </div></div>
 
 <!-- PROFESSIONAL WELCOME POPUP -->
-<div id="welcomePopup" onclick="closeWelcome()"><div class="welcomeCard" onclick="event.stopPropagation()">
-  <div class="welcomeTop">
-    <div class="welcomeIcon">✓</div>
+<div id="welcomePopup" onclick="closeWelcome()"><div class="wCard" onclick="event.stopPropagation()">
+  <div class="wTop">
+    <div class="wIcon">✓</div>
     <h2>Welcome, <span id="welcomeName">Trader</span>!</h2>
-    <div class="welcomeBadge">● Verified Account • Brixtrade</div>
+    <div class="wVerified">🛡️ VERIFIED • SECURE • BRIXTRADE</div>
   </div>
-  <div class="welcomeBody">
-    <div class="welcomeRow"><b>Account Name</b><span id="welcomeFullName">John Doe</span></div>
-    <div class="welcomeRow"><b>Platform</b><span>Brixtrade Secure</span></div>
-    <div class="welcomeRow"><b>Status</b><span style="color:var(--up)">● Active & Funded</span></div>
-    <div class="welcomeRow"><b>Demo Balance</b><span>KES 10,000</span></div>
-    <p>You are now welcomed to <b>Brixtrade</b>. Trade currencies, metals & more with instant M-Pesa and Kenyan support.</p>
-    <button class="btn-brix" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="goToTrade()">Go to Trading Room →</button>
-    <p style="font-size:11px;margin-top:6px">🔒 Your funds are secured with bank-level encryption</p>
+  <div class="wBody">
+    <div class="wRow"><b>Account Holder</b><span id="welcomeFullName">Trader</span></div>
+    <div class="wRow"><b>Status</b><span style="color:var(--up)">● ACTIVE & VERIFIED</span></div>
+    <div class="wRow"><b>Security</b><span>🔒 Bank-Level Encrypted</span></div>
+    <div class="wRow"><b>Demo Balance</b><span>KES 10,000.00</span></div>
+    <div class="wRow"><b>Platform</b><span>Brixtrade Pro • STP</span></div>
+    <div class="wNote">You are now welcomed to <b>Brixtrade</b>. Trade 25 currencies & metals with instant M-Pesa. Your account is secured.</div>
+    <button class="btn-brix" style="width:100%;padding:13px;font-size:14px" onclick="goToTrade()">Enter Trading Room →</button>
+    <div style="text-align:center;font-size:10px;color:#4b5a6e">🔒 SSL Secured • 🛡️ Firebase Protected • ✓ Verified</div>
   </div>
 </div></div>
 
@@ -211,7 +273,15 @@ body{background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),
 let currentTab='login';
 function openAuth(tab='login'){currentTab=tab;switchTab(tab);document.getElementById('authModal').classList.add('on');}
 function closeAuth(){document.getElementById('authModal').classList.remove('on');}
-function switchTab(t){currentTab=t;document.getElementById('tabLogin').classList.toggle('on',t==='login');document.getElementById('tabReg').classList.toggle('on',t==='register');document.getElementById('loginForm').style.display=t==='login'?'grid':'none';document.getElementById('regForm').style.display=t==='register'?'grid':'none';document.getElementById('forgotForm').style.display='none';document.getElementById('authMsg').textContent='';}
+function switchTab(t){
+  currentTab=t;
+  document.getElementById('tabLogin').classList.toggle('on',t==='login');
+  document.getElementById('tabReg').classList.toggle('on',t==='register');
+  document.getElementById('loginForm').style.display=t==='login'?'grid':'none';
+  document.getElementById('regForm').style.display=t==='register'?'grid':'none';
+  document.getElementById('forgotForm').style.display='none';
+  document.getElementById('authMsg').textContent='';
+}
 function showForgot(){document.getElementById('loginForm').style.display='none';document.getElementById('regForm').style.display='none';document.getElementById('forgotForm').style.display='grid';}
 function showMsg(m,err=false){const el=document.getElementById('authMsg');el.textContent=m;el.style.color=err?'#f87171':'#34d399';}
 function toggleEye(id){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
@@ -219,58 +289,60 @@ function checkStrength(pw){
   const bar=document.getElementById('strengthBar');const fill=document.getElementById('strengthFill');const text=document.getElementById('strengthText');const tips=document.getElementById('passTips');
   bar.style.display='block';text.style.display='block';tips.style.display='block';
   let s=0;if(pw.length>=6)s++;if(pw.length>=8)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
-  if(s<=2){fill.style.width='35%';fill.style.background='#f87171';text.textContent='Weak - add uppercase, number, symbol';text.style.color='#f87171';}
-  else if(s<=3){fill.style.width='65%';fill.style.background='#fbbf24';text.textContent='Medium - add symbol for strong';text.style.color='#fbbf24';}
-  else{fill.style.width='100%';fill.style.background='#34d399';text.textContent='Strong password - secure ✓';text.style.color='#34d399';}
+  if(pw.length===0){bar.style.display='none';text.style.display='none';return;}
+  if(s<=2){fill.style.width='32%';fill.style.background='#f87171';text.textContent='Weak — Add uppercase, number & symbol';text.style.color='#f87171';text.style.display='block';}
+  else if(s===3){fill.style.width='68%';fill.style.background='#fbbf24';text.textContent='Medium — Add symbol for strong';text.style.color='#fbbf24';text.style.display='block';}
+  else{fill.style.width='100%';fill.style.background='#34d399';text.textContent='Strong password — Secure ✓';text.style.color='#34d399';text.style.display='block';}
 }
-function suggestPassword(){const p='BrixTrade@'+Math.floor(Math.random()*9000+1000);const i=document.getElementById('rPass');i.value=p;i.type='text';checkStrength(p);}
+function suggestPassword(){const p='BrixTrade@'+Math.floor(Math.random()*9000+1000)+'!';const i=document.getElementById('rPass');i.value=p;i.type='text';checkStrength(p);}
 function googleLogin(){
-  showMsg('Opening Google secure login...');
+  showMsg('Opening secure Google login...');
   const provider=new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(async res=>{
-    const user=res.user;await db.collection('users').doc(user.uid).set({name:user.displayName,email:user.email,created:new Date().toISOString()},{merge:true});
+    const user=res.user;
+    try{await db.collection('users').doc(user.uid).set({name:user.displayName,email:user.email,created:new Date().toISOString()},{merge:true});}catch(e){}
     localStorage.setItem('brix_current_user',JSON.stringify({name:user.displayName,email:user.email,uid:user.uid}));
-    closeAuth();updateNav();showWelcome(user.displayName,user.displayName,user.email);
+    closeAuth();updateNav();showWelcome(user.displayName,user.displayName);
   }).catch(e=>showMsg(e.message,true));
 }
 function register(){
   const name=document.getElementById('rName').value.trim();const email=document.getElementById('rEmail').value.trim().toLowerCase();const pass=document.getElementById('rPass').value;const agree=document.getElementById('agreeCheck').checked;
-  if(!name||!email||pass.length<6){showMsg('Please fill all fields',true);return;}
-  if(!agree){showMsg('You must agree to Terms & Risk Disclosure',true);return;}
+  if(!name||!email||pass.length<6){showMsg('Please complete all fields',true);return;}
+  if(!agree){showMsg('You must accept Terms & Risk Disclosure',true);return;}
   let s=0;if(pass.length>=8)s++;if(/[A-Z]/.test(pass))s++;if(/[0-9]/.test(pass))s++;if(/[^A-Za-z0-9]/.test(pass))s++;
-  if(s<2){showMsg('Password too weak! Use 8+ chars, uppercase, number, symbol',true);return;}
-  showMsg('Creating secure account...');
+  if(s<3){showMsg('Password too weak! Use 8+ chars, uppercase, number, symbol',true);return;}
+  showMsg('Creating secured account...');
   auth.createUserWithEmailAndPassword(email,pass).then(async cred=>{
     await cred.user.updateProfile({displayName:name});
-    await db.collection('users').doc(cred.user.uid).set({name,email,created:new Date().toISOString()});
+    try{await db.collection('users').doc(cred.user.uid).set({name,email,created:new Date().toISOString()});}catch(e){}
     localStorage.setItem('brix_current_user',JSON.stringify({name,email,uid:cred.user.uid}));
-    closeAuth();updateNav();showWelcome(name,name,email);
+    closeAuth();updateNav();showWelcome(name,name);
   }).catch(e=>showMsg(e.message,true));
 }
 function login(){
   const email=document.getElementById('lEmail').value.trim().toLowerCase();const pass=document.getElementById('lPass').value;
-  if(!email||!pass){showMsg('Enter email & password',true);return;}
-  showMsg('Verifying secure login...');
+  if(!email||!pass){showMsg('Enter email and password',true);return;}
+  showMsg('Verifying secure credentials...');
   auth.signInWithEmailAndPassword(email,pass).then(async cred=>{
     const name=cred.user.displayName||cred.user.email.split('@')[0];
     localStorage.setItem('brix_current_user',JSON.stringify({name,email,uid:cred.user.uid}));
-    closeAuth();updateNav();showWelcome(name,name,email);
+    closeAuth();updateNav();showWelcome(name,name);
   }).catch(e=>showMsg(e.message,true));
 }
 function forgotPassword(){
   const email=document.getElementById('fEmail').value.trim()||document.getElementById('lEmail').value.trim();
-  if(!email){showMsg('Enter your email address',true);return;}
-  showMsg('Sending secure reset link...');
-  auth.sendPasswordResetEmail(email).then(()=>showMsg('✓ Reset link sent! Check your inbox (and spam)')).catch(e=>showMsg(e.message,true));
+  if(!email){showMsg('Enter your registered email',true);return;}
+  showMsg('Generating secure reset link...');
+  auth.sendPasswordResetEmail(email).then(()=>showMsg('✓ Secure reset link sent! Check inbox & spam')).catch(e=>showMsg(e.message,true));
 }
 function logout(){auth.signOut().then(()=>{localStorage.removeItem('brix_current_user');updateNav();});}
 function updateNav(){
   const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');
   const ln=document.getElementById('loginBtn');const lo=document.getElementById('logoutBtn');const un=document.getElementById('userName');
-  if(cur){ln.style.display='none';lo.style.display='inline-block';un.style.display='inline-block';un.innerText='Hi, '+(cur.name.split(' ')[0]);}else{ln.style.display='inline-block';lo.style.display='none';un.style.display='none';}
+  if(cur){ln.style.display='none';lo.style.display='inline-block';un.style.display='inline-block';un.innerText='● '+cur.name.split(' ')[0];}else{ln.style.display='inline-block';lo.style.display='none';un.style.display='none';}
 }
 function handleStart(){const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null')||auth.currentUser;if(!cur){openAuth('register');return;}location.href='trade.html';}
-function showWelcome(shortName,fullName,email){
+function showWelcome(shortName,fullName){
   document.getElementById('welcomeName').textContent=shortName.split(' ')[0];
   document.getElementById('welcomeFullName').textContent=fullName;
   document.getElementById('welcomePopup').classList.add('on');
@@ -279,7 +351,8 @@ function closeWelcome(){document.getElementById('welcomePopup').classList.remove
 function goToTrade(){closeWelcome();location.href='trade.html';}
 auth.onAuthStateChanged(user=>{if(user){const name=user.displayName||user.email.split('@')[0];localStorage.setItem('brix_current_user',JSON.stringify({name,email:user.email,uid:user.uid}));updateNav();}});
 updateNav();
-document.getElementById('authModal').onclick=e=>{if(e.target.id==='authModal')closeAuth();}
+document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth();});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t) t.scrollIntoView({behavior:'smooth'});});});
 </script>
 </body>
 </html>
