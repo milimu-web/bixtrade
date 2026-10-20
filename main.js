@@ -97,7 +97,7 @@ function depositWithPaystack(){
   let kesAmount = Math.round(a * 130);
   if(typeof PaystackPop !== 'undefined'){ 
     let h=PaystackPop.setup({
-      key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
+      key:'pk_live_0beac5527720989e538120555ad8f42646691193',
       email: user.email || 'user@brixtrade.com',
       amount: kesAmount * 100,
       currency:'KES',
