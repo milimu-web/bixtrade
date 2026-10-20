@@ -128,7 +128,7 @@ function subscribe(){
   if(!confirm('Unlock Sniper VIP $10/mo via Paystack?')) return; 
   const user = JSON.parse(localStorage.getItem('brix_current_user')||'{"email":"user@brixtrade.com"}');
   let h=PaystackPop.setup({
-    key:'pk_test_22b6fc1db38418de37247a7c48d3f8b32edfd2e2',
+    key:'pk_live_0beac5527720989e538120555ad8f42646691193',
     email: user.email || 'user@brixtrade.com',
     amount: 1300 * 100,
     currency:'KES',
