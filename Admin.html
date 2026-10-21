@@ -1,23 +1,71 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BrixTrade LIVE Admin</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>BrixTrade LIVE Admin</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}body{background:#0a0a0f;color:#fff;min-height:100vh}.header{background:#12121b;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #22223a;position:sticky;top:0}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px}.card{background:#16161f;border:1px solid #26263a;border-radius:12px;padding:14px}.card small{color:#8a8ab3;font-size:11px;text-transform:uppercase}.card h3{margin-top:6px;font-size:20px}.card.fee h3{color:#00d084}.card.pending h3{color:#ffbd2e}.main{padding:0 20px 40px}table{width:100%;border-collapse:collapse;background:#12121b;border-radius:12px;overflow:hidden}th{background:#1a1a2a;text-align:left;padding:12px 10px;font-size:12px;color:#9a9ab8;text-transform:uppercase}td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:top}.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}.PENDING{background:#332a00;color:#ffbd2e}.APPROVED{background:#003d22;color:#00d084}.REJECTED{background:#3d0014;color:#ff5a5a}.btn{padding:6px 10px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;margin-right:4px}.approve{background:#00d084;color:#000}.reject{background:#ff5a5a;color:#fff}.view{background:#2a2a44;color:#fff}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}body{background:#0a0a0f;color:#fff;min-height:100vh}.header{background:#12121b;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #22223a;position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px}.tabs{display:flex;gap:8px;padding:12px 20px;background:#0f0f17;position:sticky;top:60px;z-index:9;border-bottom:1px solid #22223a}.tab{padding:8px 16px;border-radius:20px;border:1px solid #2a2a44;background:#1a1a2a;color:#9a9ab8;cursor:pointer;font-weight:700;font-size:13px}.tab.on{background:#8b8dff;color:#fff;border-color:#8b8dff}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px}.card{background:#16161f;border:1px solid #26263a;border-radius:12px;padding:14px}.card small{color:#8a8ab3;font-size:11px;text-transform:uppercase}.card h3{margin-top:6px;font-size:20px}.card.fee h3{color:#00d084}.card.pending h3{color:#ffbd2e}.main{padding:0 20px 40px}table{width:100%;border-collapse:collapse;background:#12121b;border-radius:12px;overflow:hidden}th{background:#1a1a2a;text-align:left;padding:12px 10px;font-size:12px;color:#9a9ab8;text-transform:uppercase}td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:top}.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}.PENDING{background:#332a00;color:#ffbd2e}.APPROVED{background:#003d22;color:#00d084}.REJECTED{background:#3d0014;color:#ff5a5a}.btn{padding:6px 10px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;margin-right:4px}.approve{background:#00d084;color:#000}.reject{background:#ff5a5a;color:#fff}.view{background:#2a2a44;color:#fff}
+@media(max-width:700px){.header{padding:10px 12px}.tabs{padding:10px 12px;top:52px}.stats{grid-template-columns:1fr 1fr;padding:12px;gap:8px}.main{padding:0 8px 20px}table{font-size:12px}th,td{padding:8px 6px}.btn{padding:5px 8px;font-size:11px}}
+</style>
 </head><body>
-<div class="header"><div><b>BrixTrade LIVE</b> <span style="color:#666;font-size:12px">/ Firebase brixtrade-c142d</span></div><div><span style="color:#00d084">● LIVE</span> <button onclick="location.reload()" class="btn view">Refresh</button></div></div>
-<div class="stats"><div class="card"><small>Total Requests</small><h3 id="sTotal">0</h3></div><div class="card pending"><small>Pending Amount</small><h3 id="sPending">$0</h3></div><div class="card fee"><small>Total Fees (3%)</small><h3 id="sFee">$0</h3></div><div class="card"><small>Net To Pay</small><h3 id="sReceive">$0</h3></div></div>
-<div class="main"><div style="overflow:auto"><table><thead><tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>ID</th><th>Status</th><th>Action</th></tr></thead><tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:30px">Connecting...</td></tr></tbody></table></div></div>
+<div class="header"><div><b>BrixTrade LIVE</b> <span style="color:#666;font-size:12px">/ brixtrade-c142d</span></div><div><span style="color:#00d084">● LIVE</span> <button onclick="location.reload()" class="btn view">Refresh</button></div></div>
+<div class="tabs"><button class="tab on" id="tabDep" onclick="switchType('deposits')">Deposits <span id="cDep">0</span></button><button class="tab" id="tabWit" onclick="switchType('withdrawals')">Withdrawals <span id="cWit">0</span></button></div>
+<div class="stats"><div class="card"><small>Total Requests</small><h3 id="sTotal">0</h3></div><div class="card pending"><small>Pending Amount</small><h3 id="sPending">$0</h3></div><div class="card fee"><small>Total Fees (3%)</small><h3 id="sFee">$0</h3></div><div class="card"><small>Net To Pay / Add</small><h3 id="sReceive">$0</h3></div></div>
+<div class="main"><div style="overflow:auto"><table><thead id="thead"></thead><tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:30px">Connecting...</td></tr></tbody></table></div></div>
 <script>
 const firebaseConfig = { apiKey: "AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o", authDomain: "brixtrade-c142d.firebaseapp.com", projectId: "brixtrade-c142d", storageBucket: "brixtrade-c142d.firebasestorage.app", messagingSenderId: "489953142453", appId: "1:489953142453:web:2499588c325482d17a00fc", measurementId: "G-EX79EB9RDN" };
 firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
-let allReqs=[];
-db.collection("withdrawals").orderBy("id","desc").onSnapshot(snap=>{
-  allReqs=[]; snap.forEach(doc=>allReqs.push(doc.data())); render();
-}, err=>{ document.getElementById('tbody').innerHTML=`<tr><td colspan="8" style="color:#ff5a5a">Error: ${err.message}<br>Go to Firestore > Rules > allow read,write if true > Publish</td></tr>` });
-function render(){
- let total=allReqs.length,pendingAmt=0,feeTot=0,receiveTot=0,approved=0,rejected=0;
- allReqs.forEach(r=>{ let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee; if(r.status==='PENDING') pendingAmt+=r.amount; feeTot+=fee; receiveTot+=rec; });
- document.getElementById('sTotal').textContent=total; document.getElementById('sPending').textContent='$'+pendingAmt.toFixed(2); document.getElementById('sFee').textContent='$'+feeTot.toFixed(2); document.getElementById('sReceive').textContent='$'+receiveTot.toFixed(2);
- document.getElementById('tbody').innerHTML=allReqs.map(r=>{ let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee; return `<tr><td>${r.date}</td><td><b>${r.mpesaName}</b><br>${r.phone}</td><td><b>$${r.amount.toFixed(2)}</b></td><td style="color:#ffbd2e">$${fee.toFixed(2)}</td><td style="color:#00d084"><b>$${rec.toFixed(2)}</b><br><small>KES ${(rec*130).toFixed(0)}</small></td><td>${r.idNum}</td><td><span class="badge ${r.status}">${r.status}</span></td><td>${r.status==='PENDING'?`<button class="btn approve" onclick="updateStatus(${r.id},'APPROVED')">Approve</button><button class="btn reject" onclick="updateStatus(${r.id},'REJECTED')">Reject</button>`:''}</td></tr>`}).join('') || `<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No withdrawals yet - try one</td></tr>`;
+let curType='deposits'; let deposits=[], withdrawals=[];
+
+function switchType(t){
+  curType=t;
+  document.getElementById('tabDep').classList.toggle('on',t==='deposits');
+  document.getElementById('tabWit').classList.toggle('on',t==='withdrawals');
+  render();
 }
-async function updateStatus(id,status){ if(!confirm(status+'? For $'+allReqs.find(r=>r.id===id)?.amount)) return; await db.collection("withdrawals").doc(String(id)).update({status}); }
+
+db.collection("deposits").orderBy("date","desc").onSnapshot(snap=>{
+  deposits=[]; snap.forEach(doc=>deposits.push({docId:doc.id, ...doc.data()}));
+  document.getElementById('cDep').textContent=deposits.length;
+  if(curType==='deposits') render();
+});
+db.collection("withdrawals").orderBy("id","desc").onSnapshot(snap=>{
+  withdrawals=[]; snap.forEach(doc=>withdrawals.push({docId:doc.id, ...doc.data()}));
+  document.getElementById('cWit').textContent=withdrawals.length;
+  if(curType==='withdrawals') render();
+}, err=>{
+  document.getElementById('tbody').innerHTML=`<tr><td colspan="8" style="color:#ff5a5a">Error: ${err.message}<br>Rules > allow read,write</td></tr>`;
+});
+
+function render(){
+  let list = curType==='deposits' ? deposits : withdrawals;
+  if(curType==='deposits'){
+    document.getElementById('thead').innerHTML=`<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Ref</th><th>KES</th><th>Status</th><th>Action</th></tr>`;
+  }else{
+    document.getElementById('thead').innerHTML=`<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>ID</th><th>Status</th><th>Action</th></tr>`;
+  }
+  let pendingAmt=0, feeTot=0, receiveTot=0;
+  list.forEach(r=>{ 
+    let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee;
+    if(r.status==='PENDING') pendingAmt+=r.amount;
+    if(curType==='withdrawals'){ feeTot+=fee; receiveTot+=rec; } else { receiveTot+=r.amount; }
+  });
+  document.getElementById('sTotal').textContent=list.length;
+  document.getElementById('sPending').textContent='$'+pendingAmt.toFixed(2);
+  document.getElementById('sFee').textContent='$'+feeTot.toFixed(2);
+  document.getElementById('sReceive').textContent='$'+receiveTot.toFixed(2);
+
+  if(list.length===0){
+    document.getElementById('tbody').innerHTML=`<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No ${curType} yet</td></tr>`; return;
+  }
+  document.getElementById('tbody').innerHTML=list.map(r=>{
+    if(curType==='deposits'){
+      return `<tr><td>${r.date?new Date(r.date).toLocaleString():''}</td><td><b>${r.name||''}</b><br>${r.phone||''}<br><small style="color:#666">${r.email||''}</small></td><td><b>$${Number(r.amount).toFixed(2)}</b></td><td style="font-size:11px">${r.ref||''}</td><td>KES ${(Number(r.amount)*130).toFixed(0)}</td><td><span class="badge ${r.status}">${r.status}</span></td><td>${r.status==='PENDING'?`<button class="btn approve" onclick="updateStatus('${r.docId}','APPROVED')">Approve</button><button class="btn reject" onclick="updateStatus('${r.docId}','REJECTED')">Reject</button>`:''}</td></tr>`;
+    }else{
+      let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee;
+      return `<tr><td>${r.date}</td><td><b>${r.mpesaName}</b><br>${r.phone}</td><td><b>$${Number(r.amount).toFixed(2)}</b></td><td style="color:#ffbd2e">$${fee.toFixed(2)}</td><td style="color:#00d084"><b>$${rec.toFixed(2)}</b><br><small>KES ${(rec*130).toFixed(0)}</small></td><td>${r.idNum||''}</td><td><span class="badge ${r.status}">${r.status}</span></td><td>${r.status==='PENDING'?`<button class="btn approve" onclick="updateStatus('${r.docId}','APPROVED')">Approve</button><button class="btn reject" onclick="updateStatus('${r.docId}','REJECTED')">Reject</button>`:''}</td></tr>`;
+    }
+  }).join('');
+}
+async function updateStatus(docId,status){
+  if(!confirm(status+' this request?')) return;
+  await db.collection(curType).doc(docId).update({status});
+}
 </script></body></html>
