@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brixtrade - Trade Currencies & Metals</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -49,8 +49,6 @@ a{text-decoration:none;color:inherit}
 .social{border:1px solid var(--ln);padding:16px;border-radius:10px;text-align:center;background:var(--bg2);font-weight:700;font-size:13px}
 .social:hover{border-color:var(--ac);background:var(--acbg)}
 .pay-logos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-
-/* YOUR FOOTER - KEPT 100% */
 .brix-footer{background:#080c14;color:#8fa0ad;padding:40px 24px 30px;font:13px/1.6 Inter, sans-serif;margin-top:50px;border-top:1px solid var(--ln)}
 .brix-footer-wrap{max-width:1300px;margin:0 auto}
 .brix-footer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
@@ -59,8 +57,6 @@ a{text-decoration:none;color:inherit}
 .brix-footer-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:28px}
 .brix-footer-col h4{color:var(--ink);font-size:12px;font-weight:700;margin-bottom:14px;border-bottom:1px solid var(--ln);padding-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
 .brix-footer-col a{display:block;color:var(--mut);font-size:12px;margin-bottom:8px;text-decoration:underline;text-underline-offset:2px} .brix-footer-col a:hover{color:#fff}
-
-/* PROFESSIONAL LOGIN - MONEY PLATFORM STYLE */
 #authModal{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;place-items:center;z-index:99;backdrop-filter:blur(10px)}
 #authModal.on{display:grid}
 .authBox{background:#0e1420;border:1px solid #232e45;border-radius:16px;width:min(440px,94vw);box-shadow:0 30px 90px rgba(0,0,0,.8);overflow:hidden;max-height:95vh;overflow-y:auto}
@@ -92,8 +88,6 @@ a{text-decoration:none;color:inherit}
 .check input{width:14px;height:14px;accent-color:var(--ac);margin-top:2px}
 .fFooter{padding:10px 22px;background:#0a0e16;border-top:1px solid #232e45;display:flex;gap:8px;justify-content:center;font-size:10px;color:#4b5a6e}
 #authMsg{text-align:center;font-size:11px;font-weight:600;min-height:14px}
-
-/* PROFESSIONAL WELCOME POPUP */
 #welcomePopup{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(12px)}
 #welcomePopup.on{display:flex}
 .wCard{background:#0e1420;border:1px solid #232e45;border-radius:20px;width:410px;max-width:94vw;box-shadow:0 30px 100px rgba(0,0,0,.85);overflow:hidden;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
@@ -108,6 +102,35 @@ a{text-decoration:none;color:inherit}
 .wNote{text-align:center;font-size:11px;color:var(--mut);line-height:1.5}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:900px){.hero{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:36px}}
+/* MOBILE FIX - ONLY FOR PHONE, DESKTOP STAYS SAME */
+@media(max-width:700px){
+  .nav{padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));gap:8px}
+  .logo{font-size:18px}
+  .nav-links{gap:6px}
+  .nav-links a.nav-about{display:none}
+  .btn,.btn-brix{padding:9px 12px;font-size:12px}
+  .hero{grid-template-columns:1fr;padding:24px 12px 12px;gap:16px}
+  .hero h1{font-size:30px;line-height:1.15}
+  .hero p{font-size:14px;margin-bottom:16px}
+  .card{padding:12px}
+  .bots{grid-template-columns:1fr;padding:0 12px 12px;gap:10px}
+  .about{margin:12px;padding:20px 12px;border-radius:12px}
+  .about-grid{grid-template-columns:1fr;gap:10px}
+  .socials{grid-template-columns:repeat(3,1fr);gap:8px}
+  .brix-footer{padding:24px 12px}
+  .brix-footer-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+  /* CREATE ACCOUNT FULL SCREEN ON PHONE */
+  #authModal{padding:0;align-items:stretch;justify-items:stretch;background:#0a0e16}
+  #authModal.on{display:block}
+  .authBox{width:100vw;min-height:100vh;height:100vh;max-height:100vh;border-radius:0;border:0;display:flex;flex-direction:column;box-shadow:none}
+  .authHead{padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));position:sticky;top:0;z-index:2}
+  .authBody{flex:1;overflow:auto;padding:14px 12px 24px;display:flex;flex-direction:column;gap:12px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  .fInput input{padding:12px 40px 12px 12px;font-size:16px}
+  .btnGoogle{padding:13px}
+  .tBox{height:90px}
+  .fFooter{padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom));font-size:9px}
+  #welcomePopup .wCard{width:96%;max-width:96%;border-radius:16px;max-height:92vh;overflow:auto}
+}
 </style>
 </head>
 <body>
@@ -186,7 +209,6 @@ a{text-decoration:none;color:inherit}
   BRIXTRADE edu-simulation for entertainment, not licensed broker. 18+ Play responsibly. Terms | Risk | Privacy | support@brixtrade.co.ke
 </p>
 
-<!-- FOOTER KEPT EXACTLY -->
 <footer class="brix-footer">
   <div class="brix-footer-wrap">
     <div class="brix-footer-top">
@@ -205,7 +227,6 @@ a{text-decoration:none;color:inherit}
   </div>
 </footer>
 
-<!-- PROFESSIONAL AUTH MODAL -->
 <div id="authModal"><div class="authBox">
   <div class="authHead">
     <div class="authHeadLeft"><div class="authShield">🛡️</div><div><h3>Secure Access</h3><p>● Encrypted • Verified</p></div></div>
@@ -250,7 +271,6 @@ a{text-decoration:none;color:inherit}
   <div class="fFooter">🔒 Protected by Firebase • 256-bit SSL • Encrypted</div>
 </div></div>
 
-<!-- PROFESSIONAL WELCOME POPUP -->
 <div id="welcomePopup" onclick="closeWelcome()"><div class="wCard" onclick="event.stopPropagation()">
   <div class="wTop">
     <div class="wIcon">✓</div>
