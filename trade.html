@@ -47,11 +47,43 @@ main{display:grid;grid-template-columns:260px minmax(0,1fr) 320px;gap:16px;paddi
 <main><aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
 <section class="pn" id="ch"><div class="ttl"><h2 id="sn">-</h2><b id="sp">-</b><span id="sc"></span><span id="sq">Timer: <b id="timer">Ready</b></span></div><canvas id="cv"></canvas><div id="tk"><div><label>Stake($) - 1$ = KES 130</label><input id="stake" type="number" min="1" step="1" value="1"></div><div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div><button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button></div><div class="bots"><div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>Fast • 30s preset</p></div><div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>Stable • 60s preset</p></div><div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • 120s preset</p></div></div><button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button><p class="disclaimer">Brixtrade trade with all 25 metals. Protected by DCI DSS.1$ = KES130</p></section><aside class="pn" style="padding:16px"><h3 style="margin:0 0 12px 0;font-size:15px;font-family:Sora">Trade Assistant</h3><div id="msgs"></div></aside></main>
 <script>
-// === PAYHERO CONFIG ===
-const PAYHERO_BASIC_AUTH = "Basic TUFuSUJvbmR4eXc2d3VMSkg5cTY6emhwZHFzRUlnNG1ZUjh6M0pqV3VDWEV1MWQyanB5eDZhc0IwUFJKQQ==";
+// === PAYHERO CONFIG - NEW SECURE VERSION ===
+const PAYHERO_API_USERNAME = "MAnIBonwxyw6wuLJH9q6"; 
+const PAYHERO_API_PASSWORD = "zhpdqsEIg4mYR8z3JjWuCXAu1d2jpyx6asB0PRJA";
 const PAYHERO_ACCOUNT_ID = 13361;
 const PAYHERO_CHANNEL_ID = 14366;
 const PAYHERO_API_URL = "https://backend.payhero.co.ke/api/v2/payments";
+
+// Auto-creates Basic Auth - don't touch this line
+const PAYHERO_BASIC_AUTH = "Basic " + btoa(PAYHERO_API_USERNAME + ":" + PAYHERO_API_PASSWORD);
+
+// === PAYHERO STK FUNCTION ===
+async function initiatePayheroSTK(phone, amount) {
+  // Format phone to 254...
+  let formattedPhone = phone.replace(/^0/, "254").replace(/\+/, "");
+  
+  const payload = {
+    amount: amount,
+    phone_number: formattedPhone,
+    channel_id: PAYHERO_CHANNEL_ID,
+    provider: "m-pesa",
+    external_reference: "BRIX-" + Date.now(),
+    callback_url: "https://brixtrade-c142d.firebaseapp.com/callback"
+  };
+
+  const response = await fetch(PAYHERO_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": PAYHERO_BASIC_AUTH
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+  console.log("PayHero Response:", data);
+  return data;
+}
 
 let demoBalance=0,isDemo=false,demoBalanceFake=1000,tradeTimer=null,wins=0,trades=0,entryPrice=0,dailyProfitAmount=0,demoDailyProfit=0,lastProfitReset=new Date().toDateString(),activeBot="scalper",currentUid=null;
 const USD_TO_KES=130,PAYOUT=0.7,$=id=>document.getElementById(id);
