@@ -126,7 +126,7 @@ function setCurrentBalance(v){if(isDemo)demoBalanceFake=v;else demoBalance=v; sa
 function updateBalance(){$("balance").textContent="$"+getCurrentBalance().toFixed(2);$("demoBadge").classList.toggle("on",isDemo);$("demoBtn").textContent=isDemo?"Leave Demo":"Try Demo"}
 function setPnl(v){$("dailyProfit").textContent=(v>=0?"+":"-")+"$"+Math.abs(v).toFixed(2);$("dailyProfit").className=v>0?"up":v<0?"dn":""}
 updateBalance();
-function toggleDemo(){if(tradeTimer){showPopup("lose","Trade Active","⏳","Wait for the current trade to finish");return} if(!isDemo){isDemo=true;demoBalanceFake=1000;demoDailyProfit=0;setPnl(0);updateBalance();say("DEMO ROOM: $1000 unlimited practice - 90% WIN");showPopup("deposit","Demo Room","🎮","You are in DEMO\n$1000 free - 90% win rate")}else{isDemo=false;setPnl(dailyProfitAmount);updateBalance();say("Left Demo - REAL mode");}}
+function toggleDemo(){if(tradeTimer){showPopup("lose","Trade Active","⏳","Wait for the current trade to finish");return} if(!isDemo){isDemo=true;demoBalanceFake=1000;demoDailyProfit=0;setPnl(0);updateBalance();say("DEMO ROOM: $1000 unlimited practice - 90% WIN");showPopup("deposit","Demo Room","🎮","You are in DEMO\n$1000 free")}else{isDemo=false;setPnl(dailyProfitAmount);updateBalance();say("Left Demo - REAL mode");}}
 document.getElementById("wIdFile").onchange=e=>{$("wFileName").textContent=e.target.files[0]?"Selected: "+e.target.files[0].name:""};
 function withdraw(){const bal=getCurrentBalance(); if(isDemo){showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw");return} if(bal<5){showPopup("lose","Withdrawal Failed","⚠️",`Minimum $5\nBalance: $${bal.toFixed(2)}`);return} $("wBal").textContent=bal.toFixed(2);$("withdrawModal").style.display="flex";wNext(1)}
 function wNext(n){if(n==2){const amt=parseFloat($("wAmount").value);if(!amt||amt<5){alert("Enter min $5");return}if(amt>getCurrentBalance()){alert("Insufficient balance");return}} $("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none"; $("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC"}
@@ -143,10 +143,10 @@ function startTrade(dir){
  if(bal<stake){if(isDemo){demoBalanceFake=1000;updateBalance();say("Demo reset to $1000")}else{say("Low balance - Deposit");showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`);return}}
  if(!isDemo){let today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;lastProfitReset=today;setPnl(0)} if(dailyProfitAmount>=15){showPopup("lose","Daily Limit Reached","⏰",`You made $15 today!\nMax $15/day profit\nCome tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);say('Daily $15 limit reached');return;}}
  const duration=parseInt($("duration").value);entryPrice=M[sel].p;let left=duration;$("timer").textContent=left+"s";
- say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [ENTER DEMO]":""));
+ say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [DEMO 90%]":""));
  tradeTimer=setInterval(()=>{left--;$("timer").textContent=left+"s";if(left>0)return;
   clearInterval(tradeTimer);tradeTimer=null;$("timer").textContent="Ready";trades++;
-  const exitPrice=M[sel].p,tag=isDemo?" [ENTER DEMO]":"";
+  const exitPrice=M[sel].p,tag=isDemo?" [DEMO 90%]":"";
   if(exitPrice===entryPrice){say("PUSH - stake returned");showPopup("deposit","Push"+tag,"↔️",`Price did not move.\nStake returned.\nBalance: $${getCurrentBalance().toFixed(2)}`);return}
   const wentUp=exitPrice>entryPrice,guessedRight=(dir==="BUY"&&wentUp)||(dir==="SELL"&&!wentUp);
   let win;
