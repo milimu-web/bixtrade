@@ -53,67 +53,51 @@ const PAYSTACK_KEY="pk_live_0beac5527720989e538120555ad8f42646691193";
 let demoBalance=0,isDemo=false,demoBalanceFake=1000,tradeTimer=null,wins=0,trades=0,entryPrice=0,dailyProfitAmount=0,demoDailyProfit=0,lastProfitReset=new Date().toDateString(),activeBot="scalper",currentUid=null;
 const USD_TO_KES=130,PAYOUT=0.7,$=id=>document.getElementById(id);
 
-// --- PHONE + PIN LOGIN LOGIC - PIN PROTECTED ---
+// --- PHONE LOGIN LOGIC ---
 function checkLogin(){
   let savedPhone = localStorage.getItem("brix_phone");
-  let savedPin = localStorage.getItem("brix_pin");
-  if(savedPhone && savedPin){
+  if(savedPhone){
     document.getElementById("loginModal").style.display="none";
-    initUser(savedPhone, savedPin);
+    initUser(savedPhone);
   } else {
     document.getElementById("loginModal").style.display="flex";
   }
 }
 function doLogin(){
-  let phone = document.getElementById("loginPhone").value.trim().replace(/\s/g,"");
-  let pin = document.getElementById("loginPin") ? document.getElementById("loginPin").value.trim() : "";
+  let phone = document.getElementById("loginPhone").value.trim();
   if(phone.length < 10){ alert("Enter valid M-Pesa number e.g +254712345678"); return; }
-  if(!/^\d{4}$/.test(pin)){ alert("Enter 4-digit PIN"); return; }
+  // normalize
+  phone = phone.replace(/\s/g,"");
   localStorage.setItem("brix_phone", phone);
-  localStorage.setItem("brix_pin", pin);
   localStorage.setItem("brix_uid", phone);
   document.getElementById("loginModal").style.display="none";
-  initUser(phone, pin);
+  initUser(phone);
 }
 function logoutPhone(){
   if(confirm("Logout? You will need to enter phone again to see balance")){
     localStorage.removeItem("brix_phone");
-    localStorage.removeItem("brix_pin");
     location.reload();
   }
 }
-function initUser(phone, pin){
+function initUser(phone){
   currentUid = phone;
   document.getElementById("userPhoneShow").textContent = "• "+phone;
   document.getElementById("mpesaPhone").value = phone;
   document.getElementById("wPhone").value = phone;
-  // listen to user balance with PIN verification
+  // listen to user balance
   db.collection("users").doc(currentUid).onSnapshot(doc=>{
     if(doc.exists){
-      let data = doc.data();
-      // If account has PIN, verify it
-      if(data.pin && data.pin !== pin){
-        alert("Wrong PIN for this number");
-        localStorage.removeItem("brix_pin");
-        document.getElementById("loginModal").style.display="flex";
-        return;
-      }
-      // If no PIN yet, save it
-      if(!data.pin){
-        db.collection("users").doc(currentUid).set({pin:pin},{merge:true});
-      }
       if(!isDemo){
-        demoBalance = data.balance||0;
-        dailyProfitAmount = data.dailyProfit||0;
+        demoBalance = doc.data().balance||0;
+        dailyProfitAmount = doc.data().dailyProfit||0;
         updateBalance(); setPnl(dailyProfitAmount);
       }
     } else {
-      // New user - create with PIN
-      db.collection("users").doc(currentUid).set({balance:0,dailyProfit:0,phone:phone,pin:pin,createdAt:new Date()},{merge:true});
+      db.collection("users").doc(currentUid).set({balance:0,dailyProfit:0,phone:phone,createdAt:new Date()},{merge:true});
     }
   });
 }
-checkLogin();
+checkLogin();     
 
 const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a])),rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
@@ -144,7 +128,7 @@ function setPnl(v){$("dailyProfit").textContent=(v>=0?"+":"-")+"$"+Math.abs(v).t
 updateBalance();
 function toggleDemo(){if(tradeTimer){showPopup("lose","Trade Active","⏳","Wait for the current trade to finish");return} if(!isDemo){isDemo=true;demoBalanceFake=1000;demoDailyProfit=0;setPnl(0);updateBalance();say("DEMO ROOM: $1000 unlimited practice - 90% WIN");showPopup("deposit","Demo Room","🎮","You are in DEMO\n$1000 free")}else{isDemo=false;setPnl(dailyProfitAmount);updateBalance();say("Left Demo - REAL mode");}}
 document.getElementById("wIdFile").onchange=e=>{$("wFileName").textContent=e.target.files[0]?"Selected: "+e.target.files[0].name:""};
-function withdraw(){const bal=getCurrentBalance(); if(isDemo){showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw");return} if(bal<5){showPopup("lose","Withdrawal Failed","⚠️",`Minimum $5\nBalance: $${bal.toFixed(2)}`);return} $("wBal").textContent=bal.toFixed(2);$("withdrawModal").style.display="flex";wNext(1)}
+function withdraw(){const bal=getCurrentBalance(); if(isDemo){showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw");return} if(bal<5){showPopup("lose","Withdrawal Failed","⚠️",`Minimum $2\nBalance: $${bal.toFixed(2)}`);return} $("wBal").textContent=bal.toFixed(2);$("withdrawModal").style.display="flex";wNext(1)}
 function wNext(n){if(n==2){const amt=parseFloat($("wAmount").value);if(!amt||amt<5){alert("Enter min $5");return}if(amt>getCurrentBalance()){alert("Insufficient balance");return}} $("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none"; $("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC"}
 function closeWithdraw(){$("withdrawModal").style.display="none"}
 async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(); if(!amt||amt<5){alert("Enter min $5");return} if(getCurrentBalance()<amt){alert("Insufficient");return} setCurrentBalance(getCurrentBalance()-amt);updateBalance(); const req={id:Date.now(),amount:amt,phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid}; try{ await db.collection("withdrawals").doc(String(req.id)).set(req); }catch(e){} closeWithdraw(); showPopup("withdraw","Withdrawal Request Recorded. Your money would be refunded in two working days for any delays and requets contact @brixtrade.co.ke for support. Thankyou for choosing brixtrade stay connected","💸",`Amount: $${amt.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);}
