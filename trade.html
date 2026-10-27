@@ -31,17 +31,33 @@ main{display:grid;grid-template-columns:260px minmax(0,1fr) 320px;gap:16px;paddi
 @media(max-width:700px){header{display:grid!important;grid-template-columns:1fr 1fr;gap:8px 12px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top))}h1{grid-column:1 / -1;font-size:16px;width:100%;margin:0 0 4px 0;display:flex;flex-direction:column;line-height:1.2}h1 small{margin:2px 0 0 0;font-size:10px}.stat{background:rgba(24,33,49,0.8);border:1px solid #222d40;border-radius:8px;padding:6px 10px;min-width:0;flex:none!important}.stat small{font-size:9px!important;white-space:nowrap}.stat b{font-size:14px!important;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#demoBtn,.btn-brix,header .btn{grid-column:span 1;padding:10px 8px;font-size:12px;text-align:center}#demoBtn{grid-column:1}.btn-brix{grid-column:2}header .btn:last-child{grid-column:1 / -1}main{grid-template-columns:1fr;padding:8px;gap:10px;padding-bottom:90px}#ch{order:1;padding:12px}#list{order:2;max-height:180px}aside.pn:last-child{order:3}#cv{height:240px;margin-top:8px}#tk{gap:10px;margin-top:12px}input,select{padding:10px;font-size:14px}.buy,.sell{padding:18px 14px;font-size:16px;border-radius:12px}.bots{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.bot-card{padding:8px}.bot-card h3{font-size:11px}.bot-card p{font-size:10px}.ttl h2{font-size:18px}#sp{font-size:18px}#mpesaModal>div{width:96%!important;max-width:96%!important;padding:16px!important;border-radius:16px!important;max-height:92vh;overflow:auto}.wbox{width:96%;max-width:96%;padding:16px;max-height:92vh;overflow:auto}#popupBox{width:92%;padding:20px}#msgs{max-height:220px}}
 </style></head><body>
 
-<!-- PHONE LOGIN -->
-<div id="loginModal" style="position:fixed;inset:0;background:rgba(3,6,12,.92);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(12px)">
+<!-- SECURE AUTH GATE - NO PHONE LOGIN -->
+<div id="authGate" style="position:fixed;inset:0;background:rgba(3,6,12,.92);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(12px)">
   <div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:28px;width:400px;max-width:92%;text-align:center">
     <h1 style="margin:0;font-family:Sora">BRIX<span style="color:#8b8dff">TRADE</span></h1>
-    <p style="color:#8593a8;font-size:13px;margin:8px 0 18px">Enter your M-Pesa number to continue.<br>Your balance is saved to this number.</p>
-    <label style="text-align:left;display:block;font-size:11px;color:#8593a8;margin-bottom:6px">M-PESA PHONE</label>
-    <input id="loginPhone" type="tel" placeholder="+254712345678" value="+254" style="font-size:16px;padding:14px">
-    <button class="btn-brix" style="width:100%;padding:14px;margin-top:16px;font-size:15px" onclick="doLogin()">Continue →</button>
-    <div style="font-size:11px;color:#6ea8ff;margin-top:12px">🔒 Balance is linked to your phone number<br>Clear browser? Just enter same number again</div>
+    <p style="color:#8593a8;font-size:13px;margin:8px 0 18px" id="gateMsg">Checking secure session...</p>
+    <div style="margin:20px auto;width:30px;height:30px;border:3px solid #222d40;border-top-color:#8b8dff;border-radius:50%;animation:spin 1s linear infinite"></div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
   </div>
 </div>
+<script>
+// Secure gate - only allow logged-in users from index.html
+firebase.auth().onAuthStateChanged(user=>{
+  if(user){
+    window.currentUid = user.uid;
+    const gate = document.getElementById('authGate');
+    if(gate) gate.style.display='none';
+    // Now load his balance
+    if(typeof loadUserData === 'function') loadUserData();
+    if(typeof updateNav === 'function') updateNav();
+  } else {
+    // Not logged in -> back to landing page to login securely
+    location.href = 'index.html';
+  }
+});
+
+function doLogin(){ /* old phone login disabled */ return false; }
+</script>
 
 <div id="popup" onclick="closePopup()"><div id="popupBox"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
 <div id="withdrawModal"><div class="wbox"><h2>Withdrawal Verification</h2><span id="wStepLabel">Step 1</span><div id="wStep1"><label>Amount USD $<span id="wBal">0</span></label><input id="wAmount" type="number"><button class="btn-brix" style="width:100%" onclick="wNext(2)">Continue</button></div><div id="wStep2" style="display:none"><label>M-Pesa</label><input id="wPhone"><label>Name</label><input id="wMpesaName"><button class="btn-brix" style="width:100%" onclick="wNext(3)">Continue</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div><div id="wStep3" style="display:none"><label>ID</label><input id="wIdNum"><div class="upl" onclick="document.getElementById('wIdFile').click()">Tap to upload ID</div><input id="wIdFile" type="file" hidden><div id="wFileName"></div><div class="note">Encrypted • Kenya Data Protection Act</div><button class="btn-brix" style="width:100%" onclick="submitWithdrawal()">Verify & Withdraw</button></div><button onclick="closeWithdraw()" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut)">Cancel</button></div></div>
