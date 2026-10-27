@@ -1,10 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig = {apiKey:"AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o",authDomain:"brixtrade-c142d.firebaseapp.com",projectId:"brixtrade-c142d",storageBucket:"brixtrade-c142d.firebasestorage.app",messagingSenderId:"489953142453",appId:"1:489953142453:web:2499588c325482d17a00fc",measurementId:"G-EX79EB9RDN"};
-firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e16">
@@ -53,51 +56,70 @@ const PAYSTACK_KEY="pk_live_0beac5527720989e538120555ad8f42646691193";
 let demoBalance=0,isDemo=false,demoBalanceFake=1000,tradeTimer=null,wins=0,trades=0,entryPrice=0,dailyProfitAmount=0,demoDailyProfit=0,lastProfitReset=new Date().toDateString(),activeBot="scalper",currentUid=null;
 const USD_TO_KES=130,PAYOUT=0.7,$=id=>document.getElementById(id);
 
-// --- PHONE LOGIN LOGIC ---
+// --- SECURE USERNAME + PIN LOGIN (saves balance with UID, not phone) ---
+currentUid = null;
+
 function checkLogin(){
-  let savedPhone = localStorage.getItem("brix_phone");
-  if(savedPhone){
-    document.getElementById("loginModal").style.display="none";
-    initUser(savedPhone);
-  } else {
-    document.getElementById("loginModal").style.display="flex";
-  }
-}
-function doLogin(){
-  let phone = document.getElementById("loginPhone").value.trim();
-  if(phone.length < 10){ alert("Enter valid M-Pesa number e.g +254712345678"); return; }
-  // normalize
-  phone = phone.replace(/\s/g,"");
-  localStorage.setItem("brix_phone", phone);
-  localStorage.setItem("brix_uid", phone);
-  document.getElementById("loginModal").style.display="none";
-  initUser(phone);
-}
-function logoutPhone(){
-  if(confirm("Logout? You will need to enter phone again to see balance")){
-    localStorage.removeItem("brix_phone");
-    location.reload();
-  }
-}
-function initUser(phone){
-  currentUid = phone;
-  document.getElementById("userPhoneShow").textContent = "• "+phone;
-  document.getElementById("mpesaPhone").value = phone;
-  document.getElementById("wPhone").value = phone;
-  // listen to user balance
-  db.collection("users").doc(currentUid).onSnapshot(doc=>{
-    if(doc.exists){
-      if(!isDemo){
-        demoBalance = doc.data().balance||0;
-        dailyProfitAmount = doc.data().dailyProfit||0;
-        updateBalance(); setPnl(dailyProfitAmount);
-      }
+  firebase.auth().onAuthStateChanged(user => {
+    if(user){
+      document.getElementById("loginModal").style.display="none";
+      initUser(user.uid, user.displayName || user.email.split('@')[0]);
     } else {
-      db.collection("users").doc(currentUid).set({balance:0,dailyProfit:0,phone:phone,createdAt:new Date()},{merge:true});
+      document.getElementById("loginModal").style.display="flex";
     }
   });
 }
-checkLogin();     
+
+async function doLogin(){
+  let username = document.getElementById("loginUsername").value.trim().toLowerCase();
+  let pin = document.getElementById("loginPin").value.trim();
+  if(username.length < 3){ alert("Username min 3 letters"); return; }
+  if(pin.length < 4){ alert("PIN min 4 digits"); return; }
+
+  let email = username + "@brixtrade.com";
+  let password = pin + "Brix_Secure_2024!";
+
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, password);
+  } catch(err){
+    if(err.code === 'auth/user-not-found'){
+      if(!confirm("Create new account for '"+username+"' ?")) return;
+      let cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      await cred.user.updateProfile({displayName: username});
+      await db.collection("users").doc(cred.user.uid).set({
+        username: username,
+        balance: 0,
+        dailyProfit: 0,
+        createdAt: new Date()
+      });
+    } else if(err.code === 'auth/wrong-password'){
+      alert("Wrong PIN for this username");
+    } else {
+      alert(err.message);
+    }
+  }
+}
+
+function logoutPhone(){
+  if(confirm("Logout?")){
+    firebase.auth().signOut().then(()=> location.reload());
+  }
+}
+
+function initUser(uid, username){
+  currentUid = uid;
+  document.getElementById("userPhoneShow").textContent = "• "+username;
+  // Balance saved by UID, not phone - secure and persists after refresh
+  db.collection("users").doc(currentUid).onSnapshot(doc=>{
+    if(doc.exists && !isDemo){
+      demoBalance = doc.data().balance||0;
+      dailyProfitAmount = doc.data().dailyProfit||0;
+      updateBalance(); setPnl(dailyProfitAmount);
+    }
+  });
+}
+
+checkLogin();
 
 const AS=[["EUR","Euro",1.085,"fx"],["GBP","British Pound",1.30,"fx"],["JPY","Japanese Yen",.0067,"fx"],["CHF","Swiss Franc",1.14,"fx"],["AUD","Australian Dollar",.66,"fx"],["CAD","Canadian Dollar",.73,"fx"],["NZD","New Zealand Dollar",.60,"fx"],["CNY","Chinese Yuan",.138,"fx"],["INR","Indian Rupee",.0119,"fx"],["KES","Kenyan Shilling",.0077,"fx"],["ZAR","South African Rand",.056,"fx"],["NGN","Nigerian Naira",.00065,"fx"],["AED","UAE Dirham",.272,"fx"],["SGD","Singapore Dollar",.76,"fx"],["HKD","Hong Kong Dollar",.128,"fx"],["BRL","Brazilian Real",.18,"fx"],["MXN","Mexican Peso",.05,"fx"],["TRY","Turkish Lira",.029,"fx"],["SEK","Swedish Krona",.095,"fx"],["NOK","Norwegian Krone",.092,"fx"],["XAU","Gold (oz)",2650,"mt"],["XAG","Silver (oz)",31.5,"mt"],["XPT","Platinum (oz)",980,"mt"],["XPD","Palladium (oz)",1010,"mt"],["XCU","Copper (lb)",4.3,"mt"]].map(([k,n,p,t])=>({k,n,p0:p,p,t,v:t=="mt"?.0009:.0004,s:[]}));
 const M=Object.fromEntries(AS.map(a=>[a.k,a])),rn=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(6.2832*Math.random());
@@ -166,8 +188,61 @@ const today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmo
    showPopup("lose",`💥 ${dir} LOSS${tag}`,"📉",`Entry: ${fp(entryPrice)}\nExit: ${fp(exitPrice)}\nLoss: -$${stake.toFixed(2)}\nBalance: $${getCurrentBalance().toFixed(2)}`)}
  },1000)}
 
-function saveBalanceToFirebase(){if(isDemo||!currentUid)return;db.collection("users").doc(currentUid).set({balance:demoBalance,dailyProfit:dailyProfitAmount,lastUpdate:new Date(),phone:currentUid},{merge:true});}
-function convertUsdToKes(){const usd=parseFloat(document.getElementById('mpesaUsd').value)||0;const kes=usd*USD_TO_KES;document.getElementById('kesPreview').textContent="KES "+kes.toLocaleString();document.getElementById('mpesaShowUsd').textContent="$"+usd.toFixed(2);document.getElementById('mpesaTotal').textContent="KES "+kes.toLocaleString();}
-function depositWithPaystack(){if(isDemo){showPopup("lose","Demo Mode","🎮","Leave Demo");return}if(!currentUid){alert("Login first");return}document.getElementById('mpesaModal').style.display='flex';convertUsdToKes();}
-function doDirectMpesa(){const usd=parseFloat(document.getElementById('mpesaUsd').value)||0;const kes=usd*USD_TO_KES;let phone=document.getElementById('mpesaPhone').value.trim();if(!usd||usd<1){alert("Min $1");return}document.getElementById('mpesaModal').style.display='none';const handler=PaystackPop.setup({key:PAYSTACK_KEY,email:"customer@brixtrade.com",amount:kes*100,currency:"KES",metadata:{custom_fields:[{display_name:"USD",variable_name:"usd",value:usd},{display_name:"Phone",variable_name:"phone",value:phone}]},callback:function(res){isDemo=false;demoBalance+=usd;updateBalance();saveBalanceToFirebase();db.collection("deposits").doc(res.reference).set({uid:currentUid,usd,kes,phone,reference:res.reference,status:"success",createdAt:new Date()});say(`Deposit SUCCESS $${usd}=KES ${kes} Ref ${res.reference}`);showPopup("deposit","Deposit Successful","✅",`Amount: $${usd} (KES ${kes.toLocaleString()})\nRef: ${res.reference}\nNew Balance: $${demoBalance.toFixed(2)}`);},onClose:function(){say("Deposit closed");showPopup("lose","Cancelled","❌","You closed Paystack");}});handler.openIframe();}
-</script></body></html>
+function saveBalanceToFirebase(){
+  if(isDemo||!auth.currentUser)return;
+  const uid = auth.currentUser.uid;
+  db.collection("users").doc(uid).set({
+    balance: demoBalance,
+    dailyProfit: dailyProfitAmount,
+    lastUpdate: new Date(),
+    email: auth.currentUser.email,
+    username: auth.currentUser.displayName || auth.currentUser.email
+  },{merge:true}).catch(e=>console.error("Save failed:", e.message));
+}
+
+function depositWithPaystack(){
+  if(isDemo){showPopup("lose","Demo Mode","🎮","Leave Demo");return}
+  if(!auth.currentUser){alert("Login first");openAuth();return}
+  document.getElementById('mpesaModal').style.display='flex';
+  convertUsdToKes();
+}
+
+function doDirectMpesa(){
+  const usd=parseFloat(document.getElementById('mpesaUsd').value)||0;
+  const kes=usd*USD_TO_KES;
+  let phone=document.getElementById('mpesaPhone').value.trim();
+  if(!usd||usd<1){alert("Min $1");return}
+  document.getElementById('mpesaModal').style.display='none';
+  const userEmail = auth.currentUser ? auth.currentUser.email : "customer@brixtrade.com";
+  const handler=PaystackPop.setup({
+    key:PAYSTACK_KEY,
+    email:userEmail,
+    amount:kes*100,
+    currency:"KES",
+    metadata:{custom_fields:[
+      {display_name:"USD",variable_name:"usd",value:usd},
+      {display_name:"Phone",variable_name:"phone",value:phone},
+      {display_name:"UID",variable_name:"uid",value:auth.currentUser.uid}
+    ]},
+    callback:function(res){
+      isDemo=false;
+      demoBalance+=usd;
+      updateBalance();
+      saveBalanceToFirebase();
+      db.collection("deposits").doc(res.reference).set({
+        uid:auth.currentUser.uid,
+        usd, kes, phone,
+        reference:res.reference,
+        status:"success",
+        createdAt:new Date()
+      });
+      say(`Deposit SUCCESS $${usd}=KES ${kes} Ref ${res.reference}`);
+      showPopup("deposit","Deposit Successful","✅",`Amount: $${usd} (KES ${kes.toLocaleString()})\nRef: ${res.reference}\nNew Balance: $${demoBalance.toFixed(2)}`);
+    },
+    onClose:function(){
+      say("Deposit closed");
+      showPopup("lose","Cancelled","❌","You closed Paystack");
+    }
+  });
+  handler.openIframe();
+}
