@@ -142,13 +142,13 @@ function startTrade(dir){
  if(bal<stake){if(isDemo){demoBalanceFake=1000;updateBalance();say("Demo reset to $1000")}else{say("Low balance - Deposit");showPopup("lose","Low Balance","⚠️",`Need $${stake}\nBalance: $${bal.toFixed(2)}`);return}}
  if(!isDemo){let today=new Date().toDateString();if(lastProfitReset!==today){dailyProfitAmount=0;lastProfitReset=today;setPnl(0)} if(dailyProfitAmount>=15){showPopup("lose","Daily Limit Reached","⏰",`You made $15 today!\nMax $15/day profit\nCome tomorrow\nBalance: $${getCurrentBalance().toFixed(2)}`);say('Daily $15 limit reached');return;}}
  const duration=parseInt($("duration").value);entryPrice=M[sel].p;let left=duration;$("timer").textContent=left+"s";
- say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [DEMO 90%]":""));
+ say(dir+" $"+stake+" on "+sel+"/USD "+duration+"s Entry:"+fp(entryPrice)+(isDemo?" [DEMO 75%]":""));
  tradeTimer=setInterval(()=>{left--;$("timer").textContent=left+"s";if(left>0)return;
   clearInterval(tradeTimer);tradeTimer=null;$("timer").textContent="Ready";trades++;
-  const exitPrice=M[sel].p,tag=isDemo?" [DEMO 90%]":"";
+  const exitPrice=M[sel].p,tag=isDemo?" [DEMO 75%]":"";
   if(exitPrice===entryPrice){say("PUSH - stake returned");showPopup("deposit","Push"+tag,"↔️",`Price did not move.\nStake returned.\nBalance: $${getCurrentBalance().toFixed(2)}`);return}
   let win;
-  if(isDemo){ win = Math.random() < 0.90; }
+  if(isDemo){ win = Math.random() < 0.75; }
   else {
     let batch=getBatch();
     if(batch.length===0){ batch=getShuffledBatch(); }
