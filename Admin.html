@@ -80,7 +80,7 @@ window.switchType=function(t){
   document.getElementById('tabWit').classList.toggle('on',t==='withdrawals');
   render();
 }
-db.collection("deposits").orderBy("date","desc").onSnapshot(snap=>{
+db.collection("deposits").orderBy("id","desc").onSnapshot(snap=>{
   deposits=[]; snap.forEach(doc=>deposits.push({docId:doc.id, ...doc.data()}));
   document.getElementById('cDep').textContent=deposits.length;
   if(curType==='deposits') render();
