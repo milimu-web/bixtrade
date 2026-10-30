@@ -134,7 +134,7 @@ async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone
     localStorage.setItem('brixtrade_history',JSON.stringify(hist));
   }catch(e){}
   closeWithdraw();
-  showPopup("withdraw","Withdrawal Request Recorded. Your money would be refunded in two working days for any delays and requets contact @brixtrade.co.ke for support. Thankyou for choosing brixtrade stay connected","💸",`Amount: $${amt.toFixed(2)}\nFee (3%): $${fee.toFixed(2)}\nYou Receive: $${youReceive.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);
+  showPopup("withdraw","Withdrawal Request Recorded. Your money would be received in two working days for any delays and requets contact @brixtrade.co.ke for support. Thankyou for choosing brixtrade stay connected","💸",`Amount: $${amt.toFixed(2)}\nFee (3%): $${fee.toFixed(2)}\nYou Receive: $${youReceive.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);
 }
 function subscribe(){say("Sniper VIP selected");showPopup("deposit","Sniper VIP","🎯","Subscriptions aren't connected to billing yet.\nThe 120s preset is available to everyone.")}
 function selectBot(bot,el){activeBot=bot;document.querySelectorAll(".bot-card").forEach(c=>c.classList.remove("active"));el.classList.add("active");$("duration").value=bot==="scalper"?30:bot==="trend"?60:120;say(bot+" preset selected")}
@@ -246,8 +246,8 @@ function doDirectMpesa(){
 <div id="historyModal" style="position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(6px)">
 <div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:20px;width:440px;max-width:96%;max-height:85vh;overflow:auto">
 <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:Sora">📜 Trading History</h3><button onclick="closeHistory()" style="background:none;border:none;color:#8593a8;font-size:22px;cursor:pointer">✕</button></div>
-<table style="width:100%;font-size:13px;margin-top:15px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #222d40;text-align:left"><th style="padding:6px">Type</th><th>Amount</th><th>Fee</th><th>You Get</th></tr></thead><tbody id="historyBody"></tbody></table>
-<div style="margin-top:15px;display:grid;gap:8px"><button onclick="clearHistory()" style="width:100%;background:#ef4444;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer">Clear History</button><button onclick="closeHistory()" style="width:100%;background:#182131;border:1px solid #222d40;padding:10px;border-radius:10px;color:#8593a8;cursor:pointer">Close</button></div>
+<table style="width:100%;font-size:13px;margin-top:15px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #222d40;text-align:left"><th style="padding:6px">Type</th><th>Amount</th><th>Fee</th><th>You Get(Any withdrawals 2 days.Thanks)</th></tr></thead><tbody id="historyBody"></tbody></table>
+<div style="margin-top:15px;display:grid;gap:8px"><button onclick="clearHistory()" style="width:100%;background:#050f70;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer">Clear History</button><button onclick="closeHistory()" style="width:100%;background:#182131;border:1px solid #222d40;padding:10px;border-radius:10px;color:#8593a8;cursor:pointer">Close</button></div>
 </div></div>
 <script>
 function openHistory(){loadHistory();document.getElementById('historyModal').style.display='flex'}
