@@ -161,20 +161,43 @@ a{text-decoration:none;color:inherit}
   </div>
   <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);font-family:JetBrains Mono">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg2);border:1px solid var(--ln);border-radius:10px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
 </div>
-
-<!-- CLICKABLE REFERRAL - ATTENTION CATCHER -->
+<!-- CLICKABLE REFERRAL - MOBILE FIXED -->
 <section id="refSection" style="max-width:1200px;margin:20px auto;padding:0 24px;">
-  <div style="background: linear-gradient(135deg,#121927 0%,#1a2340 100%); border:1px solid #222d40; border-radius:20px; overflow:hidden; display:grid; grid-template-columns:1.1fr 0.9fr; box-shadow:0 10px 30px rgba(0,0,0,.35); position:relative; cursor:pointer;" onclick="handleInviteClick()">
+  <style>
+    #refCard{ 
+      background: linear-gradient(135deg,#121927 0%,#1a2340 100%); 
+      border:1px solid #222d40; border-radius:20px; 
+      overflow:hidden; display:grid; 
+      grid-template-columns:1.1fr 0.9fr; 
+      box-shadow:0 10px 30px rgba(0,0,0,.35); 
+      position:relative; cursor:pointer;
+    }
+    #refImgWrap{
+      background:radial-gradient(400px 250px at 70% 20%, #6366f155, transparent);
+      display:flex; align-items:center; justify-content:center; 
+      padding:12px; position:relative; overflow:hidden;
+    }
+    @media(max-width:700px){
+      #refCard{ grid-template-columns:1fr; }
+      #refImgWrap{ order:2; padding:0 12px 12px 12px; }
+      #refTextWrap{ order:1; padding:20px 16px 12px 16px !important; }
+      #refTextWrap h2{ font-size:24px !important; }
+      #refCard img{ max-width:100% !important; width:100% !important; }
+    }
+  </style>
+  <div id="refCard" onclick="handleInviteClick()">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b8dff,#6366f1,#34d399);"></div>
-    <div style="padding:28px;">
+    
+    <div id="refTextWrap" style="padding:28px;">
       <span style="background:rgba(139,141,255,.15); color:#8b8dff; border:1px solid #2a2e6a; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">🎁 REFER & EARN $5</span>
       <h2 style="font-family:Sora; font-size:28px; line-height:1.15; margin:14px 0 8px; color:#e8edf6;">Invite Friends,<br>Get <span style="color:#8b8dff;">$5 Bonus</span></h2>
       <p style="color:#8593a8; font-size:13px; margin:0 0 14px; line-height:1.5;">Tap to get your secret referral link inside trading room.</p>
       <div id="refBanner" style="display:none; background:rgba(52,211,153,.1); border:1px dashed #34d399; color:#6ee7b7; padding:10px 12px; border-radius:10px; font-size:12px; margin-bottom:14px; font-weight:600;">🎉 You were invited! Create account to unlock $5 bonus.</div>
-      <button style="background:linear-gradient(135deg,#8b8dff,#6366f1); border:0; color:white; font-weight:800; padding:12px 20px; border-radius:10px; cursor:pointer; box-shadow:0 6px 18px rgba(99,102,241,.35); font-size:13px;">👉 Invite Friends - Get Link</button>
-      <div style="display:flex; gap:12px; margin-top:10px; font-size:11px; color:#5a6a80;"><span>✅ Instant link</span><span>✅ $5 per friend</span><span>✅ Secret wallet</span></div>
+      <button style="background:linear-gradient(135deg,#8b8dff,#6366f1); border:0; color:white; font-weight:800; padding:12px 20px; border-radius:10px; cursor:pointer; box-shadow:0 6px 18px rgba(99,102,241,.35); font-size:13px; width:100%;">👉 Invite Friends - Get Link</button>
+      <div style="display:flex; gap:12px; margin-top:10px; font-size:11px; color:#5a6a80; flex-wrap:wrap;"><span>✅ Instant link</span><span>✅ $5 per friend</span><span>✅ Secret wallet</span></div>
     </div>
-    <div style="background:radial-gradient(400px 250px at 70% 20%, #6366f155, transparent); display:flex; align-items:center; justify-content:center; padding:12px; position:relative; overflow:hidden;">
+
+    <div id="refImgWrap">
       <img src="referral.png" alt="Refer & Earn $5" style="width:100%; max-width:340px; border-radius:16px; object-fit:cover; display:block;">
     </div>
   </div>
