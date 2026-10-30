@@ -262,4 +262,89 @@ function loadHistory(){
 function clearHistory(){if(confirm('Clear all history?')){localStorage.removeItem('brixtrade_history');loadHistory()}}
 </script>
 
+<!-- SECRET REFERRAL FLOATING WALLET - SAFE, WON'T BREAK LAYOUT -->
+<style>
+#refFloatBtn{
+  position:fixed; bottom:20px; right:20px; z-index:999;
+  background:linear-gradient(135deg,#8b8dff,#6366f1);
+  color:#fff; border:0; padding:12px 18px; border-radius:30px;
+  font-weight:800; font-size:13px; cursor:pointer;
+  box-shadow:0 8px 24px rgba(99,102,241,.5);
+  display:flex; gap:6px; align-items:center;
+}
+#refWalletModal{
+  position:fixed; inset:0; background:rgba(3,6,12,.85);
+  display:none; place-items:center; z-index:1000; backdrop-filter:blur(8px);
+}
+#refWalletModal.on{ display:grid; }
+#refWalletBox{
+  background:#0e1420; border:1px solid #232e45; border-radius:16px;
+  width:92%; max-width:420px; overflow:hidden; max-height:90vh; overflow-y:auto;
+}
+</style>
+
+<button id="refFloatBtn" onclick="openRefWallet()">🎁 $5 Refer & Earn</button>
+
+<div id="refWalletModal" onclick="closeRefWallet()">
+  <div id="refWalletBox" onclick="event.stopPropagation()">
+    <div style="padding:16px 20px; background:linear-gradient(180deg,#141c2c,#0e1420); border-bottom:1px solid #232e45; display:flex; justify-content:space-between; align-items:center;">
+      <b style="font-family:Sora;">Referral Wallet - Secret</b>
+      <button onclick="closeRefWallet()" style="width:28px; height:28px; border-radius:8px; border:1px solid #232e45; background:#0a0e16; color:#8593a8; cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:16px; display:grid; gap:12px; background:#0f1520;">
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="background:#0a0e16; border:1px solid #222d40; padding:12px; border-radius:10px;">
+          <small style="color:#5a6a80; font-size:10px;">APPROVED</small>
+          <div style="font-family:JetBrains Mono; font-weight:800; font-size:18px; color:#34d399;">$<span id="refApproved">0.00</span></div>
+        </div>
+        <div style="background:#0a0e16; border:1px solid #222d40; padding:12px; border-radius:10px;">
+          <small style="color:#5a6a80; font-size:10px;">PENDING</small>
+          <div style="font-family:JetBrains Mono; font-weight:800; font-size:18px; color:#fbbf24;">$<span id="refPending">0.00</span></div>
+          <small style="color:#5a6a80; font-size:9px;">Admin approval needed</small>
+        </div>
+      </div>
+
+      <div>
+        <small style="color:#8593a8; font-size:11px; font-weight:700;">YOUR SECRET LINK</small>
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <input id="tradeRefLink" readonly style="flex:1; background:#0a0e16; border:1px solid #222d40; color:#e8edf6; padding:11px; border-radius:10px; font-family:JetBrains Mono; font-size:11px;">
+          <button onclick="copyTradeRef()" style="background:linear-gradient(135deg,#8b8dff,#6366f1); border:0; color:white; font-weight:800; padding:11px 14px; border-radius:10px; cursor:pointer;">Copy</button>
+        </div>
+        <p style="color:#5a6a80; font-size:11px; margin-top:6px;">Share → friend deposits $15+ → you get $5 pending till I approve</p>
+      </div>
+
+      <div id="myReferralsList" style="border-top:1px solid #222d40; padding-top:10px; max-height:180px; overflow:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openRefWallet(){ document.getElementById('refWalletModal').classList.add('on'); loadReferralWallet(); }
+function closeRefWallet(){ document.getElementById('refWalletModal').classList.remove('on'); }
+async function loadReferralWallet(){
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  const uid = user.uid;
+  document.getElementById('tradeRefLink').value = window.location.origin + '/?ref=' + uid;
+  try{
+    const snap = await firebase.firestore().collection('referralRewards').where('referrerId','==',uid).get();
+    let approved=0, pending=0, html='';
+    snap.forEach(doc=>{
+      const d=doc.data();
+      if(d.status==='approved') approved+=d.rewardAmount||0;
+      if(d.status==='pending') pending+=d.rewardAmount||0;
+      html+=`<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #1c2538; font-size:11px;"><span>${(d.referredId||'').substring(0,6)}... $${d.depositAmount||0} deposit</span><span style="font-weight:700; color:${d.status==='approved'?'#34d399':'#fbbf24'}">${(d.status||'').toUpperCase()} $${d.rewardAmount||0}</span></div>`;
+    });
+    document.getElementById('refApproved').innerText=approved.toFixed(2);
+    document.getElementById('refPending').innerText=pending.toFixed(2);
+    document.getElementById('myReferralsList').innerHTML=html||'<small style="color:#5a6a80">No referrals yet. Share your secret link!</small>';
+  }catch(e){ console.log(e); }
+}
+function copyTradeRef(){
+  const i=document.getElementById('tradeRefLink'); i.select(); i.setSelectionRange(0,99999);
+  try{ document.execCommand('copy'); alert('Secret link copied! Share now'); }catch(e){ navigator.clipboard.writeText(i.value); alert('Copied!'); }
+}
+firebase.auth().onAuthStateChanged(u=>{ if(u) loadReferralWallet(); });
+</script>
 </body></html>
