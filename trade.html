@@ -46,7 +46,7 @@ main{display:grid;grid-template-columns:260px minmax(0,1fr) 320px;gap:16px;paddi
 <div style="background:#fff;border-radius:14px;padding:18px 12px;text-align:center;margin:16px 0;border:2px solid #e5e7eb"><img src="safaricom_logo.png" alt="Safaricom" style="height:78px;width:auto;max-width:92%;object-fit:contain;display:inline-block"><div style="color:#111;font-size:13px;margin-top:10px;font-weight:700">Lipa na M-PESA • Deposit funds securely • $1 = KES 130</div></div>
 <label>Amount (USD)</label><input id="mpesaUsd" type="number" value="5" oninput="convertUsdToKes()"><div style="font-size:12px;color:#22c55e;margin:6px 0">💱 You will pay: <b id="kesPreview">KES 650</b></div><label>Phone</label><input id="mpesaPhone" type="tel" value="+254"><div style="font-size:11px;color:#6ea8ff;margin:8px 0">📲 After Confirm → Paystack popup → Choose M-PESA → STK to phone</div><div style="background:#182131;border:1px solid #222d40;border-radius:12px;padding:12px;margin:12px 0;font-size:12px">🛡️ Secure • 256-bit SSL • PCI DSS</div><div style="display:flex;justify-content:space-between"><span>Deposit</span><b id="mpesaShowUsd">$5.00</b></div><div style="display:flex;justify-content:space-between;font-weight:800"><span>Total</span><b style="color:#22c55e" id="mpesaTotal">KES 650</b></div><button class="btn-brix" style="width:100%;padding:14px;margin-top:14px;background:#22c55e;color:#000;border:0;border-radius:12px;font-weight:800;font-size:16px" onclick="doDirectMpesa()">Confirm Deposit</button></div></div>
 
-<header><h1>BRIX<span>TRADE</span><small>Currencies & Metals</small><small id="userPhoneShow" style="color:#8b8dff"></small></h1><div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><button class="btn-demo" id="demoBtn" onclick="toggleDemo()">Try Demo</button><button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button><button class="btn" style="font-size:10px" onclick="logoutPhone()">Logout</button></header>
+<header><h1>BRIX<span>TRADE</span><small>Currencies & Metals</small><small id="userPhoneShow" style="color:#8b8dff"></small></h1><div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div><div class="stat"><small>Daily Profit</small><b id="dailyProfit">$0.00</b></div><button class="btn-demo" id="demoBtn" onclick="toggleDemo()">Try Demo</button><button class="btn-brix" onclick="depositWithPaystack()">Deposit</button><button class="btn" onclick="withdraw()">Withdraw</button><button class="btn" onclick="openHistory()" style="background:#1e293b">📜 History</button><button class="btn" style="font-size:10px" onclick="logoutPhone()">Logout</button></header>
 
 <main><aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button></div><div id="il"></div></aside>
 <section class="pn" id="ch"><div class="ttl"><h2 id="sn">-</h2><b id="sp">-</b><span id="sc"></span><span id="sq">Timer: <b id="timer">Ready</b></span></div><canvas id="cv"></canvas><div id="tk"><div><label>Stake($) - 1$ = KES 130</label><input id="stake" type="number" min="1" step="1" value="1"></div><div><label>Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper VIP</option></select></div><button class="buy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell" onclick="startTrade('SELL')">SELL ▼</button></div><div class="bots"><div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>Fast • 30s preset</p></div><div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>Stable • 60s preset</p></div><div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper VIP</h3><p>Precision • 120s preset</p></div></div><button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button><p class="disclaimer">Brixtrade trade with all 25 metals. Protected by DCI DSS.1$ = KES130</p></section><aside class="pn" style="padding:16px"><h3 style="margin:0 0 12px 0;font-size:15px;font-family:Sora">Trade Assistant</h3><div id="msgs"></div></aside></main>
@@ -122,7 +122,20 @@ document.getElementById("wIdFile").onchange=e=>{$("wFileName").textContent=e.tar
 function withdraw(){const bal=getCurrentBalance(); if(isDemo){showPopup("lose","Demo Mode","🎮","Cannot withdraw DEMO money\nDeposit real money to withdraw");return} if(bal<2){showPopup("lose","Withdrawal Failed","⚠️",`Minimum $2\nBalance: $${bal.toFixed(2)}`);return} $("wBal").textContent=bal.toFixed(2);$("withdrawModal").style.display="flex";wNext(1)}
 function wNext(n){if(n==2){const amt=parseFloat($("wAmount").value);if(!amt||amt<2){alert("Enter min $2");return}if(amt>getCurrentBalance()){alert("Insufficient balance");return}} $("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none"; $("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC"}
 function closeWithdraw(){$("withdrawModal").style.display="none"}
-async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(); if(!amt||amt<2){alert("Enter min $2");return} if(getCurrentBalance()<amt){alert("Insufficient");return} setCurrentBalance(getCurrentBalance()-amt);updateBalance(); const req={id:Date.now(),amount:amt,phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid}; try{ await db.collection("withdrawals").doc(String(req.id)).set(req); }catch(e){} closeWithdraw(); showPopup("withdraw","Withdrawal Request Recorded. Your money would be refunded in two working days for any delays and requets contact @brixtrade.co.ke for support. Thankyou for choosing brixtrade stay connected","💸",`Amount: $${amt.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);}
+// MODIFIED ONLY TO ADD 3% FEE + LOCAL HISTORY - POPUP TEXT KEPT ORIGINAL
+async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim(); if(!amt||amt<2){alert("Enter min $2");return} if(getCurrentBalance()<amt){alert("Insufficient");return}
+  const fee=amt*0.03; const youReceive=amt-fee;
+  setCurrentBalance(getCurrentBalance()-amt);updateBalance(); 
+  const req={id:Date.now(),amount:amt,fee:Number(fee.toFixed(2)),amountReceived:Number(youReceive.toFixed(2)),phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid}; 
+  try{ await db.collection("withdrawals").doc(String(req.id)).set(req); }catch(e){}
+  try{
+    let hist=JSON.parse(localStorage.getItem('brixtrade_history')||'[]');
+    hist.unshift({id:req.id,type:'withdrawal',amount:amt,fee:req.fee,amountReceived:req.amountReceived,date:req.date});
+    localStorage.setItem('brixtrade_history',JSON.stringify(hist));
+  }catch(e){}
+  closeWithdraw();
+  showPopup("withdraw","Withdrawal Request Recorded. Your money would be refunded in two working days for any delays and requets contact @brixtrade.co.ke for support. Thankyou for choosing brixtrade stay connected","💸",`Amount: $${amt.toFixed(2)}\nFee (3%): $${fee.toFixed(2)}\nYou Receive: $${youReceive.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);
+}
 function subscribe(){say("Sniper VIP selected");showPopup("deposit","Sniper VIP","🎯","Subscriptions aren't connected to billing yet.\nThe 120s preset is available to everyone.")}
 function selectBot(bot,el){activeBot=bot;document.querySelectorAll(".bot-card").forEach(c=>c.classList.remove("active"));el.classList.add("active");$("duration").value=bot==="scalper"?30:bot==="trend"?60:120;say(bot+" preset selected")}
 
@@ -204,6 +217,12 @@ function doDirectMpesa(){
       demoBalance+=usd;
       updateBalance();
       saveBalanceToFirebase();
+      // SAVE DEPOSIT TO LOCAL HISTORY
+      try{
+        let hist=JSON.parse(localStorage.getItem('brixtrade_history')||'[]');
+        hist.unshift({id:Date.now(),type:'deposit',amount:usd,fee:0,amountReceived:usd,date:new Date().toLocaleString()});
+        localStorage.setItem('brixtrade_history',JSON.stringify(hist));
+      }catch(e){}
       db.collection("deposits").doc(res.reference).set({
         uid:auth.currentUser.uid,
         usd, kes, phone,
@@ -221,4 +240,25 @@ function doDirectMpesa(){
   });
   handler.openIframe();
 }
-</script></body></html>
+</script>
+
+<!-- ADDED: HISTORY MODAL - DOES NOT INTERFERE -->
+<div id="historyModal" style="position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(6px)">
+<div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:20px;width:440px;max-width:96%;max-height:85vh;overflow:auto">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:Sora">📜 Trading History</h3><button onclick="closeHistory()" style="background:none;border:none;color:#8593a8;font-size:22px;cursor:pointer">✕</button></div>
+<table style="width:100%;font-size:13px;margin-top:15px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #222d40;text-align:left"><th style="padding:6px">Type</th><th>Amount</th><th>Fee</th><th>You Get</th></tr></thead><tbody id="historyBody"></tbody></table>
+<div style="margin-top:15px;display:grid;gap:8px"><button onclick="clearHistory()" style="width:100%;background:#ef4444;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer">Clear History</button><button onclick="closeHistory()" style="width:100%;background:#182131;border:1px solid #222d40;padding:10px;border-radius:10px;color:#8593a8;cursor:pointer">Close</button></div>
+</div></div>
+<script>
+function openHistory(){loadHistory();document.getElementById('historyModal').style.display='flex'}
+function closeHistory(){document.getElementById('historyModal').style.display='none'}
+function loadHistory(){
+  const h=JSON.parse(localStorage.getItem('brixtrade_history')||'[]');
+  const b=document.getElementById('historyBody');
+  if(h.length===0){b.innerHTML='<tr><td colspan=4 style="text-align:center;padding:20px;color:#8593a8">No history yet</td></tr>';return}
+  b.innerHTML=h.map(tx=>`<tr style="border-bottom:1px solid #1a2334"><td style="color:${tx.type==='deposit'?'#34d399':'#f87171'};padding:8px 6px">${tx.type}</td><td>$${tx.amount}</td><td>$${tx.fee||0}</td><td><b>$${tx.amountReceived}</b></td></tr><tr><td colspan=4 style="font-size:10px;color:#8593a8;padding-bottom:8px">${tx.date}</td></tr>`).join('');
+}
+function clearHistory(){if(confirm('Clear all history?')){localStorage.removeItem('brixtrade_history');loadHistory()}}
+</script>
+
+</body></html>
