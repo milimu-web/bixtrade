@@ -11,70 +11,284 @@ const auth = firebase.auth();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e16">
-<title>Brixtrade – Profile / Wallet + History</title>
+<title>Brixtrade – Wallet</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.5 Inter,sans-serif}
-header{display:flex;gap:12px;align-items:center;padding:14px 22px;background:rgba(15,21,32,.85);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
-h1{font-family:Sora;margin:0 auto 0 0;font-size:19px;letter-spacing:.14em;font-weight:800}h1 span{color:var(--ac)}
-.btn,.btn-brix{border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:700;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{display:flex;gap:10px;align-items:center;padding:12px 22px;padding-top:calc(12px + env(safe-area-inset-top,0));background:rgba(15,21,32,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+h1{font-family:Sora,sans-serif;margin:0 auto 0 0;font-size:19px;letter-spacing:.14em;font-weight:800}h1 span{color:var(--ac)}
+h2,h3{font-family:Sora,sans-serif;margin:0}
+.btn,.btn-brix{border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:700;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:var(--ac)}.btn:active,.btn-brix:active{transform:scale(.98)}
 .btn-brix{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#fff}
+.btn.sm{padding:7px 12px;font-size:12px}
 .pn{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:18px;box-shadow:var(--sh)}
-main{max-width:1150px;margin:auto;padding:16px;display:grid;grid-template-columns:400px 1fr;gap:16px}
-.stat b{font-family:JetBrains Mono;font-size:20px}
-input{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:8px;font-family:JetBrains Mono;margin:6px 0 12px;color:var(--ink)}
-#popup{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:99}#popup.show{display:flex}#popupBox{background:var(--pn);border:1px solid var(--ln);padding:28px;border-radius:18px;text-align:center;width:360px;max-width:92%}
-#popupBox.win{border-top:4px solid var(--up)}#popupBox.lose{border-top:4px solid var(--dn)}#popupBox.deposit{border-top:4px solid var(--ac)}
-#withdrawModal,#mpesaModal{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
-.wbox{background:var(--pn);border:1px solid var(--ln);border-radius:20px;padding:24px;width:460px;max-width:94%;max-height:92vh;overflow:auto}
-.upl{border:2px dashed #34405a;border-radius:12px;padding:16px;text-align:center;cursor:pointer;color:var(--mut)}
+.wrap{max-width:1150px;margin:auto;padding:16px;display:grid;gap:16px}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:20px;background:linear-gradient(135deg,#121927 0%,#1a2340 100%)}
+.who{color:var(--mut);font-size:12px;word-break:break-all}
+.bal{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;line-height:1.1;margin:6px 0 2px;letter-spacing:-.02em}
+.sub{color:var(--mut);font-size:12px}
+.acts{display:flex;gap:10px;margin-top:16px}.acts .btn,.acts .btn-brix{flex:1;padding:13px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;align-content:center}
+.stat{background:rgba(10,14,22,.45);border:1px solid var(--ln);border-radius:12px;padding:12px}
+.stat small{color:var(--mut);font-size:11px;display:block}
+.stat b{font-family:'JetBrains Mono',monospace;font-size:18px}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.cols{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;align-items:start}
+.side{display:grid;gap:16px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+input{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:14px;margin:6px 0 12px;color:var(--ink)}
+input:focus{border-color:var(--ac);outline:none}
+label{font-size:12px;color:var(--mut);font-weight:600}
+.copy{display:flex;gap:6px}.copy input{margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--ln);background:var(--pn2);padding:7px 12px;border-radius:99px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}
+.chip.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
+.tabs{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}
+.tabs button{border:1px solid var(--ln);background:var(--pn2);padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}
+.tabs button.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
+.tabs i{font-style:normal;opacity:.7;margin-left:4px}
+#txList{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto;margin-top:12px}
+.txRow{padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--pn2);font-size:12px;display:flex;justify-content:space-between;gap:10px}
+.txRow small{color:var(--mut)}.txRow>span:last-child{text-align:right;white-space:nowrap}
+.txRow.win{border-left:3px solid var(--up)}.txRow.lose{border-left:3px solid var(--dn)}.txRow.dep{border-left:3px solid var(--ac)}
+.tag{font-size:10px;border-radius:5px;padding:1px 6px;background:var(--acbg);color:var(--ac);font-weight:700}
+.tag.p{background:rgba(248,113,113,.12);color:var(--dn)}
+.empty{color:var(--mut);padding:28px 10px;text-align:center}
+#chat{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto;margin-top:10px}
+#chat div{padding:8px 10px;border-radius:9px;background:var(--pn2);border:1px solid var(--ln);font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);padding:12px}
+.modal.show{display:flex}
+.wbox{background:var(--pn);border:1px solid var(--ln);border-radius:20px;padding:24px;width:440px;max-width:100%;max-height:92vh;overflow:auto}
+.bar{height:4px;background:var(--ln);border-radius:4px;margin:10px 0 16px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .25s}
+.upl{border:2px dashed #34405a;border-radius:12px;padding:16px;text-align:center;cursor:pointer;color:var(--mut);margin:6px 0 10px}
 .note{background:var(--acbg);border-radius:8px;padding:9px;font-size:11px;margin:10px 0;color:#b9bbff}
-#walletChat{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto;margin-top:10px}
-#walletChat div{padding:9px 11px;border-radius:9px;background:var(--pn2);border:1px solid var(--ln);font-size:13px}
-.refBox{background:linear-gradient(135deg,#121927 0%,#1a2340 100%);border:1px solid #222d40;border-radius:14px;padding:14px;margin-top:14px}
-.txRow{padding:10px;border:1px solid var(--ln);border-radius:10px;background:var(--pn2);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;gap:8px}
-.txRow.win{border-left:3px solid var(--up)} .txRow.lose{border-left:3px solid var(--dn)} .txRow.dep{border-left:3px solid var(--ac)}
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.tabs button{border:1px solid var(--ln);background:var(--pn2);padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}.tabs button.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
-@media(max-width:900px){main{grid-template-columns:1fr}}
+.sum{background:var(--bg2);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:8px 0}
+.sum .row{padding:3px 0}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0));display:grid;gap:8px;z-index:300;width:min(380px,92vw)}
+.toast{background:var(--pn2);border:1px solid var(--ln);border-left:3px solid var(--ac);border-radius:10px;padding:11px 14px;box-shadow:var(--sh);font-size:13px;animation:in .2s}
+.toast.ok{border-left-color:var(--up)}.toast.err{border-left-color:var(--dn)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@media(max-width:900px){.hero,.cols{grid-template-columns:1fr}.bal{font-size:38px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
-<div id="popup" onclick="closePopup()"><div id="popupBox"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
-<div id="withdrawModal"><div class="wbox"><h2 style="font-family:Sora">Withdrawal Verification</h2><span id="wStepLabel">Step 1</span><div id="wStep1"><label>Amount USD $<span id="wBal">0</span></label><input id="wAmount" type="number"><button class="btn-brix" style="width:100%" onclick="wNext(2)">Continue</button></div><div id="wStep2" style="display:none"><label>M-Pesa</label><input id="wPhone"><label>Name</label><input id="wMpesaName"><button class="btn-brix" style="width:100%" onclick="wNext(3)">Continue</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div><div id="wStep3" style="display:none"><label>ID</label><input id="wIdNum"><div class="upl" onclick="document.getElementById('wIdFile').click()">Tap to upload ID</div><input id="wIdFile" type="file" hidden><div id="wFileName"></div><div class="note">Encrypted • Kenya Data Protection Act</div><button class="btn-brix" style="width:100%" onclick="submitWithdrawal()">Verify & Withdraw</button></div><button onclick="closeWithdraw()" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut)">Cancel</button></div></div>
-<div id="mpesaModal"><div class="wbox"><div style="display:flex;justify-content:space-between"><h2 style="margin:0;font-family:Sora">Deposit via M-PESA</h2><button onclick="document.getElementById('mpesaModal').style.display='none'" style="background:none;border:none;color:#8593a8;font-size:22px">✕</button></div><div style="background:#fff;border-radius:14px;padding:18px 12px;text-align:center;margin:16px 0;border:2px solid #e5e7eb"><div style="color:#111;font-size:13px;font-weight:700">Lipa na M-PESA • Deposit funds securely • $1 = KES 130</div></div><label>Amount (USD)</label><input id="mpesaUsd" type="number" value="5" oninput="convertUsdToKes()"><div style="font-size:12px;color:#22c55e;margin:6px 0">💱 You will pay: <b id="kesPreview">KES 650</b></div><label>Phone</label><input id="mpesaPhone" type="tel" value="+254"><div style="font-size:11px;color:#6ea8ff;margin:8px 0">📲 After Confirm → Paystack popup → Choose M-PESA → STK to phone</div><div style="display:flex;justify-content:space-between"><span>Deposit</span><b id="mpesaShowUsd">$5.00</b></div><div style="display:flex;justify-content:space-between;font-weight:800"><span>Total</span><b style="color:#22c55e" id="mpesaTotal">KES 650</b></div><button class="btn-brix" style="width:100%;padding:14px;margin-top:14px;background:#22c55e;color:#000;border:0;border-radius:12px;font-weight:800;font-size:16px" onclick="doDirectMpesa()">Confirm Deposit</button></div></div>
-<header><h1>BRIX<span>TRADE</span></h1><a href="trade.html" class="btn-brix" style="text-decoration:none">← Back to Trading</a><button class="btn" onclick="logoutPhone()">Logout</button></header>
-<main>
-<div>
-<div class="pn"><h2 style="font-family:Sora;margin:0 0 10px">Your Details</h2><div class="stat"><small style="color:var(--mut);font-size:10px">EMAIL / NAME</small><b id="userEmail" style="font-size:14px;word-break:break-all">-</b></div><div class="stat" style="margin-top:12px"><small style="color:var(--mut);font-size:10px">BALANCE</small><b id="balance">$0.00</b></div><div style="margin-top:18px;display:grid;gap:10px"><button class="btn-brix" onclick="openDeposit()">💳 Deposit M-Pesa</button><button class="btn" onclick="openWithdraw()">💸 Withdraw</button></div></div>
-<div class="refBox"><h3 style="font-family:Sora;margin:0 0 8px">🎁 Refer & Earn Wallet</h3><p style="color:var(--mut);font-size:12px;margin:0 0 8px">Share link, get $5 per friend who deposits. Secret wallet inside profile.</p><div style="display:flex;gap:6px"><input id="refLink" readonly><button class="btn" onclick="copyRef()">Copy</button></div><div style="display:flex;justify-content:space-between;margin-top:10px"><small style="color:var(--mut)">Total Referrals</small><b id="refCount">0</b></div><div style="display:flex;justify-content:space-between"><small style="color:var(--mut)">Referral Earnings</small><b id="refEarnings" style="color:var(--up)">$0.00</b></div><div id="refList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow:auto"></div></div>
-<div class="pn" style="margin-top:16px"><h3 style="font-size:14px;font-family:Sora">Wallet Chat</h3><p style="color:var(--mut);font-size:12px">Type: deposit 20, withdraw 10, balance, trades</p><div style="display:flex;gap:6px"><input id="walletInput" placeholder="e.g. deposit 5"><button class="btn-brix" onclick="handleWalletChat()">Send</button></div><div id="walletChat"></div></div>
-</div>
-<div class="pn"><h2 style="font-family:Sora;margin:0 0 10px">Trading History + Transactions</h2><div class="tabs"><button class="on" id="tabTrades" onclick="switchTx('trades')">My Trades</button><button id="tabDeps" onclick="switchTx('deposits')">Deposits</button><button id="tabWds" onclick="switchTx('withdraws')">Withdrawals</button></div><div id="txList" style="display:flex;flex-direction:column;gap:8px;max-height:75vh;overflow:auto"></div></div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<div class="modal" id="mpesaModal" role="dialog" aria-modal="true" aria-label="Deposit"><div class="wbox">
+  <div class="row"><h2>Deposit via M-PESA</h2><button class="btn sm" onclick="closeM('mpesaModal')" aria-label="Close">✕</button></div>
+  <p class="sub" style="margin:6px 0 14px">Rate: $1 = KES 130. Pay with M-PESA through Paystack.</p>
+  <label>Quick amounts</label>
+  <div class="chips" id="depChips" style="margin:6px 0 12px"></div>
+  <label for="mpesaUsd">Amount (USD)</label><input id="mpesaUsd" type="number" min="1" value="5" inputmode="decimal" oninput="convertUsdToKes()">
+  <label for="mpesaPhone">M-PESA phone</label><input id="mpesaPhone" type="tel" value="+254" inputmode="tel">
+  <div class="sum"><div class="row"><span class="sub">You deposit</span><b id="mpesaShowUsd">$5.00</b></div><div class="row"><span class="sub">You pay</span><b class="up" id="mpesaTotal">KES 650</b></div></div>
+  <button class="btn-brix btn" style="width:100%;padding:14px" onclick="doDirectMpesa()">Continue to M-PESA</button>
+  <p class="sub" style="text-align:center;margin:10px 0 0">Next: choose M-PESA in the Paystack window and approve the prompt on your phone.</p>
+</div></div>
+
+<div class="modal" id="withdrawModal" role="dialog" aria-modal="true" aria-label="Withdraw"><div class="wbox">
+  <div class="row"><h2>Withdraw</h2><span class="sub" id="wStepLabel"></span></div>
+  <div class="bar"><i id="wBar"></i></div>
+  <div id="wStep1"><label for="wAmount">Amount (USD) · available $<span id="wBal">0</span></label>
+    <div class="copy"><input id="wAmount" type="number" min="2" inputmode="decimal" oninput="wPreview()"><button class="btn" onclick="wMax()">Max</button></div>
+    <div class="sub" id="wKes" style="margin:8px 0 14px">Minimum $2</div>
+    <button class="btn-brix btn" style="width:100%" onclick="wNext(2)">Continue</button></div>
+  <div id="wStep2" hidden><label for="wPhone">M-PESA number</label><input id="wPhone" type="tel" value="+254" inputmode="tel"><label for="wMpesaName">Name on M-PESA</label><input id="wMpesaName">
+    <button class="btn-brix btn" style="width:100%" onclick="wNext(3)">Continue</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div>
+  <div id="wStep3" hidden><label for="wIdNum">National ID number</label><input id="wIdNum" inputmode="numeric">
+    <div class="upl" onclick="$('wIdFile').click()" id="wUpl">Tap to upload a photo of your ID</div><input id="wIdFile" type="file" accept="image/*,.pdf" hidden>
+    <div class="note">Your ID is used only to verify withdrawals, under the Kenya Data Protection Act.</div>
+    <div class="sum" id="wSum"></div>
+    <button class="btn-brix btn" style="width:100%" id="wSubmit" onclick="submitWithdrawal()">Submit withdrawal</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(2)">Back</button></div>
+  <button onclick="closeM('withdrawModal')" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut);cursor:pointer">Cancel</button>
+</div></div>
+
+<header><h1>BRIX<span>TRADE</span></h1><a href="trade.html" class="btn-brix btn">← Back to trading</a><button class="btn" onclick="logoutPhone()">Log out</button></header>
+
+<main class="wrap">
+  <section class="pn hero">
+    <div>
+      <div class="who" id="userEmail">Loading…</div>
+      <div class="sub" style="margin-top:10px">Available balance</div>
+      <div class="bal" id="balance">$0.00</div>
+      <div class="sub" id="balKes">≈ KES 0</div>
+      <div class="acts"><button class="btn-brix btn" onclick="openDeposit()">Deposit</button><button class="btn" onclick="openWithdraw()">Withdraw</button></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Trading profit (real)</small><b id="stPnl">$0.00</b></div>
+      <div class="stat"><small>Win rate (real)</small><b id="stWin">–</b></div>
+      <div class="stat"><small>Total deposited</small><b id="stDep">$0.00</b></div>
+      <div class="stat"><small>Pending withdrawals</small><b id="stPend">$0.00</b></div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div class="side">
+      <section class="pn"><h3>Refer a friend, earn $5</h3>
+        <p class="sub" style="margin:6px 0 12px">You get $5 when a friend you invite makes their first deposit.</p>
+        <div class="copy"><input id="refLink" readonly aria-label="Referral link"><button class="btn" onclick="copyRef()">Copy</button></div>
+        <a class="btn" id="refWa" target="_blank" rel="noopener" style="width:100%;margin-top:8px">Share on WhatsApp</a>
+        <div class="row" style="margin-top:14px"><span class="sub">Friends invited</span><b id="refCount">0</b></div>
+        <div class="row"><span class="sub">Referral earnings</span><b class="up" id="refEarnings">$0.00</b></div>
+        <div id="refList" style="margin-top:10px;display:grid;gap:6px;max-height:150px;overflow:auto"></div>
+      </section>
+      <section class="pn"><h3>Quick commands</h3>
+        <p class="sub" style="margin:6px 0 10px">Try: deposit 20, withdraw 10, balance, trades</p>
+        <div class="copy"><input id="walletInput" placeholder="deposit 5" aria-label="Command"><button class="btn-brix btn" onclick="handleWalletChat()">Go</button></div>
+        <div id="chat"></div>
+      </section>
+    </div>
+
+    <section class="pn"><h2>History</h2>
+      <div class="tabs" role="tablist">
+        <button class="on" id="tabTrades" onclick="switchTx('trades')">Trades<i id="cT">0</i></button>
+        <button id="tabDeps" onclick="switchTx('deposits')">Deposits<i id="cD">0</i></button>
+        <button id="tabWds" onclick="switchTx('withdraws')">Withdrawals<i id="cW">0</i></button>
+      </div>
+      <div class="chips" id="filters"></div>
+      <div id="txList"></div>
+    </section>
+  </div>
 </main>
+
 <script>
 const PAYSTACK_KEY="pk_live_0beac5527720989e538120555ad8f42646691193";
-const USD_TO_KES=130;
+const USD_TO_KES=130, INC=firebase.firestore.FieldValue.increment;
 const $=id=>document.getElementById(id);
-let currentUid=null,balance=0,currentTx='trades';
-auth.onAuthStateChanged(user=>{if(!user){location.href='index.html';return}currentUid=user.uid;$('userEmail').textContent=user.displayName||user.email;const origin=window.location.origin;const ref=origin+"/index.html?ref="+user.uid;$('refLink').value=ref;db.collection("users").doc(user.uid).onSnapshot(doc=>{if(doc.exists){balance=doc.data().balance||0;$('balance').textContent="$"+balance.toFixed(2);$('wBal').textContent=balance.toFixed(2);}});loadTrades();loadReferrals();});
-function logoutPhone(){if(confirm("Logout?")) auth.signOut().then(()=>location.href='index.html');}
-function copyRef(){$('refLink').select();document.execCommand('copy');sayWallet("Referral link copied!");}
-function showPopup(type,title,icon,msg){$("popupBox").className=type;$("popupIcon").textContent=icon;$("popTitle").textContent=title;$("popMsg").textContent=msg;$("popup").classList.add("show")}
-function closePopup(){$("popup").classList.remove("show")}
-function sayWallet(t){const m=document.createElement("div");m.textContent=t;$("walletChat").prepend(m)}
-function convertUsdToKes(){const usd=parseFloat($('mpesaUsd').value)||0;const kes=usd*USD_TO_KES;$('kesPreview').textContent="KES "+kes.toLocaleString();$('mpesaShowUsd').textContent="$"+usd.toFixed(2);$('mpesaTotal').textContent="KES "+kes.toLocaleString();}
-function openDeposit(){document.getElementById('mpesaModal').style.display='flex';convertUsdToKes();}
-function openWithdraw(){const bal=balance;if(bal<2){showPopup("lose","Withdrawal Failed","⚠️",`Minimum $2\nBalance: $${bal.toFixed(2)}`);return}$('wBal').textContent=bal.toFixed(2);$('withdrawModal').style.display='flex';wNext(1);}
-document.getElementById("wIdFile").onchange=e=>{$("wFileName").textContent=e.target.files[0]?"Selected: "+e.target.files[0].name:""};
-function wNext(n){$("wStep1").style.display=n==1?"block":"none";$("wStep2").style.display=n==2?"block":"none";$("wStep3").style.display=n==3?"block":"none";$("wStepLabel").textContent=n==1?"Step 1 of 3 • Amount":n==2?"Step 2 of 3 • M-Pesa":"Step 3 of 3 • KYC";}
-function closeWithdraw(){$("withdrawModal").style.display="none"}
-async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone=$("wPhone").value.trim(),mpesaName=$("wMpesaName").value.trim(),idNum=$("wIdNum").value.trim();if(!amt||amt<2){alert("Enter min $2");return}if(balance<amt){alert("Insufficient");return}const newBal=balance-amt;await db.collection("users").doc(currentUid).set({balance:newBal},{merge:true});const req={id:Date.now(),amount:amt,phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid};try{await db.collection("withdrawals").doc(String(req.id)).set(req);}catch(e){}closeWithdraw();showPopup("win","Withdrawal Request","💸",`Amount: $${amt.toFixed(2)}\nM-Pesa: ${phone}\nStatus: Pending`);sayWallet(`Withdraw request $${amt} to ${phone} recorded`);loadWithdraws();}
-function doDirectMpesa(){const usd=parseFloat(document.getElementById('mpesaUsd').value)||0;const kes=usd*USD_TO_KES;let phone=document.getElementById('mpesaPhone').value.trim();if(!usd||usd<1){alert("Min $1");return}document.getElementById('mpesaModal').style.display='none';const userEmail=auth.currentUser?auth.currentUser.email:"customer@brixtrade.com";const handler=PaystackPop.setup({key:PAYSTACK_KEY,email:userEmail,amount:kes*100,currency:"KES",metadata:{custom_fields:[{display_name:"USD",variable_name:"usd",value:usd},{display_name:"Phone",variable_name:"phone",value:phone},{display_name:"UID",variable_name:"uid",value:auth.currentUser.uid}]},callback:function(res){const newBal=balance+usd;db.collection("users").doc(auth.currentUser.uid).set({balance:newBal},{merge:true});db.collection("deposits").doc(res.reference).set({uid:auth.currentUser.uid,usd,kes,phone,reference:res.reference,status:"success",createdAt:new Date()});sayWallet(`Deposit SUCCESS $${usd}=KES ${kes} Ref ${res.reference}`);showPopup("deposit","Deposit Successful","✅",`Amount: $${usd} (KES ${kes.toLocaleString()})\nRef: ${res.reference}\nNew Balance: $${newBal.toFixed(2)}`);db.collection("users").doc(auth.currentUser.uid).get().then(doc=>{if(doc.exists && doc.data().referredBy && !doc.data().referralRewarded){const referrer=doc.data().referredBy;db.collection("users").doc(referrer).get().then(rdoc=>{if(rdoc.exists){const rb=rdoc.data().balance||0;db.collection("users").doc(referrer).set({balance:rb+5},{merge:true});db.collection("users").doc(auth.currentUser.uid).set({referralRewarded:true},{merge:true});db.collection("users").doc(referrer).collection('referrals').doc(auth.currentUser.uid).set({bonusAwarded:true,bonusDate:new Date()},{merge:true});}});}});loadDeposits();},onClose:function(){sayWallet("Deposit closed");showPopup("lose","Cancelled","❌","You closed Paystack");}});handler.openIframe();}
-function handleWalletChat(){const val=$('walletInput').value.trim().toLowerCase();if(!val) return;sayWallet("You: "+val);$('walletInput').value='';if(val.startsWith('deposit')){const num=parseFloat(val.split(' ')[1])||0;if(num>0){$('mpesaUsd').value=num;openDeposit();sayWallet(`Opening deposit for $${num}`);}else{sayWallet("Usage: deposit 20");}}else if(val.startsWith('withdraw')){const num=parseFloat(val.split(' ')[1])||0;if(num>0){$('wAmount').value=num;openWithdraw();sayWallet(`Opening withdraw for $${num}`);}else{sayWallet("Usage: withdraw 10");}}else if(val.includes('balance')){sayWallet(`Your balance is $${balance.toFixed(2)}`);}else if(val.includes('trade')){switchTx('trades');sayWallet("Showing trading history");}else if(val.includes('history')||val.includes('deposit')){switchTx('deposits');}else{sayWallet("Commands: deposit [amount], withdraw [amount], balance, trades, history");}}
-function switchTx(type){currentTx=type;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));if(type==='trades') $('tabTrades').classList.add('on');if(type==='deposits') $('tabDeps').classList.add('on');if(type==='withdraws') $('tabWds').classList.add('on');if(type==='trades') loadTrades();if(type==='deposits') loadDeposits();if(type==='withdraws') loadWithdraws();}
-async function loadTrades(){const list=$('txList');list.innerHTML='Loading trades...';try{const snap=await db.collection("trades").where("uid","==",currentUid).orderBy("date","desc").limit(50).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut);padding:20px;text-align:center">No trades yet<br><small>Trade in trading room, history appears here</small></div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');const isWin=d.result==='WIN';div.className='txRow '+(isWin?'win':'lose');div.innerHTML=`<span><b>${d.dir} ${d.asset}</b> $${d.stake} • ${d.duration}s<br><small>${d.date} | Entry ${d.entry} → Exit ${d.exit}</small></span><span style="text-align:right"><b style="color:${isWin?'var(--up)':'var(--dn)'}">${isWin?'+$'+d.profit:'-$'+d.stake} ${d.result}</b><br><small>${d.demo?'DEMO':'REAL'}</small></span>`;list.appendChild(div);});}catch(e){try{const local=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]');if(local.length>0){list.innerHTML='';local.reverse().slice(0,50).forEach(d=>{const div=document.createElement('div');const isWin=d.result==='WIN';div.className='txRow '+(isWin?'win':'lose');div.innerHTML=`<span><b>${d.dir} ${d.asset}</b> $${d.stake}<br><small>${d.date}</small></span><span style="color:${isWin?'var(--up)':'var(--dn)'}">${d.result} ${isWin?'+$'+d.profit:'-$'+d.stake}</span>`;list.appendChild(div);});return;}}catch(e2){}list.innerHTML='Error: '+e.message;}}
-async function loadDeposits(){const list=$('txList');list.innerHTML='Loading deposits...';try{const snap=await db.collection("deposits").where("uid","==",currentUid).orderBy("createdAt","desc").limit(20).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut)">No deposits yet</div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');div.className='txRow dep';div.innerHTML=`<span>Deposit $${d.usd} = KES ${d.kes}<br><small>Ref ${d.reference} | ${d.status}</small></span><span style="color:var(--up)">+$${d.usd}</span>`;list.appendChild(div);});}catch(e){list.innerHTML='Error loading: '+e.message;}}
-async function loadWithdraws(){const list=$('txList');list.innerHTML='Loading withdrawals...';try{const snap=await db.collection("withdrawals").where("uid","==",currentUid).orderBy("date","desc").limit(20).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut)">No withdrawals yet</div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');div.className='txRow lose';div.innerHTML=`<span>Withdraw $${d.amount} to ${d.phone}<br><small>${d.date} | ${d.status}</small></span><span style="color:var(--dn)">-$${d.amount}</span>`;list.appendChild(div);});}catch(e){list.innerHTML='Error: '+e.message;}}
-async function loadReferrals(){try{const snap=await db.collection("users").doc(currentUid).collection("referrals").get();$('refCount').textContent=snap.size;let countBonus=0;const list=$('refList');list.innerHTML='';snap.forEach(doc=>{const d=doc.data();if(d.bonusAwarded) countBonus++;const div=document.createElement('div');div.style.cssText='padding:8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn2);font-size:12px';div.textContent=`${d.email||d.uid} - ${d.bonusAwarded?'$5 BONUS ✅':'registered ⏳'}`;list.appendChild(div);});$('refEarnings').textContent="$"+(countBonus*5).toFixed(2);}catch(e){console.log(e);}}
-$('walletInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleWalletChat(); });
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>"$"+(Number(n)||0).toFixed(2);
+let currentUid=null,balance=0,currentTx='trades',filter='all';
+const data={trades:[],deposits:[],withdraws:[]};
+
+function toast(msg,type){const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;$('toasts').appendChild(t);setTimeout(()=>t.remove(),4200)}
+function sayWallet(t){const m=document.createElement('div');m.textContent=t;$('chat').prepend(m)}
+function openM(id){$(id).classList.add('show')}
+function closeM(id){$(id).classList.remove('show')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+
+auth.onAuthStateChanged(user=>{
+  if(!user){location.href='index.html';return}
+  currentUid=user.uid;$('userEmail').textContent=user.displayName||user.email;
+  const ref=location.origin+"/index.html?ref="+user.uid;$('refLink').value=ref;
+  $('refWa').href="https://wa.me/?text="+encodeURIComponent("Trade on Brixtrade and get started with M-PESA: "+ref);
+  db.collection("users").doc(user.uid).onSnapshot(doc=>{if(doc.exists){balance=doc.data().balance||0;$('balance').textContent=money(balance);$('balKes').textContent="≈ KES "+Math.round(balance*USD_TO_KES).toLocaleString();$('wBal').textContent=balance.toFixed(2)}});
+  loadAll();loadReferrals();
+});
+function logoutPhone(){if(confirm("Log out of Brixtrade?"))auth.signOut().then(()=>location.href='index.html')}
+function copyRef(){const v=$('refLink').value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).catch(()=>{$('refLink').select();document.execCommand('copy')}).finally(()=>{toast("Referral link copied","ok");sayWallet("Referral link copied")})}
+
+/* ---------- data ---------- */
+const tkey=v=>v&&v.toMillis?v.toMillis():(typeof v==='number'?v:(Date.parse(v)||0));
+async function fetchCol(col,sortField){
+  const s=await db.collection(col).where("uid","==",currentUid).get();
+  return s.docs.map(d=>d.data()).sort((a,b)=>tkey(b[sortField]||b.createdAt||b.id)-tkey(a[sortField]||a.createdAt||a.id)).slice(0,100);
+}
+async function loadAll(){
+  $('txList').innerHTML='<div class="empty">Loading…</div>';
+  const [t,d,w]=await Promise.allSettled([fetchCol("trades","date"),fetchCol("deposits","createdAt"),fetchCol("withdrawals","id")]);
+  data.trades=t.value||[];data.deposits=d.value||[];data.withdraws=w.value||[];
+  if(t.status==='rejected'){try{data.trades=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]').reverse()}catch(e){}}
+  updateStats();render();
+}
+function updateStats(){
+  const real=data.trades.filter(d=>!d.demo);let pnl=0,wins=0;
+  real.forEach(d=>{if(d.result==='WIN'){pnl+=Number(d.profit)||0;wins++}else pnl-=Number(d.stake)||0});
+  $('stPnl').textContent=(pnl>=0?'+':'-')+money(Math.abs(pnl));$('stPnl').className=pnl>=0?'up':'dn';
+  $('stWin').textContent=real.length?Math.round(wins/real.length*100)+'% ('+real.length+')':'–';
+  $('stDep').textContent=money(data.deposits.reduce((s,d)=>s+(Number(d.usd)||0),0));
+  $('stPend').textContent=money(data.withdraws.filter(d=>d.status==='PENDING').reduce((s,d)=>s+(Number(d.amount)||0),0));
+  $('cT').textContent=data.trades.length;$('cD').textContent=data.deposits.length;$('cW').textContent=data.withdraws.length;
+}
+function switchTx(type){currentTx=type;filter='all';document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));$({trades:'tabTrades',deposits:'tabDeps',withdraws:'tabWds'}[type]).classList.add('on');render()}
+function render(){
+  const F=$('filters');
+  if(currentTx==='trades'){F.innerHTML=[['all','All'],['win','Wins'],['lose','Losses'],['demo','Demo'],['real','Real']].map(([k,l])=>`<button class="chip ${filter===k?'on':''}" onclick="filter='${k}';render()">${l}</button>`).join('')}else F.innerHTML='';
+  const L=$('txList');let rows=data[currentTx];
+  if(currentTx==='trades')rows=rows.filter(d=>filter==='all'||(filter==='win'&&d.result==='WIN')||(filter==='lose'&&d.result!=='WIN')||(filter==='demo'&&d.demo)||(filter==='real'&&!d.demo));
+  if(!rows.length){const m={trades:'No trades here yet. Place a trade and it will show up here.',deposits:'No deposits yet. Deposit with M-PESA to start trading.',withdraws:'No withdrawals yet.'};L.innerHTML=`<div class="empty">${m[currentTx]}</div>`;return}
+  L.innerHTML=rows.map(d=>{
+    if(currentTx==='trades'){const w=d.result==='WIN';return `<div class="txRow ${w?'win':'lose'}"><span><b>${esc(d.dir)} ${esc(d.asset)}</b> · ${money(d.stake)}${d.duration?' · '+esc(d.duration)+'s':''}<br><small>${esc(d.date)}${d.entry!=null?' · '+esc(d.entry)+' → '+esc(d.exit):''}</small></span><span><b class="${w?'up':'dn'}">${w?'+'+money(d.profit):'-'+money(d.stake)}</b><br><span class="tag ${d.demo?'':'p'}">${d.demo?'DEMO':'REAL'}</span></span></div>`}
+    if(currentTx==='deposits'){const dt=d.createdAt&&d.createdAt.toDate?d.createdAt.toDate().toLocaleString():'';return `<div class="txRow dep"><span><b>Deposit</b> · KES ${Number(d.kes).toLocaleString()}<br><small>${esc(dt)} · Ref ${esc(d.reference)}</small></span><span><b class="up">+${money(d.usd)}</b><br><small>${esc(d.status)}</small></span></div>`}
+    return `<div class="txRow lose"><span><b>Withdrawal</b> to ${esc(d.phone)}<br><small>${esc(d.date)}</small></span><span><b class="dn">-${money(d.amount)}</b><br><span class="tag p">${esc(d.status)}</span></span></div>`}).join('');
+}
+
+/* ---------- deposit ---------- */
+function convertUsdToKes(){const usd=parseFloat($('mpesaUsd').value)||0;$('mpesaShowUsd').textContent=money(usd);$('mpesaTotal').textContent="KES "+(usd*USD_TO_KES).toLocaleString();document.querySelectorAll('#depChips .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===usd))}
+$('depChips').innerHTML=[5,10,20,50,100].map(v=>`<button class="chip" data-v="${v}" onclick="$('mpesaUsd').value=${v};convertUsdToKes()">$${v}</button>`).join('');
+function openDeposit(){openM('mpesaModal');convertUsdToKes()}
+function doDirectMpesa(){
+  const usd=parseFloat($('mpesaUsd').value)||0,kes=Math.round(usd*USD_TO_KES),phone=$('mpesaPhone').value.trim();
+  if(usd<1){toast("Minimum deposit is $1","err");return}
+  if(!/^\+?254\d{9}$/.test(phone.replace(/\s/g,''))&&!/^0\d{9}$/.test(phone)){toast("Enter a valid Kenyan phone number, like +254712345678","err");return}
+  closeM('mpesaModal');
+  const uid=auth.currentUser.uid;
+  PaystackPop.setup({key:PAYSTACK_KEY,email:auth.currentUser.email||"customer@brixtrade.com",amount:kes*100,currency:"KES",
+    metadata:{custom_fields:[{display_name:"USD",variable_name:"usd",value:usd},{display_name:"Phone",variable_name:"phone",value:phone},{display_name:"UID",variable_name:"uid",value:uid}]},
+    callback:function(res){
+      db.collection("users").doc(uid).set({balance:INC(usd)},{merge:true});
+      db.collection("deposits").doc(res.reference).set({uid,usd,kes,phone,reference:res.reference,status:"success",createdAt:new Date()});
+      sayWallet(`Deposit $${usd} (KES ${kes}) · Ref ${res.reference}`);toast(`Deposit successful: ${money(usd)}`,"ok");
+      db.collection("users").doc(uid).get().then(doc=>{const u=doc.data()||{};if(u.referredBy&&!u.referralRewarded){const r=u.referredBy;
+        db.collection("users").doc(r).set({balance:INC(5)},{merge:true});
+        db.collection("users").doc(uid).set({referralRewarded:true},{merge:true});
+        db.collection("users").doc(r).collection('referrals').doc(uid).set({bonusAwarded:true,bonusDate:new Date()},{merge:true})}});
+      setTimeout(loadAll,1200);
+    },
+    onClose:()=>toast("Deposit window closed. No money was taken.")}).openIframe();
+}
+
+/* ---------- withdraw ---------- */
+function openWithdraw(){if(balance<2){toast(`Minimum withdrawal is $2. Your balance is ${money(balance)}.`,"err");return}$('wBal').textContent=balance.toFixed(2);openM('withdrawModal');wNext(1)}
+function wMax(){$('wAmount').value=balance.toFixed(2);wPreview()}
+function wPreview(){const a=parseFloat($('wAmount').value)||0;$('wKes').textContent=a?`You receive about KES ${Math.round(a*USD_TO_KES).toLocaleString()}`:'Minimum $2'}
+function wNext(n){
+  const amt=parseFloat($('wAmount').value)||0;
+  if(n>1&&(amt<2||amt>balance)){toast(amt>balance?"That is more than your balance":"Minimum withdrawal is $2","err");return}
+  if(n>2&&($('wPhone').value.trim().length<10||!$('wMpesaName').value.trim())){toast("Enter your M-PESA number and name","err");return}
+  [1,2,3].forEach(i=>$('wStep'+i).hidden=i!==n);
+  $('wStepLabel').textContent=["","Step 1 of 3 · Amount","Step 2 of 3 · M-PESA","Step 3 of 3 · Verify"][n];$('wBar').style.width=(n/3*100)+'%';
+  if(n===3)$('wSum').innerHTML=`<div class="row"><span class="sub">Amount</span><b>${money(amt)}</b></div><div class="row"><span class="sub">To</span><b>${esc($('wPhone').value)}</b></div><div class="row"><span class="sub">Name</span><b>${esc($('wMpesaName').value)}</b></div>`;
+}
+$('wIdFile').onchange=e=>{$('wUpl').textContent=e.target.files[0]?"Selected: "+e.target.files[0].name:"Tap to upload a photo of your ID"};
+async function submitWithdrawal(){
+  const amt=parseFloat($('wAmount').value),phone=$('wPhone').value.trim(),mpesaName=$('wMpesaName').value.trim(),idNum=$('wIdNum').value.trim();
+  if(!idNum){toast("Enter your ID number","err");return}
+  if(!amt||amt<2||balance<amt){toast("Check the amount and try again","err");return}
+  const btn=$('wSubmit');btn.disabled=true;btn.textContent="Submitting…";
+  try{
+    const id=Date.now();
+    await db.collection("withdrawals").doc(String(id)).set({id,amount:amt,phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid});
+    await db.collection("users").doc(currentUid).set({balance:INC(-amt)},{merge:true});
+    closeM('withdrawModal');toast(`Withdrawal of ${money(amt)} submitted. Status: pending.`,"ok");sayWallet(`Withdraw $${amt} to ${phone} requested`);loadAll();
+  }catch(e){toast("Could not submit: "+e.message,"err")}
+  btn.disabled=false;btn.textContent="Submit withdrawal";
+}
+
+/* ---------- referrals ---------- */
+async function loadReferrals(){try{
+  const snap=await db.collection("users").doc(currentUid).collection("referrals").get();let paid=0;const list=$('refList');list.innerHTML='';
+  $('refCount').textContent=snap.size;
+  snap.forEach(doc=>{const d=doc.data();if(d.bonusAwarded)paid++;const div=document.createElement('div');div.className='txRow';div.innerHTML=`<span>${esc(d.email||doc.id.slice(0,8)+'…')}</span><span>${d.bonusAwarded?'<b class="up">+$5</b>':'<small>waiting for deposit</small>'}</span>`;list.appendChild(div)});
+  $('refEarnings').textContent=money(paid*5);
+}catch(e){console.log(e)}}
+
+/* ---------- commands ---------- */
+function handleWalletChat(){
+  const val=$('walletInput').value.trim().toLowerCase();if(!val)return;sayWallet("You: "+val);$('walletInput').value='';
+  const num=parseFloat(val.split(' ')[1])||0;
+  if(val.startsWith('deposit')){if(num>0){$('mpesaUsd').value=num;openDeposit()}else if(val==='deposit'||val==='deposits'){switchTx('deposits')}else sayWallet("Usage: deposit 20")}
+  else if(val.startsWith('withdraw')){if(num>0){$('wAmount').value=num;wPreview();openWithdraw()}else sayWallet("Usage: withdraw 10")}
+  else if(val.includes('balance'))sayWallet(`Your balance is ${money(balance)}`);
+  else if(val.includes('trade')){switchTx('trades');sayWallet("Showing your trades")}
+  else if(val.includes('history')){switchTx('deposits');sayWallet("Showing deposits")}
+  else sayWallet("Commands: deposit [amount], withdraw [amount], balance, trades, history");
+}
+$('walletInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleWalletChat()});
 </script></body></html>
