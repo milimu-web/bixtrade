@@ -11,52 +11,105 @@ const auth = firebase.auth();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e16">
-<title>Brixtrade – Profile / Wallet + History</title>
+<title>Brixtrade – Profile / Wallet + Drawer</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.5 Inter,sans-serif}
-header{display:flex;gap:12px;align-items:center;padding:14px 22px;background:rgba(15,21,32,.85);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+[data-theme="light"]{--bg:#f8fafc;--bg2:#ffffff;--pn:#ffffff;--pn2:#f1f5f9;--ln:#e2e8f0;--ink:#0f172a;--mut:#64748b;--sh:0 10px 30px rgba(0,0,0,.08);color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,sans-serif;transition:background .3s,color .3s}
+header{display:flex;gap:12px;align-items:center;padding:14px 22px;background:var(--bg2);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:20}
+.hamburger{width:40px;height:40px;border:1px solid var(--ln);background:var(--pn2);border-radius:10px;cursor:pointer;display:grid;place-items:center;font-size:20px}
 h1{font-family:Sora;margin:0 auto 0 0;font-size:19px;letter-spacing:.14em;font-weight:800}h1 span{color:var(--ac)}
 .btn,.btn-brix{border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:700;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink)}
 .btn-brix{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#fff}
-.pn{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:18px;box-shadow:var(--sh)}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:18px;box-shadow:var(--sh);transition:background .3s}
 main{max-width:1150px;margin:auto;padding:16px;display:grid;grid-template-columns:400px 1fr;gap:16px}
 .stat b{font-family:JetBrains Mono;font-size:20px}
 input{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:8px;font-family:JetBrains Mono;margin:6px 0 12px;color:var(--ink)}
 #popup{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:99}#popup.show{display:flex}#popupBox{background:var(--pn);border:1px solid var(--ln);padding:28px;border-radius:18px;text-align:center;width:360px;max-width:92%}
-#popupBox.win{border-top:4px solid var(--up)}#popupBox.lose{border-top:4px solid var(--dn)}#popupBox.deposit{border-top:4px solid var(--ac)}
 #withdrawModal,#mpesaModal{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
 .wbox{background:var(--pn);border:1px solid var(--ln);border-radius:20px;padding:24px;width:460px;max-width:94%;max-height:92vh;overflow:auto}
 .upl{border:2px dashed #34405a;border-radius:12px;padding:16px;text-align:center;cursor:pointer;color:var(--mut)}
 .note{background:var(--acbg);border-radius:8px;padding:9px;font-size:11px;margin:10px 0;color:#b9bbff}
 #walletChat{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto;margin-top:10px}
 #walletChat div{padding:9px 11px;border-radius:9px;background:var(--pn2);border:1px solid var(--ln);font-size:13px}
-.refBox{background:linear-gradient(135deg,#121927 0%,#1a2340 100%);border:1px solid #222d40;border-radius:14px;padding:14px;margin-top:14px}
+.refBox{background:linear-gradient(135deg,var(--pn) 0%,var(--pn2) 100%);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-top:14px}
 .txRow{padding:10px;border:1px solid var(--ln);border-radius:10px;background:var(--pn2);margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;gap:8px}
 .txRow.win{border-left:3px solid var(--up)} .txRow.lose{border-left:3px solid var(--dn)} .txRow.dep{border-left:3px solid var(--ac)}
 .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.tabs button{border:1px solid var(--ln);background:var(--pn2);padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}.tabs button.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
+/* DRAWER */
+#drawerOverlay{position:fixed;inset:0;background:rgba(3,6,12,.6);display:none;z-index:50}#drawerOverlay.on{display:block}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:340px;max-width:88%;background:#0f0f1e;border-right:1px solid #222d40;z-index:60;transform:translateX(-100%);transition:transform .28s ease;overflow:auto;display:flex;flex-direction:column}
+[data-theme="light"] #drawer{background:#ffffff;border-right-color:#e2e8f0}
+#drawer.on{transform:translateX(0)}
+.drawerTop{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #1e293b;background:#15152a}[data-theme="light"] .drawerTop{background:#f8fafc;border-color:#e2e8f0}
+.drawerClose{width:36px;height:36px;border-radius:10px;border:1px solid #2a2a4a;background:#1c1c34;color:#fff;cursor:pointer;display:grid;place-items:center}[data-theme="light"] .drawerClose{background:#e2e8f0;color:#0f172a;border-color:#cbd5e1}
+.drawerUser{display:flex;gap:14px;align-items:center;padding:18px;background:#15152a;border-bottom:1px solid #1e293b}[data-theme="light"] .drawerUser{background:#f1f5f9;border-color:#e2e8f0}
+.avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#7c3aed);display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff}
+.drawerMenu{flex:1;padding:8px 0}
+.menuItem{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;color:#cbd5e1;border-bottom:1px solid #1a1a33;text-decoration:none}[data-theme="light"] .menuItem{color:#334155;border-color:#f1f5f9}
+.menuItem:hover{background:#1c1c34}[data-theme="light"] .menuItem:hover{background:#f1f5f9}
+.menuItem.active{background:rgba(139,141,255,.15);color:#a5b4fc}
+.menuItem .icon{width:32px;height:32px;border-radius:50%;background:#1e1e3a;display:grid;place-items:center;font-size:14px}[data-theme="light"] .menuItem .icon{background:#e2e8f0}
+.menuItem.purple .icon{background:#7c3aed;color:#fff}
+.menuItem .arrow{margin-left:auto;color:#475569}
+.drawerFoot{padding:14px 20px;border-top:1px solid #1e293b;font-size:11px;color:#64748b;text-align:center}
+.darkToggle{width:52px;height:28px;background:#2a2a4a;border-radius:30px;position:relative;cursor:pointer;margin-left:auto;transition:.3s}[data-theme="light"] .darkToggle{background:#e2e8f0}
+.darkToggle.on{background:#8b5cf6}
+.darkToggle .knob{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.darkToggle.on .knob{left:27px}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 </style></head><body>
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawerTop"><button class="drawerClose" onclick="closeDrawer()">✕</button><b style="font-family:Sora">Menu</b><span style="margin-left:auto">🇬🇧 EN</span></div>
+  <div class="drawerUser"><div class="avatar" id="avatarLetter">E</div><div><b id="drawerName">Trader</b><div id="drawerEmail" style="color:var(--mut);font-size:13px">email</div></div></div>
+  <div class="drawerMenu">
+    <a class="menuItem" href="trade.html"><div class="icon" style="background:#7c3aed;color:#fff">B</div> BRIXTRADE – Trading <span class="arrow">›</span></a>
+    <div class="menuItem" onclick="toggleAccSettings()"><div class="icon">⚙️</div> Account settings <span class="arrow">⌄</span></div>
+    <div id="accSettingsDrop" style="display:none;background:var(--pn2);padding:12px 20px"><div style="font-size:12px;color:var(--mut)">Email</div><b id="drawerEmailFull" style="font-size:12px;word-break:break-all">-</b><div style="margin-top:8px;font-size:12px;color:var(--mut)">Balance</div><b id="drawerBalance">$0.00</b></div>
+    <div class="menuItem active" onclick="openDeposit();closeDrawer()"><div class="icon">↓</div> Deposit <span class="arrow">›</span></div>
+    <div class="menuItem" onclick="openWithdraw();closeDrawer()"><div class="icon">↑</div> Withdraw <span class="arrow">›</span></div>
+    <div class="menuItem" onclick="closeDrawer();document.getElementById('txList').scrollIntoView()"><div class="icon">↻</div> History <span class="arrow">›</span></div>
+    <div class="menuItem purple active"><div class="icon">🎁</div> Refer & Earn</div>
+    <div class="menuItem" style="justify-content:space-between" onclick="toggleTheme()"><div style="display:flex;align-items:center;gap:14px"><div class="icon" id="themeIcon">🌙</div> <span id="themeLabel">Dark theme</span></div><div class="darkToggle on" id="themeToggle"><div class="knob"></div></div></div>
+    <div class="menuItem"><div class="icon">?</div> Help Centre</div>
+    <div class="menuItem"><div class="icon">🛡️</div> Responsible Trading</div>
+    <div class="menuItem"><div class="icon">💬</div> Live Chat</div>
+  </div>
+  <div class="drawerFoot" id="drawerFoot">2026 GMT • localStorage history</div>
+</div>
+
 <div id="popup" onclick="closePopup()"><div id="popupBox"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
 <div id="withdrawModal"><div class="wbox"><h2 style="font-family:Sora">Withdrawal Verification</h2><span id="wStepLabel">Step 1</span><div id="wStep1"><label>Amount USD $<span id="wBal">0</span></label><input id="wAmount" type="number"><button class="btn-brix" style="width:100%" onclick="wNext(2)">Continue</button></div><div id="wStep2" style="display:none"><label>M-Pesa</label><input id="wPhone"><label>Name</label><input id="wMpesaName"><button class="btn-brix" style="width:100%" onclick="wNext(3)">Continue</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div><div id="wStep3" style="display:none"><label>ID</label><input id="wIdNum"><div class="upl" onclick="document.getElementById('wIdFile').click()">Tap to upload ID</div><input id="wIdFile" type="file" hidden><div id="wFileName"></div><div class="note">Encrypted • Kenya Data Protection Act</div><button class="btn-brix" style="width:100%" onclick="submitWithdrawal()">Verify & Withdraw</button></div><button onclick="closeWithdraw()" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut)">Cancel</button></div></div>
 <div id="mpesaModal"><div class="wbox"><div style="display:flex;justify-content:space-between"><h2 style="margin:0;font-family:Sora">Deposit via M-PESA</h2><button onclick="document.getElementById('mpesaModal').style.display='none'" style="background:none;border:none;color:#8593a8;font-size:22px">✕</button></div><div style="background:#fff;border-radius:14px;padding:18px 12px;text-align:center;margin:16px 0;border:2px solid #e5e7eb"><div style="color:#111;font-size:13px;font-weight:700">Lipa na M-PESA • Deposit funds securely • $1 = KES 130</div></div><label>Amount (USD)</label><input id="mpesaUsd" type="number" value="5" oninput="convertUsdToKes()"><div style="font-size:12px;color:#22c55e;margin:6px 0">💱 You will pay: <b id="kesPreview">KES 650</b></div><label>Phone</label><input id="mpesaPhone" type="tel" value="+254"><div style="font-size:11px;color:#6ea8ff;margin:8px 0">📲 After Confirm → Paystack popup → Choose M-PESA → STK to phone</div><div style="display:flex;justify-content:space-between"><span>Deposit</span><b id="mpesaShowUsd">$5.00</b></div><div style="display:flex;justify-content:space-between;font-weight:800"><span>Total</span><b style="color:#22c55e" id="mpesaTotal">KES 650</b></div><button class="btn-brix" style="width:100%;padding:14px;margin-top:14px;background:#22c55e;color:#000;border:0;border-radius:12px;font-weight:800;font-size:16px" onclick="doDirectMpesa()">Confirm Deposit</button></div></div>
-<header><h1>BRIX<span>TRADE</span></h1><a href="trade.html" class="btn-brix" style="text-decoration:none">← Back to Trading</a><button class="btn" onclick="logoutPhone()">Logout</button></header>
+
+<header><button class="hamburger" onclick="openDrawer()">☰</button><h1>BRIX<span>TRADE</span></h1><a href="trade.html" class="btn-brix" style="text-decoration:none">← Trading</a><button class="btn" onclick="toggleTheme()" id="headerTheme">🌙</button><button class="btn" onclick="logoutPhone()">Logout</button></header>
 <main>
 <div>
 <div class="pn"><h2 style="font-family:Sora;margin:0 0 10px">Your Details</h2><div class="stat"><small style="color:var(--mut);font-size:10px">EMAIL / NAME</small><b id="userEmail" style="font-size:14px;word-break:break-all">-</b></div><div class="stat" style="margin-top:12px"><small style="color:var(--mut);font-size:10px">BALANCE</small><b id="balance">$0.00</b></div><div style="margin-top:18px;display:grid;gap:10px"><button class="btn-brix" onclick="openDeposit()">💳 Deposit M-Pesa</button><button class="btn" onclick="openWithdraw()">💸 Withdraw</button></div></div>
 <div class="refBox"><h3 style="font-family:Sora;margin:0 0 8px">🎁 Refer & Earn Wallet</h3><p style="color:var(--mut);font-size:12px;margin:0 0 8px">Share link, get $5 per friend who deposits. Secret wallet inside profile.</p><div style="display:flex;gap:6px"><input id="refLink" readonly><button class="btn" onclick="copyRef()">Copy</button></div><div style="display:flex;justify-content:space-between;margin-top:10px"><small style="color:var(--mut)">Total Referrals</small><b id="refCount">0</b></div><div style="display:flex;justify-content:space-between"><small style="color:var(--mut)">Referral Earnings</small><b id="refEarnings" style="color:var(--up)">$0.00</b></div><div id="refList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow:auto"></div></div>
 <div class="pn" style="margin-top:16px"><h3 style="font-size:14px;font-family:Sora">Wallet Chat</h3><p style="color:var(--mut);font-size:12px">Type: deposit 20, withdraw 10, balance, trades</p><div style="display:flex;gap:6px"><input id="walletInput" placeholder="e.g. deposit 5"><button class="btn-brix" onclick="handleWalletChat()">Send</button></div><div id="walletChat"></div></div>
 </div>
-<div class="pn"><h2 style="font-family:Sora;margin:0 0 10px">Trading History + Transactions</h2><div class="tabs"><button class="on" id="tabTrades" onclick="switchTx('trades')">My Trades</button><button id="tabDeps" onclick="switchTx('deposits')">Deposits</button><button id="tabWds" onclick="switchTx('withdraws')">Withdrawals</button></div><div id="txList" style="display:flex;flex-direction:column;gap:8px;max-height:75vh;overflow:auto"></div></div>
+<div class="pn"><h2 style="font-family:Sora;margin:0 0 10px">Trading History + Transactions</h2><div class="tabs"><button class="on" id="tabTrades" onclick="switchTx('trades')">My Trades</button><button id="tabDeps" onclick="switchTx('deposits')">Deposits</button><button id="tabWds" onclick="switchTx('withdraws')">Withdrawals</button><button onclick="clearUserTrades()" style="background:#7f1d1d;color:#fff;border-color:#991b1b">Clear Trades 🗑️</button></div><div id="txList" style="display:flex;flex-direction:column;gap:8px;max-height:75vh;overflow:auto"></div><div style="margin-top:12px;font-size:11px;color:var(--mut)">✅ Deposits = Firebase (safe) • ✅ Trades = localStorage (user decides to clear) • Dark/Light toggle in drawer</div></div>
 </main>
 <script>
 const PAYSTACK_KEY="pk_live_0beac5527720989e538120555ad8f42646691193";
 const USD_TO_KES=130;
 const $=id=>document.getElementById(id);
 let currentUid=null,balance=0,currentTx='trades';
-auth.onAuthStateChanged(user=>{if(!user){location.href='index.html';return}currentUid=user.uid;$('userEmail').textContent=user.displayName||user.email;const origin=window.location.origin;const ref=origin+"/index.html?ref="+user.uid;$('refLink').value=ref;db.collection("users").doc(user.uid).onSnapshot(doc=>{if(doc.exists){balance=doc.data().balance||0;$('balance').textContent="$"+balance.toFixed(2);$('wBal').textContent=balance.toFixed(2);}});loadTrades();loadReferrals();});
+function openDrawer(){document.getElementById('drawer').classList.add('on');document.getElementById('drawerOverlay').classList.add('on')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('on');document.getElementById('drawerOverlay').classList.remove('on')}
+function toggleAccSettings(){const d=$('accSettingsDrop');d.style.display=d.style.display==='none'?'block':'none'}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  if(next==='light'){document.documentElement.setAttribute('data-theme','light');localStorage.setItem('brixTheme','light');$('themeToggle').classList.remove('on');$('themeIcon').textContent='☀️';$('themeLabel').textContent='Light theme';$('headerTheme').textContent='☀️';}
+  else{document.documentElement.removeAttribute('data-theme');localStorage.setItem('brixTheme','dark');$('themeToggle').classList.add('on');$('themeIcon').textContent='🌙';$('themeLabel').textContent='Dark theme';$('headerTheme').textContent='🌙';}
+}
+(function(){const saved=localStorage.getItem('brixTheme');if(saved==='light'){document.documentElement.setAttribute('data-theme','light');setTimeout(()=>{if($('themeToggle')){$('themeToggle').classList.remove('on');$('themeIcon').textContent='☀️';$('themeLabel').textContent='Light theme';}},100)}})();
+auth.onAuthStateChanged(user=>{if(!user){location.href='index.html';return}currentUid=user.uid;$('userEmail').textContent=user.displayName||user.email;$('drawerName').textContent=user.displayName||user.email.split('@')[0];$('drawerEmail').textContent=user.email.replace(/(.{2}).+(@.+)/,'$1***$2');$('drawerEmailFull').textContent=user.email;$('avatarLetter').textContent=(user.displayName||user.email)[0].toUpperCase();const origin=window.location.origin;const ref=origin+"/index.html?ref="+user.uid;$('refLink').value=ref;db.collection("users").doc(user.uid).onSnapshot(doc=>{if(doc.exists){balance=doc.data().balance||0;$('balance').textContent="$"+balance.toFixed(2);$('wBal').textContent=balance.toFixed(2);if($('drawerBalance')) $('drawerBalance').textContent="$"+balance.toFixed(2);}});loadTrades();loadReferrals();});
 function logoutPhone(){if(confirm("Logout?")) auth.signOut().then(()=>location.href='index.html');}
 function copyRef(){$('refLink').select();document.execCommand('copy');sayWallet("Referral link copied!");}
 function showPopup(type,title,icon,msg){$("popupBox").className=type;$("popupIcon").textContent=icon;$("popTitle").textContent=title;$("popMsg").textContent=msg;$("popup").classList.add("show")}
@@ -72,9 +125,33 @@ async function submitWithdrawal(){const amt=parseFloat($("wAmount").value),phone
 function doDirectMpesa(){const usd=parseFloat(document.getElementById('mpesaUsd').value)||0;const kes=usd*USD_TO_KES;let phone=document.getElementById('mpesaPhone').value.trim();if(!usd||usd<1){alert("Min $1");return}document.getElementById('mpesaModal').style.display='none';const userEmail=auth.currentUser?auth.currentUser.email:"customer@brixtrade.com";const handler=PaystackPop.setup({key:PAYSTACK_KEY,email:userEmail,amount:kes*100,currency:"KES",metadata:{custom_fields:[{display_name:"USD",variable_name:"usd",value:usd},{display_name:"Phone",variable_name:"phone",value:phone},{display_name:"UID",variable_name:"uid",value:auth.currentUser.uid}]},callback:function(res){const newBal=balance+usd;db.collection("users").doc(auth.currentUser.uid).set({balance:newBal},{merge:true});db.collection("deposits").doc(res.reference).set({uid:auth.currentUser.uid,usd,kes,phone,reference:res.reference,status:"success",createdAt:new Date()});sayWallet(`Deposit SUCCESS $${usd}=KES ${kes} Ref ${res.reference}`);showPopup("deposit","Deposit Successful","✅",`Amount: $${usd} (KES ${kes.toLocaleString()})\nRef: ${res.reference}\nNew Balance: $${newBal.toFixed(2)}`);db.collection("users").doc(auth.currentUser.uid).get().then(doc=>{if(doc.exists && doc.data().referredBy && !doc.data().referralRewarded){const referrer=doc.data().referredBy;db.collection("users").doc(referrer).get().then(rdoc=>{if(rdoc.exists){const rb=rdoc.data().balance||0;db.collection("users").doc(referrer).set({balance:rb+5},{merge:true});db.collection("users").doc(auth.currentUser.uid).set({referralRewarded:true},{merge:true});db.collection("users").doc(referrer).collection('referrals').doc(auth.currentUser.uid).set({bonusAwarded:true,bonusDate:new Date()},{merge:true});}});}});loadDeposits();},onClose:function(){sayWallet("Deposit closed");showPopup("lose","Cancelled","❌","You closed Paystack");}});handler.openIframe();}
 function handleWalletChat(){const val=$('walletInput').value.trim().toLowerCase();if(!val) return;sayWallet("You: "+val);$('walletInput').value='';if(val.startsWith('deposit')){const num=parseFloat(val.split(' ')[1])||0;if(num>0){$('mpesaUsd').value=num;openDeposit();sayWallet(`Opening deposit for $${num}`);}else{sayWallet("Usage: deposit 20");}}else if(val.startsWith('withdraw')){const num=parseFloat(val.split(' ')[1])||0;if(num>0){$('wAmount').value=num;openWithdraw();sayWallet(`Opening withdraw for $${num}`);}else{sayWallet("Usage: withdraw 10");}}else if(val.includes('balance')){sayWallet(`Your balance is $${balance.toFixed(2)}`);}else if(val.includes('trade')){switchTx('trades');sayWallet("Showing trading history");}else if(val.includes('history')||val.includes('deposit')){switchTx('deposits');}else{sayWallet("Commands: deposit [amount], withdraw [amount], balance, trades, history");}}
 function switchTx(type){currentTx=type;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));if(type==='trades') $('tabTrades').classList.add('on');if(type==='deposits') $('tabDeps').classList.add('on');if(type==='withdraws') $('tabWds').classList.add('on');if(type==='trades') loadTrades();if(type==='deposits') loadDeposits();if(type==='withdraws') loadWithdraws();}
-async function loadTrades(){const list=$('txList');list.innerHTML='Loading trades...';try{const snap=await db.collection("trades").where("uid","==",currentUid).orderBy("date","desc").limit(50).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut);padding:20px;text-align:center">No trades yet<br><small>Trade in trading room, history appears here</small></div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');const isWin=d.result==='WIN';div.className='txRow '+(isWin?'win':'lose');div.innerHTML=`<span><b>${d.dir} ${d.asset}</b> $${d.stake} • ${d.duration}s<br><small>${d.date} | Entry ${d.entry} → Exit ${d.exit}</small></span><span style="text-align:right"><b style="color:${isWin?'var(--up)':'var(--dn)'}">${isWin?'+$'+d.profit:'-$'+d.stake} ${d.result}</b><br><small>${d.demo?'DEMO':'REAL'}</small></span>`;list.appendChild(div);});}catch(e){try{const local=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]');if(local.length>0){list.innerHTML='';local.reverse().slice(0,50).forEach(d=>{const div=document.createElement('div');const isWin=d.result==='WIN';div.className='txRow '+(isWin?'win':'lose');div.innerHTML=`<span><b>${d.dir} ${d.asset}</b> $${d.stake}<br><small>${d.date}</small></span><span style="color:${isWin?'var(--up)':'var(--dn)'}">${d.result} ${isWin?'+$'+d.profit:'-$'+d.stake}</span>`;list.appendChild(div);});return;}}catch(e2){}list.innerHTML='Error: '+e.message;}}
+function loadTrades(){
+  const list=$('txList');
+  list.innerHTML='Loading trades...';
+  try{
+    const local=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]');
+    if(local.length===0){list.innerHTML='<div style="color:var(--mut);padding:20px;text-align:center">No trades yet<br><small>History saved locally on this device<br>Clear button = user decides</small></div>';return;}
+    list.innerHTML='';
+    local.reverse().slice(0,100).forEach(d=>{
+      const div=document.createElement('div');
+      const isWin=d.result==='WIN';
+      div.className='txRow '+(isWin?'win':'lose');
+      div.innerHTML=`<span><b>${d.dir} ${d.asset}</b> $${d.stake} • ${d.duration}s<br><small>${d.date} | Entry ${d.entry} → Exit ${d.exit}</small></span><span style="text-align:right"><b style="color:${isWin?'var(--up)':'var(--dn)'}">${isWin?'+$'+d.profit:'-$'+d.stake} ${d.result}</b><br><small>${d.demo?'DEMO':'REAL'}</small></span>`;
+      list.appendChild(div);
+    });
+  }catch(e){list.innerHTML='Error: '+e.message;}
+}
+function clearUserTrades(){
+  if(confirm('Clear all your trading history? This cannot be undone.')){
+    localStorage.removeItem('brixTrades_'+currentUid);
+    loadTrades();
+    sayWallet('✅ Trading history cleared by user');
+    showPopup("deposit","Cleared","🗑️","Your trading history cleared.\nDeposits stay in Firebase.");
+  }
+}
 async function loadDeposits(){const list=$('txList');list.innerHTML='Loading deposits...';try{const snap=await db.collection("deposits").where("uid","==",currentUid).orderBy("createdAt","desc").limit(20).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut)">No deposits yet</div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');div.className='txRow dep';div.innerHTML=`<span>Deposit $${d.usd} = KES ${d.kes}<br><small>Ref ${d.reference} | ${d.status}</small></span><span style="color:var(--up)">+$${d.usd}</span>`;list.appendChild(div);});}catch(e){list.innerHTML='Error loading: '+e.message;}}
 async function loadWithdraws(){const list=$('txList');list.innerHTML='Loading withdrawals...';try{const snap=await db.collection("withdrawals").where("uid","==",currentUid).orderBy("date","desc").limit(20).get();list.innerHTML='';if(snap.empty){list.innerHTML='<div style="color:var(--mut)">No withdrawals yet</div>';return;}snap.forEach(doc=>{const d=doc.data();const div=document.createElement('div');div.className='txRow lose';div.innerHTML=`<span>Withdraw $${d.amount} to ${d.phone}<br><small>${d.date} | ${d.status}</small></span><span style="color:var(--dn)">-$${d.amount}</span>`;list.appendChild(div);});}catch(e){list.innerHTML='Error: '+e.message;}}
 async function loadReferrals(){try{const snap=await db.collection("users").doc(currentUid).collection("referrals").get();$('refCount').textContent=snap.size;let countBonus=0;const list=$('refList');list.innerHTML='';snap.forEach(doc=>{const d=doc.data();if(d.bonusAwarded) countBonus++;const div=document.createElement('div');div.style.cssText='padding:8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn2);font-size:12px';div.textContent=`${d.email||d.uid} - ${d.bonusAwarded?'$5 BONUS ✅':'registered ⏳'}`;list.appendChild(div);});$('refEarnings').textContent="$"+(countBonus*5).toFixed(2);}catch(e){console.log(e);}}
 $('walletInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleWalletChat(); });
+document.getElementById('drawerFoot').textContent=new Date().toISOString().substring(0,19).replace('T',' ')+' GMT • '+ (localStorage.getItem('brixTheme')==='light'?'Light':'Dark');
 </script></body></html>
