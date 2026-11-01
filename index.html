@@ -55,12 +55,16 @@ button{font-family:inherit}
 .hero h1 span{background:linear-gradient(135deg,var(--ac),#b4b6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{color:var(--mut);font-size:18px;margin-bottom:28px;max-width:520px}
 .card{background:linear-gradient(180deg,var(--pn),#0f1522);border:1px solid var(--ln);border-radius:16px;padding:0;box-shadow:var(--sh),0 0 60px rgba(99,102,241,.08);overflow:hidden}
+.hero-img{width:100%;height:320px;object-fit:cover;display:block;border-radius:16px 16px 0 0}
 .bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .bot{position:relative;border:1px solid var(--ln);border-radius:14px;padding:22px;background:var(--pn);text-align:center;transition:border-color .2s,transform .2s,box-shadow .2s}
 .bot:hover{border-color:#3a4a6c;transform:translateY(-3px);box-shadow:var(--sh)}
 .bot p{color:var(--mut);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:2px}
 .bot.active{border-color:var(--ac);background:linear-gradient(180deg,rgba(139,141,255,.16),var(--pn));box-shadow:0 0 0 1px var(--ac2),0 16px 40px rgba(99,102,241,.2)}
 .bot.active::before{content:"Most popular";position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:99px;white-space:nowrap}
+.gold-grid{display:grid;grid-template-columns:0.9fr 1.1fr;overflow:hidden;align-items:stretch;background:linear-gradient(135deg,#121927 0%,#1a2340 100%);border:1px solid #222d40;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.gold-grid img{width:100%;height:100%;object-fit:cover;min-height:340px;display:block}
+.global-hero{position:relative;border-radius:20px;overflow:hidden;border:1px solid #222d40;min-height:420px;display:grid;place-items:center;background:linear-gradient(rgba(10,14,22,0.3), rgba(10,14,22,0.85)), url('global-traders.jpg');background-size:cover;background-position:center}
 .about{max-width:1200px;margin:30px auto 0;padding:48px 28px;background:linear-gradient(180deg,var(--pn),#0e1420);border:1px solid var(--ln);border-radius:20px}
 .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
 .about-box{background:var(--bg2);border:1px solid var(--ln);padding:22px;border-radius:14px;transition:border-color .2s,transform .2s}
@@ -135,11 +139,21 @@ button{font-family:inherit}
   .nav{padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));gap:8px}
   .logo{font-size:18px}.nav-links{gap:6px}.nav-links a.nav-about{display:none}
   .btn,.btn-brix{padding:9px 12px;font-size:12px}
-  .hero{padding:28px 12px 12px;gap:20px}
-  .hero p{font-size:15px;margin-bottom:18px}
+  .hero{padding:20px 14px 10px;gap:18px}
+  .hero h1{font-size:32px !important;line-height:1.1}
+  .hero p{font-size:14px;margin-bottom:14px;line-height:1.5}
+  .hero-img{height:210px !important}
   .card{padding:0}
-  .bots{padding:12px 12px;gap:22px}
-  .about{margin:12px;padding:24px 14px;border-radius:14px}
+  .gold-grid{grid-template-columns:1fr !important}
+  .gold-grid img{order:1;min-height:210px !important;max-height:240px}
+  .gold-grid > div:last-child{order:2;padding:20px 16px !important}
+  .gold-grid h2{font-size:22px !important}
+  .global-hero{min-height:360px !important;padding:0 !important;background-position:65% center}
+  .global-hero > div{padding:28px 16px !important}
+  .global-hero h2{font-size:24px !important;line-height:1.2 !important}
+  .global-hero p{font-size:13px !important;line-height:1.5 !important}
+  .bots{padding:12px 14px;gap:16px}
+  .about{margin:12px;padding:20px 14px;border-radius:14px}
   .about-grid{gap:10px}.socials{gap:8px}
   .brix-footer{padding:24px 12px}.brix-footer-grid{gap:16px}
   #authModal{padding:0;align-items:stretch;justify-items:stretch;background:#0a0e16}
@@ -177,16 +191,14 @@ button{font-family:inherit}
       <button class="btn-brix" style="font-size:16px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
     </div>
   </div>
-  <!-- HERO IMAGE PLACED -->
   <div class="card">
-    <img src="hero-trading.jpg" alt="Trading" style="width:100%;height:320px;object-fit:cover;display:block;border-radius:16px;">
+    <img src="hero-trading.jpg" alt="Trading" class="hero-img">
     <div style="padding:10px 14px;display:flex;justify-content:space-between;font-family:JetBrains Mono;font-size:12px;background:var(--bg2);">
       <b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);">2,650.45 +1.24%</b>
     </div>
   </div>
 </div>
 
-<!-- CLICKABLE REFERRAL -->
 <section id="refSection" style="max-width:1200px;margin:20px auto;padding:0 24px;">
   <style>
     #refCard{ background: linear-gradient(135deg,#121927 0%,#1a2340 100%); border:1px solid #222d40; border-radius:20px; overflow:hidden; display:grid; grid-template-columns:1.1fr 0.9fr; box-shadow:0 10px 30px rgba(0,0,0,.35); position:relative; cursor:pointer; }
@@ -209,10 +221,9 @@ button{font-family:inherit}
   </div>
 </section>
 
-<!-- GOLD SECTION - NEW WITH YOUR IMAGE -->
 <section style="max-width:1200px;margin:20px auto;padding:0 24px;">
-  <div style="background:linear-gradient(135deg,#121927 0%,#1a2340 100%); border:1px solid #222d40; border-radius:20px; display:grid; grid-template-columns:0.9fr 1.1fr; overflow:hidden; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,.35);">
-    <img src="gold-bars.jpg" style="width:100%;height:100%;object-fit:cover;min-height:340px;display:block;" alt="XAU Gold Trading">
+  <div class="gold-grid">
+    <img src="gold-bars.jpg" alt="XAU Gold Trading">
     <div style="padding:28px;">
       <span style="background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.25); color:#fbbf24; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">PRECIOUS METALS • XAU/USD</span>
       <h2 style="font-family:Sora;font-size:28px;line-height:1.15;margin:14px 0 8px;">XAU Gold Trading</h2>
@@ -277,9 +288,8 @@ button{font-family:inherit}
   </div>
 </section>
 
-<!-- GLOBAL SECTION - NEW WITH YOUR IMAGE -->
 <section style="max-width:1200px;margin:20px auto;padding:0 24px;">
-  <div style="position:relative; border-radius:20px; overflow:hidden; border:1px solid #222d40; min-height:420px; display:grid; place-items:center; background: linear-gradient(rgba(10,14,22,0.3), rgba(10,14,22,0.85)), url('global-traders.jpg'); background-size:cover; background-position:center;">
+  <div class="global-hero">
     <div style="text-align:center; padding:40px 20px; max-width:700px;">
       <span style="background:rgba(139,141,255,.15); border:1px solid rgba(139,141,255,.3); color:#8b8dff; padding:5px 14px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">GLOBAL COMMUNITY • 2M+ TRADERS</span>
       <h2 style="font:800 36px Sora; margin:16px 0 10px; line-height:1.1;">Join Millions of Traders Worldwide</h2>
