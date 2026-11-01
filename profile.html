@@ -192,7 +192,7 @@ async function fetchCol(col,sortField){
 }
 async function loadAll(){
   $('txList').innerHTML='<div class="empty">Loading…</div>';
-  const [t,d,w]=await Promise.allSettled([fetchCol("trades","date"),fetchCol("deposits","createdAt"),fetchCol("withdrawals","id")]);
+  const [t,d,w]=await Promise.allSettled([fetchCol("trades","timestamp"),fetchCol("deposits","createdAt"),fetchCol("withdrawals","timestamp")]);
   data.trades=t.value||[];data.deposits=d.value||[];data.withdraws=w.value||[];
   if(t.status==='rejected'){try{data.trades=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]').reverse()}catch(e){}}
   updateStats();render();
