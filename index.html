@@ -37,16 +37,12 @@ body{background:radial-gradient(1200px 500px at 70% -10%,#16204a66,transparent),
 a{text-decoration:none;color:inherit}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 button{font-family:inherit}
-
-/* NAV */
 .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:rgba(15,21,32,.82);backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--ln)}
 .nav::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--ac2),transparent);opacity:.5}
 .logo{font:800 22px Sora,serif;letter-spacing:.1em}.logo span{color:var(--ac)}
 .nav-links{display:flex;gap:12px;align-items:center}
 .nav-links a.nav-about{font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;color:var(--mut);transition:.15s}
 .nav-links a.nav-about:hover{background:var(--acbg);color:var(--ac)}
-
-/* BUTTONS */
 .btn{padding:9px 18px;border-radius:10px;border:1px solid var(--ln);background:var(--pn2);cursor:pointer;font-weight:600;color:var(--ink);transition:border-color .15s,background .15s,transform .1s}
 .btn:hover{border-color:var(--ac);background:var(--acbg)}
 .btn-brix{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--ac),var(--ac2));border:0;color:#fff;font-weight:800;padding:10px 22px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(99,102,241,.35);transition:transform .1s,box-shadow .2s,filter .2s}
@@ -54,24 +50,17 @@ button{font-family:inherit}
 .btn-brix:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(99,102,241,.5)}
 .btn-brix:hover::after{transform:translateX(120%)}
 .btn:active,.btn-brix:active{transform:scale(.97)}
-
-/* HERO */
 .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;max-width:1200px;margin:0 auto;padding:72px 24px 56px}
 .hero h1{font:800 clamp(34px,5vw,56px)/1.06 Sora,serif;letter-spacing:-.02em;margin-bottom:18px}
 .hero h1 span{background:linear-gradient(135deg,var(--ac),#b4b6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{color:var(--mut);font-size:18px;margin-bottom:28px;max-width:520px}
-.card{background:linear-gradient(180deg,var(--pn),#0f1522);border:1px solid var(--ln);border-radius:16px;padding:20px;box-shadow:var(--sh),0 0 60px rgba(99,102,241,.08)}
-.card>div:last-child{background:repeating-linear-gradient(0deg,transparent 0 35px,#ffffff08 35px 36px),repeating-linear-gradient(90deg,transparent 0 47px,#ffffff08 47px 48px),linear-gradient(180deg,#34d3990d,transparent 70%),var(--bg2)!important}
-
-/* BOTS */
+.card{background:linear-gradient(180deg,var(--pn),#0f1522);border:1px solid var(--ln);border-radius:16px;padding:0;box-shadow:var(--sh),0 0 60px rgba(99,102,241,.08);overflow:hidden}
 .bots{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .bot{position:relative;border:1px solid var(--ln);border-radius:14px;padding:22px;background:var(--pn);text-align:center;transition:border-color .2s,transform .2s,box-shadow .2s}
 .bot:hover{border-color:#3a4a6c;transform:translateY(-3px);box-shadow:var(--sh)}
 .bot p{color:var(--mut);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:2px}
 .bot.active{border-color:var(--ac);background:linear-gradient(180deg,rgba(139,141,255,.16),var(--pn));box-shadow:0 0 0 1px var(--ac2),0 16px 40px rgba(99,102,241,.2)}
 .bot.active::before{content:"Most popular";position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:99px;white-space:nowrap}
-
-/* ABOUT */
 .about{max-width:1200px;margin:30px auto 0;padding:48px 28px;background:linear-gradient(180deg,var(--pn),#0e1420);border:1px solid var(--ln);border-radius:20px}
 .about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
 .about-box{background:var(--bg2);border:1px solid var(--ln);padding:22px;border-radius:14px;transition:border-color .2s,transform .2s}
@@ -81,8 +70,6 @@ button{font-family:inherit}
 .social{border:1px solid var(--ln);padding:16px;border-radius:12px;text-align:center;background:var(--bg2);font-weight:700;font-size:13px;transition:.15s}
 .social:hover{border-color:var(--ac);background:var(--acbg);transform:translateY(-2px)}
 .pay-logos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-
-/* FOOTER */
 .brix-footer{background:#080c14;color:#8fa0ad;padding:44px 24px 30px;font:13px/1.6 Inter,sans-serif;margin-top:50px;border-top:1px solid var(--ln)}
 .brix-footer-wrap{max-width:1300px;margin:0 auto}
 .brix-footer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
@@ -94,8 +81,6 @@ button{font-family:inherit}
 .brix-footer-col h4{color:var(--ink);font-size:12px;font-weight:700;margin-bottom:14px;border-bottom:1px solid var(--ln);padding-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
 .brix-footer-col a{display:block;color:var(--mut);font-size:12px;margin-bottom:8px;transition:color .15s,transform .15s}
 .brix-footer-col a:hover{color:#fff;transform:translateX(2px)}
-
-/* AUTH MODAL */
 #authModal{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;place-items:center;z-index:99;backdrop-filter:blur(10px)}
 #authModal.on{display:grid}
 .authBox{background:#0e1420;border:1px solid #232e45;border-radius:18px;width:min(440px,94vw);box-shadow:0 30px 90px rgba(0,0,0,.8);overflow:hidden;max-height:95vh;overflow-y:auto;animation:pop .25s ease-out}
@@ -132,8 +117,6 @@ button{font-family:inherit}
 .check input{width:14px;height:14px;accent-color:var(--ac);margin-top:2px}
 .fFooter{padding:10px 22px;background:#0a0e16;border-top:1px solid #232e45;display:flex;gap:8px;justify-content:center;font-size:10px;color:#4b5a6e}
 #authMsg{text-align:center;font-size:11px;font-weight:600;min-height:14px}
-
-/* WELCOME */
 #welcomePopup{position:fixed;inset:0;background:rgba(3,6,12,.86);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(12px)}
 #welcomePopup.on{display:flex}
 .wCard{background:#0e1420;border:1px solid #232e45;border-radius:20px;width:410px;max-width:94vw;box-shadow:0 30px 100px rgba(0,0,0,.85);overflow:hidden;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
@@ -147,8 +130,6 @@ button{font-family:inherit}
 .wRow b{font-weight:500;color:#7a8aa0;font-size:11px}.wRow span{font-weight:700;font-family:JetBrains Mono;color:var(--ink);font-size:12px}
 .wNote{text-align:center;font-size:11px;color:var(--mut);line-height:1.5}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-
-/* RESPONSIVE */
 @media(max-width:900px){.hero{grid-template-columns:1fr;padding:48px 24px 32px}.bots{grid-template-columns:1fr;gap:22px}.about-grid{grid-template-columns:1fr}.socials{grid-template-columns:repeat(3,1fr)}.brix-footer-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){
   .nav{padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));gap:8px}
@@ -156,7 +137,7 @@ button{font-family:inherit}
   .btn,.btn-brix{padding:9px 12px;font-size:12px}
   .hero{padding:28px 12px 12px;gap:20px}
   .hero p{font-size:15px;margin-bottom:18px}
-  .card{padding:12px}
+  .card{padding:0}
   .bots{padding:12px 12px;gap:22px}
   .about{margin:12px;padding:24px 14px;border-radius:14px}
   .about-grid{gap:10px}.socials{gap:8px}
@@ -196,35 +177,24 @@ button{font-family:inherit}
       <button class="btn-brix" style="font-size:16px;padding:14px 28px" onclick="handleStart()">Launch Trading Room →</button>
     </div>
   </div>
-  <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);font-family:JetBrains Mono">2,650.45 +1.24%</b></div><div style="height:180px;background:var(--bg2);border:1px solid var(--ln);border-radius:10px;display:grid;place-items:center;color:var(--mut)">📈 Live Candle Graph<br><small>EUR USD GBP XAU XAG</small></div></div>
+  <!-- HERO IMAGE PLACED -->
+  <div class="card">
+    <img src="hero-trading.jpg" alt="Trading" style="width:100%;height:320px;object-fit:cover;display:block;border-radius:16px;">
+    <div style="padding:10px 14px;display:flex;justify-content:space-between;font-family:JetBrains Mono;font-size:12px;background:var(--bg2);">
+      <b style="font-family:Sora">XAU/USD Gold</b><b style="color:var(--up);">2,650.45 +1.24%</b>
+    </div>
+  </div>
 </div>
-<!-- CLICKABLE REFERRAL - MOBILE FIXED -->
+
+<!-- CLICKABLE REFERRAL -->
 <section id="refSection" style="max-width:1200px;margin:20px auto;padding:0 24px;">
   <style>
-    #refCard{ 
-      background: linear-gradient(135deg,#121927 0%,#1a2340 100%); 
-      border:1px solid #222d40; border-radius:20px; 
-      overflow:hidden; display:grid; 
-      grid-template-columns:1.1fr 0.9fr; 
-      box-shadow:0 10px 30px rgba(0,0,0,.35); 
-      position:relative; cursor:pointer;
-    }
-    #refImgWrap{
-      background:radial-gradient(400px 250px at 70% 20%, #6366f155, transparent);
-      display:flex; align-items:center; justify-content:center; 
-      padding:12px; position:relative; overflow:hidden;
-    }
-    @media(max-width:700px){
-      #refCard{ grid-template-columns:1fr; }
-      #refImgWrap{ order:2; padding:0 12px 12px 12px; }
-      #refTextWrap{ order:1; padding:20px 16px 12px 16px !important; }
-      #refTextWrap h2{ font-size:24px !important; }
-      #refCard img{ max-width:100% !important; width:100% !important; }
-    }
+    #refCard{ background: linear-gradient(135deg,#121927 0%,#1a2340 100%); border:1px solid #222d40; border-radius:20px; overflow:hidden; display:grid; grid-template-columns:1.1fr 0.9fr; box-shadow:0 10px 30px rgba(0,0,0,.35); position:relative; cursor:pointer; }
+    #refImgWrap{ background:radial-gradient(400px 250px at 70% 20%, #6366f155, transparent); display:flex; align-items:center; justify-content:center; padding:12px; position:relative; overflow:hidden; }
+    @media(max-width:700px){ #refCard{ grid-template-columns:1fr; } #refImgWrap{ order:2; padding:0 12px 12px 12px; } #refTextWrap{ order:1; padding:20px 16px 12px 16px !important; } #refTextWrap h2{ font-size:24px !important; } #refCard img{ max-width:100% !important; width:100% !important; } }
   </style>
   <div id="refCard" onclick="handleInviteClick()">
     <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b8dff,#6366f1,#34d399);"></div>
-    
     <div id="refTextWrap" style="padding:28px;">
       <span style="background:rgba(139,141,255,.15); color:#8b8dff; border:1px solid #2a2e6a; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">🎁 REFER & EARN $5</span>
       <h2 style="font-family:Sora; font-size:28px; line-height:1.15; margin:14px 0 8px; color:#e8edf6;">Invite Friends,<br>Get <span style="color:#8b8dff;">$5 Bonus</span></h2>
@@ -233,9 +203,29 @@ button{font-family:inherit}
       <button style="background:linear-gradient(135deg,#8b8dff,#6366f1); border:0; color:white; font-weight:800; padding:12px 20px; border-radius:10px; cursor:pointer; box-shadow:0 6px 18px rgba(99,102,241,.35); font-size:13px; width:100%;">👉 Invite Friends - Get Link</button>
       <div style="display:flex; gap:12px; margin-top:10px; font-size:11px; color:#5a6a80; flex-wrap:wrap;"><span>✅ Instant link</span><span>✅ $5 per friend</span><span>✅ Secret wallet</span></div>
     </div>
-
     <div id="refImgWrap">
       <img src="referral.png" alt="Refer & Earn $5" style="width:100%; max-width:340px; border-radius:16px; object-fit:cover; display:block;">
+    </div>
+  </div>
+</section>
+
+<!-- GOLD SECTION - NEW WITH YOUR IMAGE -->
+<section style="max-width:1200px;margin:20px auto;padding:0 24px;">
+  <div style="background:linear-gradient(135deg,#121927 0%,#1a2340 100%); border:1px solid #222d40; border-radius:20px; display:grid; grid-template-columns:0.9fr 1.1fr; overflow:hidden; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,.35);">
+    <img src="gold-bars.jpg" style="width:100%;height:100%;object-fit:cover;min-height:340px;display:block;" alt="XAU Gold Trading">
+    <div style="padding:28px;">
+      <span style="background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.25); color:#fbbf24; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">PRECIOUS METALS • XAU/USD</span>
+      <h2 style="font-family:Sora;font-size:28px;line-height:1.15;margin:14px 0 8px;">XAU Gold Trading</h2>
+      <p style="color:#8593a8;font-size:13px;line-height:1.6;margin-bottom:14px;">Trade spot gold with low spreads from $5. Hedge inflation, diversify your portfolio. Scanner is inside the platform and Sniper VIP is FREE for now.</p>
+      <div style="background:rgba(139,141,255,.08); border:1px solid rgba(139,141,255,.2); border-radius:10px; padding:10px 12px; margin-bottom:14px; font-size:12px; line-height:1.5;">
+        <b style="color:#8b8dff;">🎯 Scanner Inside:</b> Scan live market conditions, spot trends, and get intelligent insights to make better trading decisions.
+      </div>
+      <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+        <div><b style="font-size:12px;color:#8593a8;">Live Price</b><div style="font-family:JetBrains Mono;font-weight:700;">$2,650.45 <span style="color:#34d399;">+1.24%</span></div></div>
+        <div><b style="font-size:12px;color:#8593a8;">Spread</b><div style="font-family:JetBrains Mono;font-weight:700;">From 0.20</div></div>
+        <div><b style="font-size:12px;color:#8593a8;">Payout</b><div style="font-family:JetBrains Mono;font-weight:700;">80%</div></div>
+      </div>
+      <button class="btn-brix" style="width:100%;padding:12px;" onclick="handleStart()">Trade Gold Now →</button>
     </div>
   </div>
 </section>
@@ -243,7 +233,7 @@ button{font-family:inherit}
 <div class="bots" id="bots">
   <div class="bot"><h3 style="font-family:Sora">⚡ Scalper</h3><p>30s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Scalper</button></div>
   <div class="bot"><h3 style="font-family:Sora">📈 Trend</h3><p>60s</p><button class="btn" style="margin-top:10px;width:100%" onclick="handleStart()">Use Trend</button></div>
-  <div class="bot active"><h3 style="font-family:Sora">🎯 Sniper VIP</h3><p>$10/mo</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
+  <div class="bot active"><h3 style="font-family:Sora">🎯 Sniper VIP</h3><p>$10/mo - FREE for now</p><button class="btn-brix" style="margin-top:10px;width:100%" onclick="handleStart()">Unlock VIP</button></div>
 </div>
 
 <section class="about" id="about">
@@ -283,6 +273,21 @@ button{font-family:inherit}
       <span style="background:#e90000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px">Airtel Money</span>
       <span style="background:#fff;border:1px solid #1a1f71;color:#1a1f71;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px;font-style:italic">VISA</span>
       <span style="background:#000;color:#fff;padding:6px 14px;border-radius:6px;font-weight:900;font-size:13px"><span style="color:#eb001b">●</span><span style="color:#f79e1b">●</span> Mastercard</span>
+    </div>
+  </div>
+</section>
+
+<!-- GLOBAL SECTION - NEW WITH YOUR IMAGE -->
+<section style="max-width:1200px;margin:20px auto;padding:0 24px;">
+  <div style="position:relative; border-radius:20px; overflow:hidden; border:1px solid #222d40; min-height:420px; display:grid; place-items:center; background: linear-gradient(rgba(10,14,22,0.3), rgba(10,14,22,0.85)), url('global-traders.jpg'); background-size:cover; background-position:center;">
+    <div style="text-align:center; padding:40px 20px; max-width:700px;">
+      <span style="background:rgba(139,141,255,.15); border:1px solid rgba(139,141,255,.3); color:#8b8dff; padding:5px 14px; border-radius:20px; font-size:10px; font-weight:800; letter-spacing:.1em;">GLOBAL COMMUNITY • 2M+ TRADERS</span>
+      <h2 style="font:800 36px Sora; margin:16px 0 10px; line-height:1.1;">Join Millions of Traders Worldwide</h2>
+      <p style="color:#cbd5e1; font-size:15px; line-height:1.6;">From New York to Tokyo, Paris to Dubai — connect with a global community trading markets 24/7. Scanner is inside the platform and Sniper VIP is FREE for now.</p>
+      <button class="btn-brix" style="margin-top:20px; padding:14px 32px; font-size:15px;" onclick="handleStart()">Start Trading Now — It's Free</button>
+      <div style="display:flex; gap:16px; justify-content:center; margin-top:18px; flex-wrap:wrap; font-size:11px; color:#8593a8;">
+        <span>✓ Trusted by 2M+</span><span>✓ 180+ Countries</span><span>✓ 24/7 Support</span><span>✓ Licensed & Regulated</span>
+      </div>
     </div>
   </div>
 </section>
