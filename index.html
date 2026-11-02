@@ -410,9 +410,10 @@ button{font-family:inherit}
 <script>
 let currentTab='login';
 const $=id=>document.getElementById(id);
-const COUNTRIES=["Kenya","Uganda","Tanzania","Rwanda","Burundi","Ethiopia","Somalia","South Sudan","DR Congo","Nigeria","Ghana","Senegal","Côte d'Ivoire","Cameroon","South Africa","Zambia","Zimbabwe","Malawi","Mozambique","Botswana","Namibia","Egypt","Morocco","United States","United Kingdom","Canada","Australia","Germany","France","India","United Arab Emirates","Other"];
+const COUNTRIES=[["Kenya","KE"],["Uganda","UG"],["Tanzania","TZ"],["Rwanda","RW"],["Burundi","BI"],["Ethiopia","ET"],["Somalia","SO"],["South Sudan","SS"],["DR Congo","CD"],["Nigeria","NG"],["Ghana","GH"],["Senegal","SN"],["Côte d'Ivoire","CI"],["Cameroon","CM"],["South Africa","ZA"],["Zambia","ZM"],["Zimbabwe","ZW"],["Malawi","MW"],["Mozambique","MZ"],["Botswana","BW"],["Namibia","NA"],["Egypt","EG"],["Morocco","MA"],["United States","US"],["United Kingdom","GB"],["Canada","CA"],["Australia","AU"],["Germany","DE"],["France","FR"],["India","IN"],["United Arab Emirates","AE"],["Other",""]];
+const flag=c=>c?String.fromCodePoint(...[...c].map(x=>127397+x.charCodeAt(0))):"🌍";
 const SOURCES=["Facebook","Instagram","TikTok","X / Twitter","WhatsApp","Telegram","YouTube","Friend / referral","Google search","Other"];
-$('rCountry').innerHTML='<option value="">Select country…</option>'+COUNTRIES.map(c=>'<option'+(c==='Kenya'?' selected':'')+'>'+c+'</option>').join('');
+$('rCountry').innerHTML='<option value="">🌍 Select country…</option>'+COUNTRIES.map(([n,c])=>'<option value="'+n+'"'+(n==='Kenya'?' selected':'')+'>'+flag(c)+' '+n+'</option>').join('');
 $('rSource').innerHTML='<option value="">Select…</option>'+SOURCES.map(s=>'<option>'+s+'</option>').join('');
 if(localStorage.getItem('brixtrade_ref'))$('rSource').value='Friend / referral';
 $('rDob').max=new Date(Date.now()-18*365.25*864e5).toISOString().slice(0,10);
