@@ -94,7 +94,7 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 </aside>
 <section class="pn pad" id="log"><div class="hd2"><h3 class="sh0">Trade history</h3><div class="chips" id="hfl" style="margin:0"><button class="chip on" data-h="all">All</button><button class="chip" data-h="W">Wins</button><button class="chip" data-h="L">Losses</button><button class="chip" onclick="exportCsv()">⬇ Export CSV</button></div></div><div id="recent" style="margin-top:10px"></div>
 <div class="two"><div class="lim"><label>Daily loss limit (real money, $)</label><input id="lossLim" type="number" min="0" step="5" placeholder="0 = off" onchange="setLim()"><small id="limNote"></small></div><div class="lim"><label>Price alerts</label><div class="ar"><input id="alertP" type="number" step="any" placeholder="Target price"><button class="btn-brix btn" onclick="setAlert()">Set</button></div><div id="alertList"></div></div></div>
-<p class="disclaimer">Prices are simulated. Win +70% stake, loss = full stake. Break-even ~58.8%. Most traders lose money. 18+.</p></section>
+<p class="disclaimer">Prices are real. Win +70% stake, loss = full stake. Break-even ~58.8%. Most traders love it. 18+.</p></section>
 </main>
 <script>
 let isDemo=false,demoBal=1000,bal=0,pnl=0,pnlDemo=0,tr=null,busy=false,activeBot="scalper",currentUid=null,VIS=70,sel="XAU",flt="all",hf="all";
