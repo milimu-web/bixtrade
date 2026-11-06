@@ -520,6 +520,16 @@ button{font-family:inherit}
 <script>
 let currentTab='login';
 const $=id=>document.getElementById(id);
+// Send Congratulations email via Brevo - ADDED
+async function sendWelcomeEmail(email, name){
+  try{
+    await fetch('/api/send-welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, name: name })
+    });
+  }catch(e){ console.log('Email failed', e); }
+}
 const COUNTRIES=[["Kenya","KE"],["Uganda","UG"],["Tanzania","TZ"],["Rwanda","RW"],["Burundi","BI"],["Ethiopia","ET"],["Somalia","SO"],["South Sudan","SS"],["DR Congo","CD"],["Nigeria","NG"],["Ghana","GH"],["Senegal","SN"],["Côte d'Ivoire","CI"],["Cameroon","CM"],["South Africa","ZA"],["Zambia","ZM"],["Zimbabwe","ZW"],["Malawi","MW"],["Mozambique","MZ"],["Botswana","BW"],["Namibia","NA"],["Egypt","EG"],["Morocco","MA"],["United States","US"],["United Kingdom","GB"],["Canada","CA"],["Australia","AU"],["Germany","DE"],["France","FR"],["India","IN"],["United Arab Emirates","AE"],["Other",""]];
 const flag=c=>c?String.fromCodePoint(...[...c].map(x=>127397+x.charCodeAt(0))):"🌍";
 const SOURCES=["Facebook","Instagram","TikTok","X / Twitter","WhatsApp","Telegram","YouTube","Friend / referral","Google search","Other"];
@@ -538,7 +548,7 @@ function checkMatch(){const a=$('rPass').value,b=$('rPass2').value,t=$('matchTex
 function suggestPassword(){const p='BrixTrade@'+Math.floor(Math.random()*9000+1000)+'!';const i=$('rPass');if(i){i.value=p;i.type='text';$('rPass2').value=p;$('rPass2').type='text';checkStrength(p);checkMatch();}}
 function extraFields(){const o={};if(currentTab==='register'){const c=$('rCountry').value,s=$('rSource').value;if(c)o.country=c;if(s)o.source=s;}return o;}
 function handleInviteClick(){const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');const authUser=auth.currentUser;if(!cur && !authUser){openAuth('register');setTimeout(()=>showMsg('Create account to get your secret referral link & wallet inside trade room'),100);}else{location.href='trade.html';}}
-function googleLogin(){showMsg('Opening secure Google login...');const provider=new firebase.auth.GoogleAuthProvider();const extra=extraFields();auth.signInWithPopup(provider).then(async res=>{const user=res.user;const referredBy=localStorage.getItem('brixtrade_ref')||null;try{const payload=Object.assign({name:user.displayName,email:user.email,created:new Date().toISOString()},extra);if(referredBy && referredBy!==user.uid)payload.referredBy=referredBy;await db.collection('users').doc(user.uid).set(payload,{merge:true});if(referredBy && referredBy!==user.uid){await db.collection('users').doc(referredBy).collection('referrals').doc(user.uid).set({uid:user.uid,email:user.email,date:firebase.firestore.FieldValue.serverTimestamp(),status:'registered'},{merge:true});}}catch(e){}localStorage.setItem('brix_current_user',JSON.stringify({name:user.displayName,email:user.email,uid:user.uid}));closeAuth();updateNav();showWelcome(user.displayName,user.displayName);}).catch(e=>showMsg(e.message,true));}
+function googleLogin(){showMsg('Opening secure Google login...');const provider=new firebase.auth.GoogleAuthProvider();const extra=extraFields();auth.signInWithPopup(provider).then(async res=>{const user=res.user;const referredBy=localStorage.getItem('brixtrade_ref')||null;try{const payload=Object.assign({name:user.displayName,email:user.email,created:new Date().toISOString()},extra);if(referredBy && referredBy!==user.uid)payload.referredBy=referredBy;await db.collection('users').doc(user.uid).set(payload,{merge:true});if(referredBy && referredBy!==user.uid){await db.collection('users').doc(referredBy).collection('referrals').doc(user.uid).set({uid:user.uid,email:user.email,date:firebase.firestore.FieldValue.serverTimestamp(),status:'registered'},{merge:true});}}catch(e){}localStorage.setItem('brix_current_user',JSON.stringify({name:user.displayName,email:user.email,uid:user.uid}));sendWelcomeEmail(user.email, user.displayName);closeAuth();updateNav();showWelcome(user.displayName,user.displayName);}).catch(e=>showMsg(e.message,true));}
 function register(){
   const name=$('rName').value.trim(),email=$('rEmail').value.trim().toLowerCase(),pass=$('rPass').value,pass2=$('rPass2').value,agree=$('agreeCheck').checked;
   const country=$('rCountry').value,source=$('rSource').value,dob=$('rDob').value,phone=$('rPhone').value.replace(/[\s-]/g,''),mkt=$('mktCheck').checked;
@@ -565,6 +575,7 @@ function register(){
       if(referredBy && referredBy!==cred.user.uid){await db.collection('users').doc(referredBy).collection('referrals').doc(cred.user.uid).set({uid:cred.user.uid,email,date:firebase.firestore.FieldValue.serverTimestamp(),status:'registered'},{merge:true});}
     }catch(e){}
     localStorage.setItem('brix_current_user',JSON.stringify({name,email,uid:cred.user.uid}));
+    sendWelcomeEmail(email, name);
     closeAuth();updateNav();showWelcome(name,name);
   }).catch(e=>showMsg(e.message,true));
 }
