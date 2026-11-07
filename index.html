@@ -520,13 +520,17 @@ button{font-family:inherit}
 <script>
 let currentTab='login';
 const $=id=>document.getElementById(id);
-// Send Congratulations email via Brevo - ADDED
+// Send welcome email via /api/send-welcome (Brevo). Sends the Firebase ID token so the server can verify the user.
 async function sendWelcomeEmail(email, name){
   try{
+    const token = await auth.currentUser.getIdToken();
     await fetch('/api/send-welcome', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ name })
     });
   }catch(e){ console.log('Email failed', e); }
 }
@@ -548,7 +552,41 @@ function checkMatch(){const a=$('rPass').value,b=$('rPass2').value,t=$('matchTex
 function suggestPassword(){const p='BrixTrade@'+Math.floor(Math.random()*9000+1000)+'!';const i=$('rPass');if(i){i.value=p;i.type='text';$('rPass2').value=p;$('rPass2').type='text';checkStrength(p);checkMatch();}}
 function extraFields(){const o={};if(currentTab==='register'){const c=$('rCountry').value,s=$('rSource').value;if(c)o.country=c;if(s)o.source=s;}return o;}
 function handleInviteClick(){const cur=JSON.parse(localStorage.getItem('brix_current_user')||'null');const authUser=auth.currentUser;if(!cur && !authUser){openAuth('register');setTimeout(()=>showMsg('Create account to get your secret referral link & wallet inside trade room'),100);}else{location.href='trade.html';}}
-function googleLogin(){showMsg('Opening secure Google login...');const provider=new firebase.auth.GoogleAuthProvider();const extra=extraFields();auth.signInWithPopup(provider).then(async res=>{const user=res.user;const referredBy=localStorage.getItem('brixtrade_ref')||null;try{const payload=Object.assign({name:user.displayName,email:user.email,created:new Date().toISOString()},extra);if(referredBy && referredBy!==user.uid)payload.referredBy=referredBy;await db.collection('users').doc(user.uid).set(payload,{merge:true});if(referredBy && referredBy!==user.uid){await db.collection('users').doc(referredBy).collection('referrals').doc(user.uid).set({uid:user.uid,email:user.email,date:firebase.firestore.FieldValue.serverTimestamp(),status:'registered'},{merge:true});}}catch(e){}localStorage.setItem('brix_current_user',JSON.stringify({name:user.displayName,email:user.email,uid:user.uid}));sendWelcomeEmail(user.email, user.displayName);closeAuth();updateNav();showWelcome(user.displayName,user.displayName);}).catch(e=>showMsg(e.message,true));}
+function googleLogin(){
+  showMsg('Opening secure Google login...');
+  const provider = new firebase.auth.GoogleAuthProvider();
+  const extra = extraFields();
+  auth.signInWithPopup(provider).then(async res => {
+    const user = res.user;
+    const referredBy = localStorage.getItem('brixtrade_ref') || null;
+    try{
+      const payload = Object.assign({
+        name: user.displayName,
+        email: user.email,
+        created: new Date().toISOString()
+      }, extra);
+      if(referredBy && referredBy !== user.uid) payload.referredBy = referredBy;
+      await db.collection('users').doc(user.uid).set(payload, { merge: true });
+      if(referredBy && referredBy !== user.uid){
+        await db.collection('users').doc(referredBy).collection('referrals').doc(user.uid).set({
+          uid: user.uid,
+          email: user.email,
+          date: firebase.firestore.FieldValue.serverTimestamp(),
+          status: 'registered'
+        }, { merge: true });
+      }
+    }catch(e){}
+    localStorage.setItem('brix_current_user', JSON.stringify({
+      name: user.displayName, email: user.email, uid: user.uid
+    }));
+    if(res.additionalUserInfo && res.additionalUserInfo.isNewUser){
+      sendWelcomeEmail(user.email, user.displayName);
+    }
+    closeAuth();
+    updateNav();
+    showWelcome(user.displayName, user.displayName);
+  }).catch(e => showMsg(e.message, true));
+}
 function register(){
   const name=$('rName').value.trim(),email=$('rEmail').value.trim().toLowerCase(),pass=$('rPass').value,pass2=$('rPass2').value,agree=$('agreeCheck').checked;
   const country=$('rCountry').value,source=$('rSource').value,dob=$('rDob').value,phone=$('rPhone').value.replace(/[\s-]/g,''),mkt=$('mktCheck').checked;
