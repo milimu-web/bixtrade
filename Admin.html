@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>BrixTrade LIVE Admin</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>BrixTrade LIVE Admin</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}body{background:#0a0a0f;color:#fff;min-height:100vh}
 #lockScreen{position:fixed;inset:0;background:#0a0a0f;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -21,111 +22,163 @@
 th{background:#1a1a2a;text-align:left;padding:12px 10px;font-size:12px;color:#9a9ab8;text-transform:uppercase}
 td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:top}
 .badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
-.PENDING{background:#332a00;color:#ffbd2e}.APPROVED{background:#003d22;color:#00d084}.REJECTED{background:#3d0014;color:#ff5a5a}
+.PENDING{background:#332a00;color:#ffbd2e}.APPROVED,.SUCCESS{background:#003d22;color:#00d084}.REJECTED{background:#3d0014;color:#ff5a5a}
 .btn{padding:6px 10px;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;margin-right:4px}
 .approve{background:#00d084;color:#000}.reject{background:#ff5a5a;color:#fff}.view{background:#2a2a44;color:#fff}
 @media(max-width:700px){.header{padding:10px 12px}.tabs{padding:10px 12px;top:52px}.stats{grid-template-columns:1fr 1fr;padding:12px;gap:8px}.main{padding:0 8px 20px}th,td{padding:8px 6px}.btn{padding:5px 8px;font-size:11px}}
 #appContent{display:none}
 </style>
 </head><body>
-
+ 
 <div id="lockScreen">
   <div class="lockBox">
     <h2>🔒 BrixTrade Admin</h2>
-    <p>Enter password to continue</p>
-    <input id="passInput" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkPass()">
-    <button onclick="checkPass()">Unlock</button>
-    <div class="err" id="errMsg">Wrong password</div>
+    <p>Sign in with your admin account</p>
+    <input id="emailInput" type="email" placeholder="Admin email" autocomplete="username">
+    <input id="passInput" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button onclick="adminLogin()">Sign in</button>
+    <div class="err" id="errMsg"></div>
   </div>
 </div>
-
+ 
 <div id="appContent">
 <div class="header"><div><b>BrixTrade LIVE</b> <span style="color:#666;font-size:12px">/ brixtrade-c142d</span></div><div><span style="color:#00d084">● LIVE</span> <button onclick="location.reload()" class="btn view">Refresh</button> <button onclick="logoutAdmin()" class="btn view">Logout</button></div></div>
 <div class="tabs"><button class="tab on" id="tabDep" onclick="switchType('deposits')">Deposits <span id="cDep">0</span></button><button class="tab" id="tabWit" onclick="switchType('withdrawals')">Withdrawals <span id="cWit">0</span></button></div>
 <div class="stats"><div class="card"><small>Total Requests</small><h3 id="sTotal">0</h3></div><div class="card pending"><small>Pending Amount</small><h3 id="sPending">$0</h3></div><div class="card fee"><small>Total Fees (3%)</small><h3 id="sFee">$0</h3></div><div class="card"><small>Net To Pay / Add</small><h3 id="sReceive">$0</h3></div></div>
 <div class="main"><div style="overflow:auto"><table><thead id="thead"></thead><tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:30px">Connecting...</td></tr></tbody></table></div></div>
 </div>
-
+ 
 <script>
-const ADMIN_PASS = "Milimu 2026";
-function checkPass(){
-  const v = document.getElementById('passInput').value;
-  if(v === ADMIN_PASS){
-    sessionStorage.setItem('brix_admin_ok','1');
-    showApp();
-  } else {
-    document.getElementById('errMsg').style.display='block';
-  }
-}
-function showApp(){
-  document.getElementById('lockScreen').style.display='none';
-  document.getElementById('appContent').style.display='block';
-  initFirebase();
-}
-function logoutAdmin(){
-  sessionStorage.removeItem('brix_admin_ok');
-  location.reload();
-}
-if(sessionStorage.getItem('brix_admin_ok')==='1'){ showApp(); }
-
-function initFirebase(){
 const firebaseConfig = { apiKey: "AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o", authDomain: "brixtrade-c142d.firebaseapp.com", projectId: "brixtrade-c142d", storageBucket: "brixtrade-c142d.firebasestorage.app", messagingSenderId: "489953142453", appId: "1:489953142453:web:2499588c325482d17a00fc", measurementId: "G-EX79EB9RDN" };
-firebase.initializeApp(firebaseConfig); 
-const db=firebase.firestore();
-window._db=db;
-let curType='deposits'; let deposits=[], withdrawals=[];
-window.switchType=function(t){
-  curType=t;
-  document.getElementById('tabDep').classList.toggle('on',t==='deposits');
-  document.getElementById('tabWit').classList.toggle('on',t==='withdrawals');
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+ 
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tms = v => v && v.toMillis ? v.toMillis() : (typeof v === 'number' ? v : (Date.parse(v) || 0));
+const fmtDate = v => { const t = tms(v); return t ? new Date(t).toLocaleString() : (v ? String(v) : ''); };
+function showErr(m){ const e = document.getElementById('errMsg'); e.textContent = m; e.style.display = 'block'; }
+ 
+let started = false;
+ 
+function adminLogin(){
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value;
+  if(!email || !pass){ showErr('Enter your email and password'); return; }
+  document.getElementById('errMsg').style.display = 'none';
+  auth.signInWithEmailAndPassword(email, pass).catch(e => showErr(e.message));
+}
+ 
+function logoutAdmin(){ auth.signOut().then(() => location.reload()); }
+ 
+// Only accounts that have a document in the "admins" collection (document id = their UID) get in.
+auth.onAuthStateChanged(async user => {
+  if(!user) return;
+  try{
+    const snap = await db.collection('admins').doc(user.uid).get();
+    if(!snap.exists){
+      showErr('This account is not an admin.');
+      await auth.signOut();
+      return;
+    }
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    if(!started){ started = true; startApp(); }
+  }catch(e){
+    showErr('Could not verify admin access: ' + e.message);
+  }
+});
+ 
+let curType = 'deposits';
+let deposits = [], withdrawals = [];
+ 
+function switchType(t){
+  curType = t;
+  document.getElementById('tabDep').classList.toggle('on', t === 'deposits');
+  document.getElementById('tabWit').classList.toggle('on', t === 'withdrawals');
   render();
 }
-db.collection("deposits").orderBy("id","desc").onSnapshot(snap=>{
-  deposits=[]; snap.forEach(doc=>deposits.push({docId:doc.id, ...doc.data()}));
-  document.getElementById('cDep').textContent=deposits.length;
-  if(curType==='deposits') render();
-});
-db.collection("withdrawals").orderBy("id","desc").onSnapshot(snap=>{
-  withdrawals=[]; snap.forEach(doc=>withdrawals.push({docId:doc.id, ...doc.data()}));
-  document.getElementById('cWit').textContent=withdrawals.length;
-  if(curType==='withdrawals') render();
-}, err=>{
-  document.getElementById('tbody').innerHTML=`<tr><td colspan="8" style="color:#ff5a5a">Error: ${err.message}</td></tr>`;
-});
-
-function render(){
-  let list = curType==='deposits' ? deposits : withdrawals;
-  if(curType==='deposits'){
-    document.getElementById('thead').innerHTML=`<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Ref</th><th>KES</th><th>Status</th><th>Action</th></tr>`;
-  }else{
-    document.getElementById('thead').innerHTML=`<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>ID</th><th>Status</th><th>Action</th></tr>`;
-  }
-  let pendingAmt=0, feeTot=0, receiveTot=0;
-  list.forEach(r=>{ 
-    let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee;
-    if(r.status==='PENDING') pendingAmt+=r.amount;
-    if(curType==='withdrawals'){ feeTot+=fee; receiveTot+=rec; } else { receiveTot+=r.amount; }
+ 
+function startApp(){
+  const fail = err => { document.getElementById('tbody').innerHTML = '<tr><td colspan="8" style="color:#ff5a5a">Error: ' + esc(err.message) + '</td></tr>'; };
+ 
+  // No orderBy here: documents that lack the field would be silently left out. We sort in the browser instead.
+  db.collection('deposits').onSnapshot(snap => {
+    deposits = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      deposits.push(Object.assign({ docId: doc.id }, d, {
+        amount: Number(d.amount != null ? d.amount : d.usd) || 0,
+        ref: d.ref || d.reference || '',
+        sortKey: tms(d.createdAt || d.date || d.id)
+      }));
+    });
+    deposits.sort((a, b) => b.sortKey - a.sortKey);
+    document.getElementById('cDep').textContent = deposits.length;
+    if(curType === 'deposits') render();
+  }, fail);
+ 
+  db.collection('withdrawals').onSnapshot(snap => {
+    withdrawals = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      withdrawals.push(Object.assign({ docId: doc.id }, d, {
+        amount: Number(d.amount) || 0,
+        sortKey: Number(d.id) || tms(d.timestamp || d.date)
+      }));
+    });
+    withdrawals.sort((a, b) => b.sortKey - a.sortKey);
+    document.getElementById('cWit').textContent = withdrawals.length;
+    if(curType === 'withdrawals') render();
+  }, fail);
+ 
+  document.getElementById('tbody').addEventListener('click', e => {
+    const b = e.target.closest('button[data-id]');
+    if(b) updateStatus(b.dataset.id, b.dataset.s);
   });
-  document.getElementById('sTotal').textContent=list.length;
-  document.getElementById('sPending').textContent='$'+pendingAmt.toFixed(2);
-  document.getElementById('sFee').textContent='$'+feeTot.toFixed(2);
-  document.getElementById('sReceive').textContent='$'+receiveTot.toFixed(2);
-
-  if(list.length===0){
-    document.getElementById('tbody').innerHTML=`<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No ${curType} yet</td></tr>`; return;
+}
+ 
+function actions(r){
+  return r.status === 'PENDING'
+    ? '<button class="btn approve" data-id="' + esc(r.docId) + '" data-s="APPROVED">Approve</button><button class="btn reject" data-id="' + esc(r.docId) + '" data-s="REJECTED">Reject</button>'
+    : '';
+}
+ 
+function render(){
+  const list = curType === 'deposits' ? deposits : withdrawals;
+  document.getElementById('thead').innerHTML = curType === 'deposits'
+    ? '<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Ref</th><th>KES</th><th>Status</th><th>Action</th></tr>'
+    : '<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>ID</th><th>Status</th><th>Action</th></tr>';
+ 
+  let pendingAmt = 0, feeTot = 0, receiveTot = 0;
+  list.forEach(r => {
+    const fee = r.fee || r.amount * 0.03, rec = r.receive || r.amount - fee;
+    if(r.status === 'PENDING') pendingAmt += r.amount;
+    if(curType === 'withdrawals'){ feeTot += fee; receiveTot += rec; } else { receiveTot += r.amount; }
+  });
+  document.getElementById('sTotal').textContent = list.length;
+  document.getElementById('sPending').textContent = '$' + pendingAmt.toFixed(2);
+  document.getElementById('sFee').textContent = '$' + feeTot.toFixed(2);
+  document.getElementById('sReceive').textContent = '$' + receiveTot.toFixed(2);
+ 
+  if(!list.length){
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No ' + curType + ' yet</td></tr>';
+    return;
   }
-  document.getElementById('tbody').innerHTML=list.map(r=>{
-    if(curType==='deposits'){
-      return `<tr><td>${r.date?new Date(r.date).toLocaleString():''}</td><td><b>${r.name||''}</b><br>${r.phone||''}<br><small style="color:#666">${r.email||''}</small></td><td><b>$${Number(r.amount).toFixed(2)}</b></td><td style="font-size:11px">${r.ref||''}</td><td>KES ${(Number(r.amount)*130).toFixed(0)}</td><td><span class="badge ${r.status}">${r.status}</span></td><td>${r.status==='PENDING'?`<button class="btn approve" onclick="updateStatus('${r.docId}','APPROVED')">Approve</button><button class="btn reject" onclick="updateStatus('${r.docId}','REJECTED')">Reject</button>`:''}</td></tr>`;
-    }else{
-      let fee=r.fee||r.amount*0.03; let rec=r.receive||r.amount-fee;
-      return `<tr><td>${r.date}</td><td><b>${r.mpesaName}</b><br>${r.phone}</td><td><b>$${Number(r.amount).toFixed(2)}</b></td><td style="color:#ffbd2e">$${fee.toFixed(2)}</td><td style="color:#00d084"><b>$${rec.toFixed(2)}</b><br><small>KES ${(rec*130).toFixed(0)}</small></td><td>${r.idNum||''}</td><td><span class="badge ${r.status}">${r.status}</span></td><td>${r.status==='PENDING'?`<button class="btn approve" onclick="updateStatus('${r.docId}','APPROVED')">Approve</button><button class="btn reject" onclick="updateStatus('${r.docId}','REJECTED')">Reject</button>`:''}</td></tr>`;
+ 
+  document.getElementById('tbody').innerHTML = list.map(r => {
+    const st = String(r.status || '').toUpperCase();
+    if(curType === 'deposits'){
+      return '<tr><td>' + esc(fmtDate(r.createdAt || r.date)) + '</td><td><b>' + esc(r.name) + '</b><br>' + esc(r.phone) + '<br><small style="color:#666">' + esc(r.email) + '</small></td><td><b>$' + r.amount.toFixed(2) + '</b></td><td style="font-size:11px">' + esc(r.ref) + '</td><td>KES ' + esc(r.kes != null ? Number(r.kes).toLocaleString() : (r.amount * 130).toFixed(0)) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></td><td>' + actions(r) + '</td></tr>';
     }
+    const fee = r.fee || r.amount * 0.03, rec = r.receive || r.amount - fee;
+    return '<tr><td>' + esc(fmtDate(r.date)) + '</td><td><b>' + esc(r.mpesaName) + '</b><br>' + esc(r.phone) + '</td><td><b>$' + r.amount.toFixed(2) + '</b></td><td style="color:#ffbd2e">$' + fee.toFixed(2) + '</td><td style="color:#00d084"><b>$' + rec.toFixed(2) + '</b><br><small>KES ' + (rec * 130).toFixed(0) + '</small></td><td>' + esc(r.idNum) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></td><td>' + actions(r) + '</td></tr>';
   }).join('');
 }
-window.updateStatus=async function(docId,status){
-  if(!confirm(status+' this request?')) return;
-  await window._db.collection(curType).doc(docId).update({status});
-}
+ 
+async function updateStatus(docId, status){
+  if(!confirm(status + ' this request?')) return;
+  try{ await db.collection(curType).doc(docId).update({ status }); }
+  catch(e){ alert('Could not update: ' + e.message); }
 }
 </script></body></html>
