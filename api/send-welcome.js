@@ -38,7 +38,11 @@ export default async function handler(req, res) {
         sender: { name: 'BrixTrade', email: 'noreply@brixtrade.co.ke' },
         to: [{ email: user.email, name: safeName }],
         subject: 'Welcome to BrixTrade! 🎉',
-        htmlContent: `<h1>Welcome ${safeName}!</h1><p>Thanks for joining BrixTrade. Your account is ready.</p>`
+        htmlContent: `
+          <img src="https://www.brixtrade.co.ke/logo.png" alt="BrixTrade" width="160" style="display:block;margin-bottom:16px">
+          <h1>Welcome ${safeName}!</h1>
+          <p>Thanks for joining BrixTrade. Your account is ready.</p>
+        `
       })
     });
 
