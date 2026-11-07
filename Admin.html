@@ -77,7 +77,7 @@ auth.onAuthStateChanged(async user => {
   try{
     const snap = await db.collection('admins').doc(user.uid).get();
     if(!snap.exists){
-      showErr('This account is not an admin.');
+      showErr('This account is not an admin. UID: ' + user.uid);
       await auth.signOut();
       return;
     }
