@@ -103,7 +103,7 @@ const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:
 let hist=[],limit=+(LS.get("brixLim")||0);const favs=new Set((()=>{try{return JSON.parse(LS.get("brixFav")||"[]")}catch(e){return[]}})());
 function getBatch(){try{return JSON.parse(localStorage.getItem('brixBatch_'+currentUid)||'[]');}catch(e){return [];}}
 function saveBatch(b){localStorage.setItem('brixBatch_'+currentUid, JSON.stringify(b));}
-function getShuffledBatch(){let arr=[1,1,1,1,1,1,1,1,1,0];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function getShuffledBatch(){let arr=[1,1,1,1,0,0,0,0,0,0];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function fav(k){favs.has(k)?favs.delete(k):favs.add(k);LS.set("brixFav",JSON.stringify([...favs]));ui_design()}
 function applyTheme(t){document.documentElement.setAttribute("data-theme",t);$("themeBtn").textContent=t==="light"?"☾":"☀";$("themeMeta").setAttribute("content",t==="light"?"#f2f4f8":"#0a0e16")}
 function toggleTheme(){const t=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";LS.set("brixTheme",t);applyTheme(t);draw()}
