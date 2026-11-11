@@ -12,7 +12,6 @@ const auth = firebase.auth();
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e16">
 <title>Brixtrade – Wallet</title>
-<script src="https://js.paystack.co/v1/inline.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
@@ -25,6 +24,7 @@ h1{font-family:Sora,sans-serif;margin:0 auto 0 0;font-size:19px;letter-spacing:.
 h2,h3{font-family:Sora,sans-serif;margin:0}
 .btn,.btn-brix{border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:700;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{border-color:var(--ac)}.btn:active,.btn-brix:active{transform:scale(.98)}
+.btn:disabled,.btn-brix:disabled{opacity:.6;cursor:not-allowed}
 .btn-brix{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#fff}
 .btn.sm{padding:7px 12px;font-size:12px}
 .pn{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:18px;box-shadow:var(--sh)}
@@ -82,14 +82,15 @@ label{font-size:12px;color:var(--mut);font-weight:600}
 
 <div class="modal" id="mpesaModal" role="dialog" aria-modal="true" aria-label="Deposit"><div class="wbox">
   <div class="row"><h2>Deposit via M-PESA</h2><button class="btn sm" onclick="closeM('mpesaModal')" aria-label="Close">✕</button></div>
-  <p class="sub" style="margin:6px 0 14px">Rate: $1 = KES 130. Pay with M-PESA through Paystack.</p>
+  <p class="sub" style="margin:6px 0 14px">Rate: $1 = KES 130. You will get an M-PESA prompt on your phone.</p>
   <label>Quick amounts</label>
   <div class="chips" id="depChips" style="margin:6px 0 12px"></div>
   <label for="mpesaUsd">Amount (USD)</label><input id="mpesaUsd" type="number" min="1" value="5" inputmode="decimal" oninput="convertUsdToKes()">
   <label for="mpesaPhone">M-PESA phone</label><input id="mpesaPhone" type="tel" value="+254" inputmode="tel">
   <div class="sum"><div class="row"><span class="sub">You deposit</span><b id="mpesaShowUsd">$5.00</b></div><div class="row"><span class="sub">You pay</span><b class="up" id="mpesaTotal">KES 650</b></div></div>
-  <button class="btn-brix btn" style="width:100%;padding:14px" onclick="doDirectMpesa()">Continue to M-PESA</button>
-  <p class="sub" style="text-align:center;margin:10px 0 0">Next: choose M-PESA in the Paystack window and approve the prompt on your phone.</p>
+  <div class="note" id="mpesaStatus" hidden></div>
+  <button id="mpesaPayBtn" class="btn-brix btn" style="width:100%;padding:14px" onclick="doDirectMpesa()">Send M-PESA prompt</button>
+  <p class="sub" style="text-align:center;margin:10px 0 0">Approve the prompt on your phone and enter your M-PESA PIN. Your balance updates automatically.</p>
 </div></div>
 
 <div class="modal" id="withdrawModal" role="dialog" aria-modal="true" aria-label="Withdraw"><div class="wbox">
@@ -158,7 +159,6 @@ label{font-size:12px;color:var(--mut);font-weight:600}
 </main>
 
 <script>
-const PAYSTACK_KEY="pk_live_0beac5527720989e538120555ad8f42646691193";
 const USD_TO_KES=130, INC=firebase.firestore.FieldValue.increment;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -202,7 +202,7 @@ function updateStats(){
   real.forEach(d=>{if(d.result==='WIN'){pnl+=Number(d.profit)||0;wins++}else pnl-=Number(d.stake)||0});
   $('stPnl').textContent=(pnl>=0?'+':'-')+money(Math.abs(pnl));$('stPnl').className=pnl>=0?'up':'dn';
   $('stWin').textContent=real.length?Math.round(wins/real.length*100)+'% ('+real.length+')':'–';
-  $('stDep').textContent=money(data.deposits.reduce((s,d)=>s+(Number(d.usd)||0),0));
+  $('stDep').textContent=money(data.deposits.filter(d=>d.status==='success').reduce((s,d)=>s+(Number(d.usd)||0),0));
   $('stPend').textContent=money(data.withdraws.filter(d=>d.status==='PENDING').reduce((s,d)=>s+(Number(d.amount)||0),0));
   $('cT').textContent=data.trades.length;$('cD').textContent=data.deposits.length;$('cW').textContent=data.withdraws.length;
 }
@@ -215,33 +215,65 @@ function render(){
   if(!rows.length){const m={trades:'No trades here yet. Place a trade and it will show up here.',deposits:'No deposits yet. Deposit with M-PESA to start trading.',withdraws:'No withdrawals yet.'};L.innerHTML=`<div class="empty">${m[currentTx]}</div>`;return}
   L.innerHTML=rows.map(d=>{
     if(currentTx==='trades'){const w=d.result==='WIN';return `<div class="txRow ${w?'win':'lose'}"><span><b>${esc(d.dir)} ${esc(d.asset)}</b> · ${money(d.stake)}${d.duration?' · '+esc(d.duration)+'s':''}<br><small>${esc(d.date)}${d.entry!=null?' · '+esc(d.entry)+' → '+esc(d.exit):''}</small></span><span><b class="${w?'up':'dn'}">${w?'+'+money(d.profit):'-'+money(d.stake)}</b><br><span class="tag ${d.demo?'':'p'}">${d.demo?'DEMO':'REAL'}</span></span></div>`}
-    if(currentTx==='deposits'){const dt=d.createdAt&&d.createdAt.toDate?d.createdAt.toDate().toLocaleString():'';return `<div class="txRow dep"><span><b>Deposit</b> · KES ${Number(d.kes).toLocaleString()}<br><small>${esc(dt)} · Ref ${esc(d.reference)}</small></span><span><b class="up">+${money(d.usd)}</b><br><small>${esc(d.status)}</small></span></div>`}
+    if(currentTx==='deposits'){const dt=d.createdAt&&d.createdAt.toDate?d.createdAt.toDate().toLocaleString():'';return `<div class="txRow dep"><span><b>Deposit</b> · KES ${Number(d.kes).toLocaleString()}<br><small>${esc(dt)} · Ref ${esc(d.reference)}</small></span><span><b class="${d.status==='success'?'up':''}">${d.status==='success'?'+':''}${money(d.usd)}</b><br><small>${esc(d.status)}</small></span></div>`}
     return `<div class="txRow lose"><span><b>Withdrawal</b> to ${esc(d.phone)}<br><small>${esc(d.date)}</small></span><span><b class="dn">-${money(d.amount)}</b><br><span class="tag p">${esc(d.status)}</span></span></div>`}).join('');
 }
 
-/* ---------- deposit ---------- */
+/* ---------- deposit (STK push via PayHero + Vercel API, no payment page) ---------- */
 function convertUsdToKes(){const usd=parseFloat($('mpesaUsd').value)||0;$('mpesaShowUsd').textContent=money(usd);$('mpesaTotal').textContent="KES "+(usd*USD_TO_KES).toLocaleString();document.querySelectorAll('#depChips .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===usd))}
 $('depChips').innerHTML=[5,10,20,50,100].map(v=>`<button class="chip" data-v="${v}" onclick="$('mpesaUsd').value=${v};convertUsdToKes()">$${v}</button>`).join('');
 function openDeposit(){openM('mpesaModal');convertUsdToKes()}
-function doDirectMpesa(){
-  const usd=parseFloat($('mpesaUsd').value)||0,kes=Math.round(usd*USD_TO_KES),phone=$('mpesaPhone').value.trim();
+function setMpesaStatus(msg){const s=$('mpesaStatus');s.textContent=msg||'';s.hidden=!msg}
+
+let depositUnsub=null, depositTimeout=null;
+
+async function doDirectMpesa(){
+  const usd=parseFloat($('mpesaUsd').value)||0, phone=$('mpesaPhone').value.trim();
   if(usd<1){toast("Minimum deposit is $1","err");return}
   if(!/^\+?254\d{9}$/.test(phone.replace(/\s/g,''))&&!/^0\d{9}$/.test(phone)){toast("Enter a valid Kenyan phone number, like +254712345678","err");return}
-  closeM('mpesaModal');
-  const uid=auth.currentUser.uid;
-  PaystackPop.setup({key:PAYSTACK_KEY,email:auth.currentUser.email||"customer@brixtrade.com",amount:kes*100,currency:"KES",
-    metadata:{custom_fields:[{display_name:"USD",variable_name:"usd",value:usd},{display_name:"Phone",variable_name:"phone",value:phone},{display_name:"UID",variable_name:"uid",value:uid}]},
-    callback:function(res){
-      db.collection("users").doc(uid).set({balance:INC(usd)},{merge:true});
-      db.collection("deposits").doc(res.reference).set({uid,usd,kes,phone,reference:res.reference,status:"success",createdAt:new Date()});
-      sayWallet(`Deposit $${usd} (KES ${kes}) · Ref ${res.reference}`);toast(`Deposit successful: ${money(usd)}`,"ok");
-      db.collection("users").doc(uid).get().then(doc=>{const u=doc.data()||{};if(u.referredBy&&!u.referralRewarded){const r=u.referredBy;
-        db.collection("users").doc(r).set({balance:INC(5)},{merge:true});
-        db.collection("users").doc(uid).set({referralRewarded:true},{merge:true});
-        db.collection("users").doc(r).collection('referrals').doc(uid).set({bonusAwarded:true,bonusDate:new Date()},{merge:true})}});
-      setTimeout(loadAll,1200);
-    },
-    onClose:()=>toast("Deposit window closed. No money was taken.")}).openIframe();
+
+  const btn=$('mpesaPayBtn');
+  btn.disabled=true;
+  setMpesaStatus("Sending M-PESA prompt to your phone...");
+
+  try{
+    const token=await auth.currentUser.getIdToken();
+    const r=await fetch('/api/deposit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({usd,phone})
+    });
+    const res=await r.json();
+    if(!r.ok) throw new Error(res.error||"Could not start payment");
+    setMpesaStatus("Check your phone and enter your M-PESA PIN. This page updates automatically.");
+
+    // Watch the deposit record; the server flips it to success/failed
+    if(depositUnsub) depositUnsub();
+    depositUnsub=db.collection("deposits").doc(res.reference).onSnapshot(doc=>{
+      const d=doc.data(); if(!d) return;
+      if(d.status==="success"){
+        cleanup(); closeM('mpesaModal');
+        sayWallet(`Deposit $${d.usd} (KES ${d.kes}) · Ref ${d.reference}`);
+        toast(`Deposit successful: ${money(d.usd)}`,"ok");
+        setTimeout(loadAll,800);
+      }else if(d.status==="failed"){
+        cleanup(); toast("Payment failed or was cancelled. No money was taken.","err");
+        setTimeout(loadAll,800);
+      }
+    });
+    // Stop waiting after 2 minutes (if they paid late, the server still credits them)
+    depositTimeout=setTimeout(()=>{cleanup();toast("No response yet. If you paid, your balance will update shortly.")},120000);
+  }catch(e){
+    cleanup();
+    toast(e.message||"Could not start payment","err");
+  }
+
+  function cleanup(){
+    if(depositUnsub){depositUnsub();depositUnsub=null}
+    clearTimeout(depositTimeout);
+    btn.disabled=false;
+    setMpesaStatus('');
+  }
 }
 
 /* ---------- withdraw ---------- */
