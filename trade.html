@@ -4,6 +4,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.jpg">
 <script>
 const firebaseConfig = {apiKey:"AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o",authDomain:"brixtrade-c142d.firebaseapp.com",projectId:"brixtrade-c142d",storageBucket:"brixtrade-c142d.firebasestorage.app",messagingSenderId:"489953142453",appId:"1:489953142453:web:2499588c325482d17a00fc",measurementId:"G-EX79EB9RDN"};
 firebase.initializeApp(firebaseConfig);
@@ -186,4 +190,7 @@ const FAQ=[[/alert|notify/,"Pick a market, type a price under Price alerts and t
 function ask(q){q=(q||$("q").value).trim();if(!q)return;$("q").value="";say(q,"u");const l=q.toLowerCase(),f=FAQ.find(x=>x[0].test(l));if(!f){bot("Try: How do I trade? · Payout & risk · Deposit · Withdraw · Scan markets.");return}const a=f[1];bot(typeof a==="function"?a():a)}
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter")ask()});$("lossLim").value=limit||"";$("sndBtn").textContent=snd?"🔊":"🔇";$("qch").innerHTML=["How do I trade?","Payout & risk","Deposit","Withdraw","Demo mode"].map(t=>`<button class="chip" onclick="ask('${t}')">${t}</button>`).join("");
 applyTheme(document.documentElement.getAttribute("data-theme")||"dark");renderStats();renderHistory();renderAlerts();ui_design();
-</script></body></html>
+</script>
+<script src="/pwa.js"></script>
+</body>
+</html>
