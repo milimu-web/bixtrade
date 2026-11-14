@@ -76,13 +76,56 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 @media(max-width:1100px){main{grid-template-columns:minmax(0,1fr);grid-template-areas:"list" "ch" "rail" "log"}#rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start}}
 @media(max-width:860px){.two{grid-template-columns:1fr}#list{flex-direction:column}.tabs{border-right:0;border-bottom:1px solid var(--ln);overflow-x:auto}}
 @media(max-width:700px){header{padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top));gap:6px}h1{font-size:15px}.stat{padding:2px 6px}.stat b{font-size:13px!important}.hdr-tools{width:100%;justify-content:space-between}.hdr-tools .btn,.hdr-tools .btn-brix{flex:1;text-align:center;padding:8px 4px;font-size:11px}main{padding:8px;gap:10px;padding-bottom:30px}#ch{padding:12px}.cw #cv{height:clamp(320px,52vh,480px)}input,select{padding:10px;font-size:16px}.buy,.sell{padding:18px 14px;font-size:16px} .ttl h2,#sp{font-size:18px}#sq{margin-left:0}#popupBox{width:92%;padding:20px}#rail{display:flex}}
+.menu-wrap{position:relative}
+.bars{display:grid;gap:4px;width:18px}
+.bars i{display:block;height:2px;border-radius:2px;background:currentColor;transition:transform .2s,opacity .2s}
+#menuBtn[aria-expanded="true"] .bars i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+#menuBtn[aria-expanded="true"] .bars i:nth-child(2){opacity:0}
+#menuBtn[aria-expanded="true"] .bars i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+#hdrTools{display:none;position:absolute;right:0;top:calc(100% + 8px);flex-direction:column;gap:8px;min-width:200px;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:14px;box-shadow:var(--sh);z-index:60}
+#hdrTools.open{display:flex}
+#hdrTools .btn,#hdrTools .btn-brix{width:100%;min-width:0;height:auto;padding:11px 14px;display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;font-size:14px}
+#themeBtn::after{content:"Theme";font-size:14px}
+#sndBtn::after{content:"Sound";font-size:14px}
+#logoutMenuBtn::after{content:"Log out";font-size:14px}
 </style></head><body>
 <div id="authGate" style="position:fixed;inset:0;background:rgba(3,6,12,.92);display:flex;align-items:center;justify-content:center;z-index:9999"><div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:28px;width:400px;max-width:92%;text-align:center"><h1 style="margin:0;font-family:Sora;color:#e8edf6">BRIX<span style="color:#8b8dff">TRADE</span></h1><p style="color:#8593a8;font-size:13px;margin:8px 0 18px">Checking secure session...</p></div></div>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
 <header><h1>BRIX<span>TRADE</span><small>Currencies & Metals • <span id="userPhoneShow" style="color:var(--ac)"></span></small></h1>
 <div class="stat"><small>Balance <span id="demoBadge">DEMO</span></small><b id="balance">$0.00</b></div>
 <div class="stat"><small>Today P/L</small><b id="dailyProfit">$0.00</b></div>
-<div class="hdr-tools"><button class="btn" id="demoBtn" onclick="toggleDemo()">Demo</button><a href="profile.html" class="btn-brix">👤 Wallet</a><button class="btn ic" id="themeBtn" onclick="toggleTheme()">☀</button><button class="btn ic" id="sndBtn" onclick="toggleSnd()">🔊</button><button class="btn ic" onclick="logoutPhone()">↩</button></div></header>
+<div class="menu-wrap">
+  <button class="btn ic" id="menuBtn" type="button" onclick="toggleMenu(event)" aria-label="Open menu" aria-expanded="false"><span class="bars"><i></i><i></i><i></i></span></button>
+  <div class="hdr-tools" id="hdrTools">
+    <button class="btn" id="demoBtn" onclick="toggleDemo()">Demo</button>
+    <a href="profile.html" class="btn-brix">👤 Wallet</a>
+    <button class="btn ic" id="themeBtn" onclick="toggleTheme()">☀</button>
+    <button class="btn ic" id="sndBtn" onclick="toggleSnd()">🔊</button>
+    <button class="btn ic" id="logoutMenuBtn" onclick="logoutPhone()">↩</button>
+  </div>
+</div></header>
+<script>
+function toggleMenu(e){
+  if(e) e.stopPropagation();
+  var m=document.getElementById('hdrTools'), b=document.getElementById('menuBtn');
+  var open=m.classList.toggle('open');
+  b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+document.addEventListener('click', function(e){
+  var m=document.getElementById('hdrTools');
+  if(m && m.classList.contains('open') && !m.contains(e.target)){
+    m.classList.remove('open');
+    document.getElementById('menuBtn').setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    var m=document.getElementById('hdrTools');
+    if(m) m.classList.remove('open');
+    document.getElementById('menuBtn').setAttribute('aria-expanded','false');
+  }
+});
+</script>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button><button data-f="fav">★</button></div><div id="il"></div></aside>
 <section class="pn" id="ch"><div class="ttl"><span id="sIcon"></span><div><h2 id="sn">-</h2><div class="nm2" id="snm"></div></div><b id="sp">-</b><span id="sc"></span><span class="sim">REAL MARKET</span><span id="sq">Timer: <b id="timer">Ready</b></span></div>
