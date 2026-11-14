@@ -4,15 +4,6 @@
 <meta name="google-site-verification" content="a9x5pmOz6kldEFE4iQZzrWT3djoE2K2UfTy2Bd-EqjQ" />
 <meta charset="utf-8">
 <script>try{if(localStorage.getItem("brixTheme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
-<script>
-(function(){
-  try{
-    var installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    var user = JSON.parse(localStorage.getItem('brix_current_user') || 'null');
-    if (installed && user && user.uid) location.replace('/trade.html');
-  }catch(e){}
-})();
-</script>
 <meta name="theme-color" content="#0a0e16" id="themeMeta">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brixtrade - Trade Currencies & Metals</title>
@@ -643,8 +634,20 @@ function handleStart(){const cur=JSON.parse(localStorage.getItem('brix_current_u
 function showWelcome(shortName,fullName){$('welcomeName').textContent=shortName.split(' ')[0];$('welcomeFullName').textContent=fullName;$('welcomePopup').classList.add('on');}
 function closeWelcome(){$('welcomePopup').classList.remove('on');}
 function goToTrade(){closeWelcome();location.href='trade.html';}
-auth.onAuthStateChanged(user=>{if(user){const name=user.displayName||user.email.split('@')[0];localStorage.setItem('brix_current_user',JSON.stringify({name,email:user.email,uid:user.uid}));updateNav();}});
-updateNav();
+let firstAuthCheck=true;
+auth.onAuthStateChanged(user=>{
+  const first=firstAuthCheck; firstAuthCheck=false;
+  if(user){
+    const name=user.displayName||user.email.split('@')[0];
+    localStorage.setItem('brix_current_user',JSON.stringify({name,email:user.email,uid:user.uid}));
+    updateNav();
+    const installed=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+    if(first && installed) location.replace('/trade.html');
+  }else{
+    localStorage.removeItem('brix_current_user');
+    updateNav();
+  }
+});
 $('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth();});
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',function(e){e.preventDefault();const h=this.getAttribute('href');const t=h.length>1?document.querySelector(h):null;if(t)t.scrollIntoView({behavior:'smooth'});});});
 </script>
