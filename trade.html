@@ -141,7 +141,21 @@ document.addEventListener('keydown', function(e){
 <div class="pn pad"><div class="hd2"><h3 class="sh0">Order ticket</h3><span class="mode" id="modeTag">REAL</span></div><div id="tstat" hidden></div>
 <div id="tk"><div><label class="l">Stake ($1 – $100)</label><input id="stake" type="number" min="1" max="100" step="1" value="10" oninput="sumUp()" onblur="stakeVal();sumUp()"></div><div><label class="l">Duration</label><select id="duration"><option value="30">30s Scalper</option><option value="60">60s Trend</option><option value="120">120s Sniper</option></select></div><div class="chips full" id="sch" style="margin-top:0"></div><div id="sum" class="full"></div><button class="buy tbtn" id="bBuy" onclick="startTrade('BUY')">BUY ▲</button><button class="sell tbtn" id="bSell" onclick="startTrade('SELL')">SELL ▼</button></div>
 <div class="bots"><div class="bot-card active" onclick="selectBot('scalper', this)"><h3>⚡ Scalper</h3><p>30s preset</p></div><div class="bot-card" onclick="selectBot('trend', this)"><h3>📈 Trend</h3><p>60s preset</p></div><div class="bot-card" onclick="selectBot('sniper', this)"><h3>🎯 Sniper</h3><p>120s preset</p></div></div><button class="btn-vip" onclick="subscribe()">Unlock Sniper VIP $10/mo</button></div>
-<div class="pn pad"><div class="hd2"><h3 class="sh0">Scoreboard</h3><span class="mode" id="sbMode">REAL</span></div><div id="stats"></div></div>
+
+<div class="pn pad">
+  <div class="hd2"><h3 class="sh0">Quick Actions</h3><span class="mode" id="qaMode">WALLET</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+    <a href="profile.html" class="btn-brix" style="text-align:center;padding:11px 8px">💰 Deposit</a>
+    <a href="profile.html" class="btn" style="text-align:center;padding:11px 8px">🏧 Withdraw</a>
+    <a href="profile.html" class="btn" style="text-align:center;padding:11px 8px">🎁 Invite &amp; earn $5</a>
+    <button class="btn" type="button" style="padding:11px 8px" onclick="typeof enableNotifications==='function'?enableNotifications():alert('Notifications are not available yet.')">🔔 Alerts</button>
+  </div>
+  <div style="margin-top:12px;padding:10px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--acbg);font-size:12px;color:var(--mut);line-height:1.5">
+    <b style="color:var(--ink)">Remember:</b> a win pays 70% and a loss costs your stake, so you need to win about <b style="color:var(--ink)">58.8%</b> of trades to break even. Only trade money you can afford to lose.
+  </div>
+</div>
+<div id="stats" style="display:none"></div><span id="sbMode" style="display:none"></span>
+
 <aside class="pn" id="asst"><h3>Trade Assistant</h3><button class="btn-brix" onclick="scan()">🔍 Scan markets</button><div id="scan"></div><div id="msgs"></div><div class="chips" id="qch"></div><div class="ask"><input id="q" placeholder="Ask…"><button class="btn-brix" onclick="ask()">Send</button></div></aside>
 </aside>
 <section class="pn pad" id="log"><div class="hd2"><h3 class="sh0">Trade history</h3><div class="chips" id="hfl" style="margin:0"><button class="chip on" data-h="all">All</button><button class="chip" data-h="W">Wins</button><button class="chip" data-h="L">Losses</button><button class="chip" onclick="exportCsv()">⬇ Export CSV</button></div></div><div id="recent" style="margin-top:10px"></div>
