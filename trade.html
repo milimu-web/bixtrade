@@ -82,7 +82,7 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 #menuBtn[aria-expanded="true"] .bars i:nth-child(1){transform:translateY(6px) rotate(45deg)}
 #menuBtn[aria-expanded="true"] .bars i:nth-child(2){opacity:0}
 #menuBtn[aria-expanded="true"] .bars i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-#hdrTools{display:none;position:absolute;right:0;top:calc(100% + 8px);flex-direction:column;gap:8px;min-width:200px;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:14px;box-shadow:var(--sh);z-index:60}
+#hdrTools{display:none;position:fixed;right:10px;left:auto;top:64px;flex-direction:column;gap:8px;width:220px;max-width:calc(100vw - 20px);max-height:calc(100vh - 80px);overflow-y:auto;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:14px;box-shadow:var(--sh);z-index:9000}
 #hdrTools.open{display:flex}
 #hdrTools .btn,#hdrTools .btn-brix{width:100%;min-width:0;height:auto;padding:11px 14px;display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;font-size:14px}
 #themeBtn::after{content:"Theme";font-size:14px}
@@ -108,7 +108,12 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 function toggleMenu(e){
   if(e) e.stopPropagation();
   var m=document.getElementById('hdrTools'), b=document.getElementById('menuBtn');
-  var open=m.classList.toggle('open');
+  var open=!m.classList.contains('open');
+  if(open){
+    var h=document.querySelector('header');
+    m.style.top=(h.getBoundingClientRect().bottom+6)+'px';
+  }
+  m.classList.toggle('open',open);
   b.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 document.addEventListener('click', function(e){
