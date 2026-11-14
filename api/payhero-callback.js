@@ -42,12 +42,22 @@ export default async function handler(req, res) {
       t.set(userRef, { balance: FieldValue.increment(d.usd) }, { merge: true });
       t.update(depRef, { status: "success", paidAt: FieldValue.serverTimestamp() });
 
-      // Referral bonus (moved here from the browser)
-      if (u.referredBy && !u.referralRewarded) {
-        const refUser = db.collection("users").doc(u.referredBy);
-        t.set(refUser, { balance: FieldValue.increment(5) }, { merge: true });
-        t.set(userRef, { referralRewarded: true }, { merge: true });
-        t.set(refUser.collection("referrals").doc(d.uid), { bonusAwarded: true, bonusDate: new Date() }, { merge: true });
+      // Referral bonus: only the friend's FIRST deposit counts, and it must be $15 or more
+      if (!u.firstDepositDone) {
+        t.set(userRef, { firstDepositDone: true, firstDepositUsd: d.usd }, { merge: true });
+
+        if (u.referredBy && u.referredBy !== d.uid && !u.referralRewarded) {
+          const refUser = db.collection("users").doc(u.referredBy);
+          const refDoc = refUser.collection("referrals").doc(d.uid);
+
+          if (d.usd >= 15) {
+            t.set(refUser, { balance: FieldValue.increment(5) }, { merge: true });
+            t.set(userRef, { referralRewarded: true }, { merge: true });
+            t.set(refDoc, { bonusAwarded: true, status: "paid", firstDepositUsd: d.usd, bonusDate: new Date() }, { merge: true });
+          } else {
+            t.set(refDoc, { status: "ineligible", firstDepositUsd: d.usd }, { merge: true });
+          }
+        }
       }
     });
   } else {
