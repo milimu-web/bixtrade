@@ -4,6 +4,15 @@
 <meta name="google-site-verification" content="a9x5pmOz6kldEFE4iQZzrWT3djoE2K2UfTy2Bd-EqjQ" />
 <meta charset="utf-8">
 <script>try{if(localStorage.getItem("brixTheme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+<script>
+(function(){
+  try{
+    var installed = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var user = JSON.parse(localStorage.getItem('brix_current_user') || 'null');
+    if (installed && user && user.uid) location.replace('/trade.html');
+  }catch(e){}
+})();
+</script>
 <meta name="theme-color" content="#0a0e16" id="themeMeta">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brixtrade - Trade Currencies & Metals</title>

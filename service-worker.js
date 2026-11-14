@@ -1,4 +1,4 @@
-const CACHE = 'brixtrade-v1';
+const CACHE = 'brixtrade-v2';
 const FILES = ['/', '/index.html', '/trade.html', '/manifest.json'];
 
 // Never cache live prices, trades, payments or login. Edit to match your backend routes.
