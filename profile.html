@@ -3,78 +3,141 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script>
 const firebaseConfig = {apiKey:"AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o",authDomain:"brixtrade-c142d.firebaseapp.com",projectId:"brixtrade-c142d",storageBucket:"brixtrade-c142d.firebasestorage.app",messagingSenderId:"489953142453",appId:"1:489953142453:web:2499588c325482d17a00fc",measurementId:"G-EX79EB9RDN"};
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0e16">
+<meta name="theme-color" content="#0b111b">
 <title>Brixtrade – Wallet</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0e16;--bg2:#0f1520;--pn:#121927;--pn2:#182131;--ln:#222d40;--ink:#e8edf6;--mut:#8593a8;--up:#34d399;--dn:#f87171;--ac:#8b8dff;--ac2:#6366f1;--acbg:rgba(139,141,255,.1);--sh:0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
+:root{--bg:#0b111b;--bg2:#0f1622;--pn:#131b29;--pn2:#18222f;--ln:#243044;--ink:#e9eef7;--mut:#8896ab;--up:#34d399;--dn:#f87171;--warn:#fbbf24;--ac:#7c83ff;--ac2:#5a62f0;--acbg:rgba(124,131,255,.12);color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(1200px 500px at 70% -10%,#16204a55,transparent),var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;padding-bottom:env(safe-area-inset-bottom,0);min-height:100vh;display:flex;flex-direction:column}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-header{display:flex;gap:10px;align-items:center;padding:12px 22px;padding-top:calc(12px + env(safe-area-inset-top,0));background:rgba(15,21,32,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
-h1{font-family:Sora,sans-serif;margin:0 auto 0 0;font-size:19px;letter-spacing:.14em;font-weight:800}h1 span{color:var(--ac)}
-h2,h3{font-family:Sora,sans-serif;margin:0}
-.btn,.btn-brix{border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:700;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+h1,h2,h3{margin:0;font-weight:700}
+.num{font-family:'JetBrains Mono',monospace}
+
+/* header */
+header{background:var(--bg2);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top,0)}
+.hin{max-width:1150px;margin:auto;display:flex;align-items:center;gap:12px;padding:12px 20px}
+.logo{font-size:18px;letter-spacing:.14em;font-weight:800;margin-right:auto}.logo span{color:var(--ac)}
+.secure{font-size:11px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.secure i{width:7px;height:7px;border-radius:50%;background:var(--up);display:inline-block}
+
+.btn,.btn-brix{border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;border:1px solid var(--ln);background:var(--pn2);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13px}
 .btn:hover{border-color:var(--ac)}.btn:active,.btn-brix:active{transform:scale(.98)}
 .btn:disabled,.btn-brix:disabled{opacity:.6;cursor:not-allowed}
-.btn-brix{background:linear-gradient(135deg,var(--ac),var(--ac2));border-color:transparent;color:#fff}
-.btn.sm{padding:7px 12px;font-size:12px}
-.pn{background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:18px;box-shadow:var(--sh)}
-.wrap{max-width:1150px;margin:auto;padding:16px;display:grid;gap:16px}
-.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:20px;background:linear-gradient(135deg,#121927 0%,#1a2340 100%)}
-.who{color:var(--mut);font-size:12px;word-break:break-all}
-.bal{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;line-height:1.1;margin:6px 0 2px;letter-spacing:-.02em}
+.btn-brix{background:var(--ac2);border-color:var(--ac2);color:#fff}
+.btn-brix:hover{background:var(--ac)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.danger{color:var(--dn)}.btn.danger:hover{border-color:var(--dn)}
+
+.wrap{max-width:1150px;width:100%;margin:auto;padding:20px;display:grid;gap:18px;flex:1}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:12px;padding:20px}
+.ptitle{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:700}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.pagehead h2{font-size:22px}
+.pagehead .sub{margin-top:2px}
+
+/* account summary */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr);gap:0;padding:0;overflow:hidden}
+.hero>div{padding:22px}
+.hero .left{border-right:1px solid var(--ln)}
+.acct{display:grid;gap:2px;margin-bottom:16px;font-size:12px;color:var(--mut)}
+.acct b{color:var(--ink);font-weight:600;word-break:break-all}
+.bal{font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:700;line-height:1.1;margin:6px 0 2px;letter-spacing:-.02em}
 .sub{color:var(--mut);font-size:12px}
-.acts{display:flex;gap:10px;margin-top:16px}.acts .btn,.acts .btn-brix{flex:1;padding:13px}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;align-content:center}
-.stat{background:rgba(10,14,22,.45);border:1px solid var(--ln);border-radius:12px;padding:12px}
-.stat small{color:var(--mut);font-size:11px;display:block}
-.stat b{font-family:'JetBrains Mono',monospace;font-size:18px}
+.acts{display:flex;gap:10px;margin-top:18px}.acts .btn,.acts .btn-brix{flex:1;padding:12px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:0;padding:0!important}
+.stat{padding:20px 22px;border-bottom:1px solid var(--ln)}
+.stat:nth-child(odd){border-right:1px solid var(--ln)}
+.stat:nth-last-child(-n+2){border-bottom:none}
+.stat.wide{grid-column:1/-1;border-right:none!important;border-bottom:none}
+.stat small{color:var(--mut);font-size:11px;display:block;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:4px}
+.stat b{font-family:'JetBrains Mono',monospace;font-size:20px}
 .up{color:var(--up)}.dn{color:var(--dn)}
-.cols{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;align-items:start}
-.side{display:grid;gap:16px}
+
+.cols{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;align-items:start}
+.side{display:grid;gap:18px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-input{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:14px;margin:6px 0 12px;color:var(--ink)}
+input{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:14px;margin:6px 0 12px;color:var(--ink)}
 input:focus{border-color:var(--ac);outline:none}
 label{font-size:12px;color:var(--mut);font-weight:600}
 .copy{display:flex;gap:6px}.copy input{margin:0}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{border:1px solid var(--ln);background:var(--pn2);padding:7px 12px;border-radius:99px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}
+.chip{border:1px solid var(--ln);background:var(--pn2);padding:6px 12px;border-radius:99px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}
 .chip.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
-.tabs{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}
-.tabs button{border:1px solid var(--ln);background:var(--pn2);padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--mut);font-weight:600;font-size:12px}
-.tabs button.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
-.tabs i{font-style:normal;opacity:.7;margin-left:4px}
-#txList{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto;margin-top:12px}
-.txRow{padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--pn2);font-size:12px;display:flex;justify-content:space-between;gap:10px}
-.txRow small{color:var(--mut)}.txRow>span:last-child{text-align:right;white-space:nowrap}
-.txRow.win{border-left:3px solid var(--up)}.txRow.lose{border-left:3px solid var(--dn)}.txRow.dep{border-left:3px solid var(--ac)}
-.tag{font-size:10px;border-radius:5px;padding:1px 6px;background:var(--acbg);color:var(--ac);font-weight:700}
+
+/* history */
+.hhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hactions{display:flex;gap:8px;align-items:center}
+.linkbtn{background:none;border:none;color:var(--ac);cursor:pointer;font-size:12px;font-weight:600;padding:4px}
+.linkbtn:hover{text-decoration:underline}
+.tabs{display:flex;gap:0;margin:14px 0 12px;border-bottom:1px solid var(--ln)}
+.tabs button{border:none;background:none;padding:10px 16px;cursor:pointer;color:var(--mut);font-weight:600;font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--ac)}
+.tabs i{font-style:normal;font-size:11px;background:var(--pn2);border:1px solid var(--ln);border-radius:99px;padding:0 7px;margin-left:6px;color:var(--mut)}
+.tbl{max-height:68vh;overflow:auto;margin-top:12px;border:1px solid var(--ln);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
+th{position:sticky;top:0;background:var(--pn2);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding:10px 12px;font-weight:700;border-bottom:1px solid var(--ln)}
+td{padding:11px 12px;border-bottom:1px solid var(--ln);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th.r,td.r{text-align:right;white-space:nowrap}
+td small{color:var(--mut);display:block}
+td .ref{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut)}
+.tag{font-size:10px;border-radius:5px;padding:2px 7px;background:var(--acbg);color:var(--ac);font-weight:700;letter-spacing:.04em;display:inline-block}
 .tag.p{background:rgba(248,113,113,.12);color:var(--dn)}
-.empty{color:var(--mut);padding:28px 10px;text-align:center}
+.tag.ok{background:rgba(52,211,153,.12);color:var(--up)}
+.tag.w{background:rgba(251,191,36,.12);color:var(--warn)}
+.empty{color:var(--mut);padding:36px 10px;text-align:center}
 #chat{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto;margin-top:10px}
-#chat div{padding:8px 10px;border-radius:9px;background:var(--pn2);border:1px solid var(--ln);font-size:12px}
+#chat div{padding:8px 10px;border-radius:8px;background:var(--pn2);border:1px solid var(--ln);font-size:12px}
+
+/* modals */
 .modal{position:fixed;inset:0;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);padding:12px}
 .modal.show{display:flex}
-.wbox{background:var(--pn);border:1px solid var(--ln);border-radius:20px;padding:24px;width:440px;max-width:100%;max-height:92vh;overflow:auto}
-.bar{height:4px;background:var(--ln);border-radius:4px;margin:10px 0 16px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .25s}
-.upl{border:2px dashed #34405a;border-radius:12px;padding:16px;text-align:center;cursor:pointer;color:var(--mut);margin:6px 0 10px}
+.wbox{background:var(--pn);border:1px solid var(--ln);border-radius:16px;padding:24px;width:440px;max-width:100%;max-height:92vh;overflow:auto}
+.bar{height:4px;background:var(--ln);border-radius:4px;margin:10px 0 16px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac2);transition:width .25s}
+.upl{border:2px dashed #34405a;border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--mut);margin:6px 0 10px}
 .note{background:var(--acbg);border-radius:8px;padding:9px;font-size:11px;margin:10px 0;color:#b9bbff}
-.sum{background:var(--bg2);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:8px 0}
+.sum{background:var(--bg2);border:1px solid var(--ln);border-radius:10px;padding:12px;margin:8px 0}
 .sum .row{padding:3px 0}
 #toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0));display:grid;gap:8px;z-index:300;width:min(380px,92vw)}
-.toast{background:var(--pn2);border:1px solid var(--ln);border-left:3px solid var(--ac);border-radius:10px;padding:11px 14px;box-shadow:var(--sh);font-size:13px;animation:in .2s}
+.toast{background:var(--pn2);border:1px solid var(--ln);border-left:3px solid var(--ac);border-radius:8px;padding:11px 14px;box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:13px;animation:in .2s}
 .toast.ok{border-left-color:var(--up)}.toast.err{border-left-color:var(--dn)}
 @keyframes in{from{opacity:0;transform:translateY(8px)}}
-@media(max-width:900px){.hero,.cols{grid-template-columns:1fr}.bal{font-size:38px}}
+
+/* KYC */
+select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:var(--bg2);border-radius:8px;font-size:14px;margin:6px 0 12px;color:var(--ink)}
+.kycbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--ln);border-left:3px solid var(--warn);background:var(--pn);border-radius:10px;padding:12px 16px;font-size:13px}
+.kycbar.p{border-left-color:var(--ac)}.kycbar.r{border-left-color:var(--dn)}
+.shot{aspect-ratio:3/2;border:2px dashed #34405a;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--mut);text-align:center;overflow:hidden;margin:8px 0 12px;background:var(--bg2);font-size:12px;padding:8px}
+.shot img,.shot video{width:100%;height:100%;object-fit:cover;display:block}
+.shot.sq{aspect-ratio:1/1;max-width:280px;margin:8px auto 12px;border-radius:50%}
+video.mirror{transform:scaleX(-1)}
+.tips{font-size:12px;color:var(--mut);margin:0 0 10px;padding-left:18px}
+.btnrow{display:flex;gap:8px;margin-top:8px}.btnrow .btn,.btnrow .btn-brix{flex:1}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.thumbs div{border:1px solid var(--ln);border-radius:8px;overflow:hidden;background:var(--bg2);font-size:11px;color:var(--mut);text-align:center}
+.thumbs img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--mut);margin:10px 0;font-weight:400}
+.chk input{width:auto;margin:3px 0 0}
+
+/* footer */
+footer{border-top:1px solid var(--ln);background:var(--bg2);margin-top:8px}
+.fin{max-width:1150px;margin:auto;padding:18px 20px;display:grid;gap:6px;color:var(--mut);font-size:11.5px}
+.fin b{color:var(--ink)}
+.flinks{display:flex;gap:16px;flex-wrap:wrap}
+
+@media(max-width:900px){.hero,.cols{grid-template-columns:1fr}.hero .left{border-right:none;border-bottom:1px solid var(--ln)}.bal{font-size:34px}.secure{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
 
@@ -102,30 +165,99 @@ label{font-size:12px;color:var(--mut);font-weight:600}
     <button class="btn-brix btn" style="width:100%" onclick="wNext(2)">Continue</button></div>
   <div id="wStep2" hidden><label for="wPhone">M-PESA number</label><input id="wPhone" type="tel" value="+254" inputmode="tel"><label for="wMpesaName">Name on M-PESA</label><input id="wMpesaName">
     <button class="btn-brix btn" style="width:100%" onclick="wNext(3)">Continue</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(1)">Back</button></div>
-  <div id="wStep3" hidden><label for="wIdNum">National ID number</label><input id="wIdNum" inputmode="numeric">
-    <div class="upl" onclick="$('wIdFile').click()" id="wUpl">Tap to upload a photo of your ID</div><input id="wIdFile" type="file" accept="image/*,.pdf" hidden>
-    <div class="note">Your ID is used only to verify withdrawals, under the Kenya Data Protection Act.</div>
+  <div id="wStep3" hidden>
+    <div class="note">Your identity is verified. Withdrawals are reviewed before they are sent to M-PESA.</div>
     <div class="sum" id="wSum"></div>
     <button class="btn-brix btn" style="width:100%" id="wSubmit" onclick="submitWithdrawal()">Submit withdrawal</button><button class="btn" style="width:100%;margin-top:8px" onclick="wNext(2)">Back</button></div>
   <button onclick="closeM('withdrawModal')" style="width:100%;margin-top:10px;background:none;border:none;color:var(--mut);cursor:pointer">Cancel</button>
 </div></div>
 
-<header><h1>BRIX<span>TRADE</span></h1><a href="trade.html" class="btn-brix btn">← Back to trading</a><button class="btn" onclick="logoutPhone()">Log out</button></header>
+<div class="modal" id="clearModal" role="dialog" aria-modal="true" aria-label="Clear history"><div class="wbox" style="width:400px">
+  <h2>Clear <span id="clearName">history</span>?</h2>
+  <p class="sub" style="margin:10px 0 16px;font-size:13px">This removes the list from your view on this device. Your balance, totals and official transaction records are not affected, and you can restore the list any time with "Show all".</p>
+  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeM('clearModal')">Cancel</button><button class="btn-brix btn" style="flex:1" onclick="confirmClear()">Clear history</button></div>
+</div></div>
+
+<div class="modal" id="kycModal" role="dialog" aria-modal="true" aria-label="Identity verification"><div class="wbox" style="width:460px">
+  <div class="row"><h2>Verify your identity</h2><button class="btn sm" onclick="closeKyc()" aria-label="Close">✕</button></div>
+  <div class="sub" id="kStepLabel" style="margin-top:4px"></div>
+  <div class="bar"><i id="kBar"></i></div>
+
+  <div id="k1">
+    <label for="kName">Full name (as on your ID)</label><input id="kName" autocomplete="name">
+    <label for="kType">ID type</label>
+    <select id="kType"><option>National ID</option><option>Passport</option><option>Driving licence</option></select>
+    <label for="kNum">ID number</label><input id="kNum" autocomplete="off">
+    <div class="note">Your documents are used only to verify your identity, under the Kenya Data Protection Act. They are stored securely and never shown to other users.</div>
+    <button class="btn-brix btn" style="width:100%" onclick="kNext(2)">Continue</button>
+  </div>
+
+  <div id="k2" hidden>
+    <h3 style="font-size:15px">Front of your ID</h3>
+    <ul class="tips"><li>Place the ID on a flat, dark surface</li><li>All four corners visible, no glare</li><li>Text must be sharp and readable</li></ul>
+    <div class="shot" id="kfrontBox">No photo yet</div>
+    <input id="kfrontFile" type="file" accept="image/*" capture="environment" hidden onchange="onKFile('front',this)">
+    <div class="btnrow"><button class="btn" onclick="$('kfrontFile').click()" id="kfrontBtn">Take or upload photo</button><button class="btn-brix btn" onclick="kNext(3)">Continue</button></div>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="kNext(1)">Back</button>
+  </div>
+
+  <div id="k3" hidden>
+    <h3 style="font-size:15px">Back of your ID</h3>
+    <ul class="tips"><li>Same rules as the front</li><li>Passport: photograph the signature page</li></ul>
+    <div class="shot" id="kbackBox">No photo yet</div>
+    <input id="kbackFile" type="file" accept="image/*" capture="environment" hidden onchange="onKFile('back',this)">
+    <div class="btnrow"><button class="btn" onclick="$('kbackFile').click()" id="kbackBtn">Take or upload photo</button><button class="btn-brix btn" onclick="kNext(4)">Continue</button></div>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="kNext(2)">Back</button>
+  </div>
+
+  <div id="k4" hidden>
+    <h3 style="font-size:15px">Take a selfie</h3>
+    <ul class="tips"><li>Face the camera in good light</li><li>No hat, mask or sunglasses</li><li>Only you in the frame</li></ul>
+    <div class="shot sq" id="kselfieBox"><span id="kselfieHint">Camera is off</span><video id="kVideo" class="mirror" autoplay playsinline muted hidden></video><img id="kselfieImg" alt="Your selfie" hidden></div>
+    <input id="kselfieFile" type="file" accept="image/*" capture="user" hidden onchange="onKFile('selfie',this)">
+    <div class="btnrow">
+      <button class="btn" id="kCamBtn" onclick="startCam()">Open camera</button>
+      <button class="btn-brix btn" id="kSnapBtn" onclick="snapSelfie()" hidden>Capture</button>
+      <button class="btn-brix btn" id="kSelfieNext" onclick="kNext(5)">Continue</button>
+    </div>
+    <button class="linkbtn" style="margin-top:6px" onclick="$('kselfieFile').click()">Camera not working? Upload a selfie</button>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="kNext(3)">Back</button>
+  </div>
+
+  <div id="k5" hidden>
+    <h3 style="font-size:15px">Review and submit</h3>
+    <div class="sum" id="kSum"></div>
+    <div class="thumbs" id="kThumbs"></div>
+    <label class="chk"><input type="checkbox" id="kConsent">I confirm these documents are mine and the details are correct. I agree to Brixtrade processing them to verify my identity.</label>
+    <button class="btn-brix btn" style="width:100%" id="kSubmit" onclick="submitKyc()">Submit for verification</button>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="kNext(4)">Back</button>
+  </div>
+</div></div>
+
+<header><div class="hin">
+  <div class="logo">BRIX<span>TRADE</span></div>
+  <span class="secure"><i></i>Secure session</span>
+  <a href="trade.html" class="btn-brix btn">← Back to trading</a>
+  <button class="btn" onclick="logoutPhone()">Log out</button>
+</div></header>
 
 <main class="wrap">
+  <div class="pagehead"><div><h2>Wallet</h2><div class="sub">Manage your balance, deposits and withdrawals</div></div></div>
+  <div class="kycbar" id="kycBanner" hidden></div>
+
   <section class="pn hero">
-    <div>
-      <div class="who" id="userEmail">Loading…</div>
-      <div class="sub" style="margin-top:10px">Available balance</div>
+    <div class="left">
+      <div class="acct"><span>Account holder</span><b id="userEmail">Loading…</b><span class="tag ok" id="vBadge" hidden style="margin-top:4px;width:max-content">✓ VERIFIED</span><span style="margin-top:6px">Account ID</span><b class="num" id="acctId">–</b></div>
+      <div class="ptitle">Available balance</div>
       <div class="bal" id="balance">$0.00</div>
       <div class="sub" id="balKes">≈ KES 0</div>
       <div class="acts"><button class="btn-brix btn" onclick="openDeposit()">Deposit</button><button class="btn" onclick="openWithdraw()">Withdraw</button></div>
     </div>
     <div class="stats">
-      <div class="stat"><small>Trading profit (real)</small><b id="stPnl">$0.00</b></div>
-      <div class="stat"><small>Win rate (real)</small><b id="stWin">–</b></div>
       <div class="stat"><small>Total deposited</small><b id="stDep">$0.00</b></div>
       <div class="stat"><small>Pending withdrawals</small><b id="stPend">$0.00</b></div>
+      <div class="stat" id="stKycCard"><small>Identity verification</small><b id="stKyc" style="font-size:14px"><span class="tag w">NOT VERIFIED</span></b></div>
+      <div class="stat"><small>Member since</small><b id="stSince" style="font-size:16px">–</b></div>
     </div>
   </section>
 
@@ -146,17 +278,30 @@ label{font-size:12px;color:var(--mut);font-weight:600}
       </section>
     </div>
 
-    <section class="pn"><h2>History</h2>
+    <section class="pn">
+      <div class="hhead">
+        <h2 style="font-size:18px">Transaction history</h2>
+        <div class="hactions">
+          <button class="linkbtn" id="showAllBtn" onclick="restoreHistory()" hidden>Show all</button>
+          <button class="btn sm danger" id="clearBtn" onclick="askClear()">Clear history</button>
+        </div>
+      </div>
       <div class="tabs" role="tablist">
         <button class="on" id="tabTrades" onclick="switchTx('trades')">Trades<i id="cT">0</i></button>
         <button id="tabDeps" onclick="switchTx('deposits')">Deposits<i id="cD">0</i></button>
         <button id="tabWds" onclick="switchTx('withdraws')">Withdrawals<i id="cW">0</i></button>
       </div>
       <div class="chips" id="filters"></div>
-      <div id="txList"></div>
+      <div class="tbl" id="txList"></div>
     </section>
   </div>
 </main>
+
+<footer><div class="fin">
+  <div class="flinks"><b>Brixtrade</b><span>Payments by M-PESA</span><span>Rate: $1 = KES 130</span><span>All amounts in USD</span></div>
+  <div>Trading involves risk and you can lose the money you stake. Only trade with funds you can afford to lose. Withdrawals are reviewed and processed after identity verification.</div>
+  <div>Personal data is handled in line with the Kenya Data Protection Act.</div>
+</div></footer>
 
 <script>
 const USD_TO_KES=130, INC=firebase.firestore.FieldValue.increment;
@@ -165,27 +310,30 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=n=>"$"+(Number(n)||0).toFixed(2);
 let currentUid=null,balance=0,currentTx='trades',filter='all';
 const data={trades:[],deposits:[],withdraws:[]};
+const NAMES={trades:'trades',deposits:'deposits',withdraws:'withdrawals'};
 
 function toast(msg,type){const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;$('toasts').appendChild(t);setTimeout(()=>t.remove(),4200)}
 function sayWallet(t){const m=document.createElement('div');m.textContent=t;$('chat').prepend(m)}
 function openM(id){$(id).classList.add('show')}
 function closeM(id){$(id).classList.remove('show')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){stopCam();document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))}});
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){stopCam();m.classList.remove('show')}}));
 
 auth.onAuthStateChanged(user=>{
   if(!user){location.href='index.html';return}
   currentUid=user.uid;$('userEmail').textContent=user.displayName||user.email;
+  $('acctId').textContent='BRX-'+user.uid.slice(0,8).toUpperCase();
   const ref=location.origin+"/index.html?ref="+user.uid;$('refLink').value=ref;
   $('refWa').href="https://wa.me/?text="+encodeURIComponent("Trade on Brixtrade and get started with M-PESA: "+ref);
   db.collection("users").doc(user.uid).onSnapshot(doc=>{if(doc.exists){balance=doc.data().balance||0;$('balance').textContent=money(balance);$('balKes').textContent="≈ KES "+Math.round(balance*USD_TO_KES).toLocaleString();$('wBal').textContent=balance.toFixed(2)}});
-  loadAll();loadReferrals();
+  loadAll();loadReferrals();watchKyc(user);
 });
 function logoutPhone(){if(confirm("Log out of Brixtrade?"))auth.signOut().then(()=>location.href='index.html')}
 function copyRef(){const v=$('refLink').value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).catch(()=>{$('refLink').select();document.execCommand('copy')}).finally(()=>{toast("Referral link copied","ok");sayWallet("Referral link copied")})}
 
 /* ---------- data ---------- */
 const tkey=v=>v&&v.toMillis?v.toMillis():(typeof v==='number'?v:(Date.parse(v)||0));
+const rowTime=d=>tkey(d.timestamp)||tkey(d.createdAt)||tkey(d.id)||0;
 async function fetchCol(col,sortField){
   const s=await db.collection(col).where("uid","==",currentUid).get();
   return s.docs.map(d=>d.data()).sort((a,b)=>tkey(b[sortField]||b.createdAt||b.id)-tkey(a[sortField]||a.createdAt||a.id)).slice(0,100);
@@ -197,26 +345,56 @@ async function loadAll(){
   if(t.status==='rejected'){try{data.trades=JSON.parse(localStorage.getItem('brixTrades_'+currentUid)||'[]').reverse()}catch(e){}}
   updateStats();render();
 }
+
+/* ---------- clear history (view only; records stay on the server) ---------- */
+const clearKey=tab=>'brixClear_'+currentUid+'_'+tab;
+function getCleared(tab){try{return Number(localStorage.getItem(clearKey(tab)))||0}catch(e){return 0}}
+function setCleared(tab,v){try{v?localStorage.setItem(clearKey(tab),String(v)):localStorage.removeItem(clearKey(tab))}catch(e){}}
+function visibleRows(tab){const c=getCleared(tab);return c?data[tab].filter(d=>rowTime(d)>c):data[tab]}
+function askClear(){
+  if(!visibleRows(currentTx).length){toast("There is nothing to clear here","err");return}
+  $('clearName').textContent=NAMES[currentTx];openM('clearModal');
+}
+function confirmClear(){
+  setCleared(currentTx,Date.now());closeM('clearModal');
+  toast("Your "+NAMES[currentTx]+" list was cleared","ok");updateStats();render();
+}
+function restoreHistory(){setCleared(currentTx,0);toast("Showing all "+NAMES[currentTx],"ok");updateStats();render()}
+
 function updateStats(){
-  const real=data.trades.filter(d=>!d.demo);let pnl=0,wins=0;
-  real.forEach(d=>{if(d.result==='WIN'){pnl+=Number(d.profit)||0;wins++}else pnl-=Number(d.stake)||0});
-  $('stPnl').textContent=(pnl>=0?'+':'-')+money(Math.abs(pnl));$('stPnl').className=pnl>=0?'up':'dn';
-  $('stWin').textContent=real.length?Math.round(wins/real.length*100)+'% ('+real.length+')':'–';
   $('stDep').textContent=money(data.deposits.filter(d=>d.status==='success').reduce((s,d)=>s+(Number(d.usd)||0),0));
   $('stPend').textContent=money(data.withdraws.filter(d=>d.status==='PENDING').reduce((s,d)=>s+(Number(d.amount)||0),0));
-  $('cT').textContent=data.trades.length;$('cD').textContent=data.deposits.length;$('cW').textContent=data.withdraws.length;
+  $('cT').textContent=visibleRows('trades').length;$('cD').textContent=visibleRows('deposits').length;$('cW').textContent=visibleRows('withdraws').length;
 }
 function switchTx(type){currentTx=type;filter='all';document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));$({trades:'tabTrades',deposits:'tabDeps',withdraws:'tabWds'}[type]).classList.add('on');render()}
+
+function statusTag(s){
+  const v=String(s||'').toLowerCase();
+  const cls=v==='success'||v==='approved'||v==='paid'||v==='completed'?'ok':(v==='failed'||v==='rejected'||v==='cancelled'?'p':'w');
+  return `<span class="tag ${cls}">${esc(String(s||'').toUpperCase())}</span>`;
+}
 function render(){
   const F=$('filters');
+  $('showAllBtn').hidden=!getCleared(currentTx);
   if(currentTx==='trades'){F.innerHTML=[['all','All'],['win','Wins'],['lose','Losses'],['demo','Demo'],['real','Real']].map(([k,l])=>`<button class="chip ${filter===k?'on':''}" onclick="filter='${k}';render()">${l}</button>`).join('')}else F.innerHTML='';
-  const L=$('txList');let rows=data[currentTx];
+  const L=$('txList');let rows=visibleRows(currentTx);
   if(currentTx==='trades')rows=rows.filter(d=>filter==='all'||(filter==='win'&&d.result==='WIN')||(filter==='lose'&&d.result!=='WIN')||(filter==='demo'&&d.demo)||(filter==='real'&&!d.demo));
-  if(!rows.length){const m={trades:'No trades here yet. Place a trade and it will show up here.',deposits:'No deposits yet. Deposit with M-PESA to start trading.',withdraws:'No withdrawals yet.'};L.innerHTML=`<div class="empty">${m[currentTx]}</div>`;return}
-  L.innerHTML=rows.map(d=>{
-    if(currentTx==='trades'){const w=d.result==='WIN';return `<div class="txRow ${w?'win':'lose'}"><span><b>${esc(d.dir)} ${esc(d.asset)}</b> · ${money(d.stake)}${d.duration?' · '+esc(d.duration)+'s':''}<br><small>${esc(d.date)}${d.entry!=null?' · '+esc(d.entry)+' → '+esc(d.exit):''}</small></span><span><b class="${w?'up':'dn'}">${w?'+'+money(d.profit):'-'+money(d.stake)}</b><br><span class="tag ${d.demo?'':'p'}">${d.demo?'DEMO':'REAL'}</span></span></div>`}
-    if(currentTx==='deposits'){const dt=d.createdAt&&d.createdAt.toDate?d.createdAt.toDate().toLocaleString():'';return `<div class="txRow dep"><span><b>Deposit</b> · KES ${Number(d.kes).toLocaleString()}<br><small>${esc(dt)} · Ref ${esc(d.reference)}</small></span><span><b class="${d.status==='success'?'up':''}">${d.status==='success'?'+':''}${money(d.usd)}</b><br><small>${esc(d.status)}</small></span></div>`}
-    return `<div class="txRow lose"><span><b>Withdrawal</b> to ${esc(d.phone)}<br><small>${esc(d.date)}</small></span><span><b class="dn">-${money(d.amount)}</b><br><span class="tag p">${esc(d.status)}</span></span></div>`}).join('');
+  if(!rows.length){
+    const cleared=getCleared(currentTx);
+    const m={trades:'No trades here yet. Place a trade and it will show up here.',deposits:'No deposits yet. Deposit with M-PESA to start trading.',withdraws:'No withdrawals yet.'};
+    L.innerHTML=`<div class="empty">${cleared?'History cleared. New activity will appear here.':m[currentTx]}</div>`;return}
+  let head='',body='';
+  if(currentTx==='trades'){
+    head='<th>Date</th><th>Trade</th><th>Account</th><th>Result</th><th class="r">Amount</th>';
+    body=rows.map(d=>{const w=d.result==='WIN';return `<tr><td>${esc(d.date)}</td><td><b>${esc(d.dir)} ${esc(d.asset)}</b><small>Stake ${money(d.stake)}${d.duration?' · '+esc(d.duration)+'s':''}${d.entry!=null?' · '+esc(d.entry)+' → '+esc(d.exit):''}</small></td><td><span class="tag ${d.demo?'':'p'}">${d.demo?'DEMO':'REAL'}</span></td><td><span class="tag ${w?'ok':'p'}">${w?'WIN':'LOSS'}</span></td><td class="r"><b class="${w?'up':'dn'}">${w?'+'+money(d.profit):'-'+money(d.stake)}</b></td></tr>`}).join('');
+  }else if(currentTx==='deposits'){
+    head='<th>Date</th><th>Details</th><th>Reference</th><th>Status</th><th class="r">Amount</th>';
+    body=rows.map(d=>{const dt=d.createdAt&&d.createdAt.toDate?d.createdAt.toDate().toLocaleString():'';return `<tr><td>${esc(dt)}</td><td><b>M-PESA deposit</b><small>KES ${Number(d.kes||0).toLocaleString()}</small></td><td class="ref">${esc(d.reference)}</td><td>${statusTag(d.status)}</td><td class="r"><b class="${d.status==='success'?'up':''}">${d.status==='success'?'+':''}${money(d.usd)}</b></td></tr>`}).join('');
+  }else{
+    head='<th>Date</th><th>Details</th><th>Reference</th><th>Status</th><th class="r">Amount</th>';
+    body=rows.map(d=>`<tr><td>${esc(d.date)}</td><td><b>M-PESA withdrawal</b><small>To ${esc(d.phone)}</small></td><td class="ref">${esc(d.id)}</td><td>${statusTag(d.status)}</td><td class="r"><b class="dn">-${money(d.amount)}</b></td></tr>`).join('');
+  }
+  L.innerHTML=`<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
 /* ---------- deposit (STK push via PayHero + Vercel API, no payment page) ---------- */
@@ -247,7 +425,6 @@ async function doDirectMpesa(){
     if(!r.ok) throw new Error(res.error||"Could not start payment");
     setMpesaStatus("Check your phone and enter your M-PESA PIN. This page updates automatically.");
 
-    // Watch the deposit record; the server flips it to success/failed
     if(depositUnsub) depositUnsub();
     depositUnsub=db.collection("deposits").doc(res.reference).onSnapshot(doc=>{
       const d=doc.data(); if(!d) return;
@@ -261,7 +438,6 @@ async function doDirectMpesa(){
         setTimeout(loadAll,800);
       }
     });
-    // Stop waiting after 2 minutes (if they paid late, the server still credits them)
     depositTimeout=setTimeout(()=>{cleanup();toast("No response yet. If you paid, your balance will update shortly.")},120000);
   }catch(e){
     cleanup();
@@ -277,7 +453,7 @@ async function doDirectMpesa(){
 }
 
 /* ---------- withdraw ---------- */
-function openWithdraw(){if(balance<2){toast(`Minimum withdrawal is $2. Your balance is ${money(balance)}.`,"err");return}$('wBal').textContent=balance.toFixed(2);openM('withdrawModal');wNext(1)}
+function openWithdraw(){if(kycStatus!=='approved'){toast(kycStatus==='pending'?"Your verification is still under review.":"Verify your identity before withdrawing.","err");if(kycStatus!=='pending')openKyc();return}if(balance<2){toast(`Minimum withdrawal is $2. Your balance is ${money(balance)}.`,"err");return}$('wBal').textContent=balance.toFixed(2);openM('withdrawModal');wNext(1)}
 function wMax(){$('wAmount').value=balance.toFixed(2);wPreview()}
 function wPreview(){const a=parseFloat($('wAmount').value)||0;$('wKes').textContent=a?`You receive about KES ${Math.round(a*USD_TO_KES).toLocaleString()}`:'Minimum $2'}
 function wNext(n){
@@ -285,29 +461,158 @@ function wNext(n){
   if(n>1&&(amt<2||amt>balance)){toast(amt>balance?"That is more than your balance":"Minimum withdrawal is $2","err");return}
   if(n>2&&($('wPhone').value.trim().length<10||!$('wMpesaName').value.trim())){toast("Enter your M-PESA number and name","err");return}
   [1,2,3].forEach(i=>$('wStep'+i).hidden=i!==n);
-  $('wStepLabel').textContent=["","Step 1 of 3 · Amount","Step 2 of 3 · M-PESA","Step 3 of 3 · Verify"][n];$('wBar').style.width=(n/3*100)+'%';
+  $('wStepLabel').textContent=["","Step 1 of 3 · Amount","Step 2 of 3 · M-PESA","Step 3 of 3 · Confirm"][n];$('wBar').style.width=(n/3*100)+'%';
   if(n===3)$('wSum').innerHTML=`<div class="row"><span class="sub">Amount</span><b>${money(amt)}</b></div><div class="row"><span class="sub">To</span><b>${esc($('wPhone').value)}</b></div><div class="row"><span class="sub">Name</span><b>${esc($('wMpesaName').value)}</b></div>`;
 }
-$('wIdFile').onchange=e=>{$('wUpl').textContent=e.target.files[0]?"Selected: "+e.target.files[0].name:"Tap to upload a photo of your ID"};
 async function submitWithdrawal(){
-  const amt=parseFloat($('wAmount').value),phone=$('wPhone').value.trim(),mpesaName=$('wMpesaName').value.trim(),idNum=$('wIdNum').value.trim();
-  if(!idNum){toast("Enter your ID number","err");return}
+  const amt=parseFloat($('wAmount').value),phone=$('wPhone').value.trim(),mpesaName=$('wMpesaName').value.trim();
+  if(kycStatus!=='approved'){toast("Verify your identity first","err");return}
   if(!amt||amt<2||balance<amt){toast("Check the amount and try again","err");return}
   const btn=$('wSubmit');btn.disabled=true;btn.textContent="Submitting…";
   try{
     const id=Date.now();
-    await db.collection("withdrawals").doc(String(id)).set({id,amount:amt,phone,mpesaName,idNum,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid});
+    await db.collection("withdrawals").doc(String(id)).set({id,amount:amt,phone,mpesaName,kycVerified:true,date:new Date().toLocaleString(),status:"PENDING",uid:currentUid});
     await db.collection("users").doc(currentUid).set({balance:INC(-amt)},{merge:true});
     closeM('withdrawModal');toast(`Withdrawal of ${money(amt)} submitted. Status: pending.`,"ok");sayWallet(`Withdraw $${amt} to ${phone} requested`);loadAll();
   }catch(e){toast("Could not submit: "+e.message,"err")}
   btn.disabled=false;btn.textContent="Submit withdrawal";
 }
 
+/* ---------- KYC (ID front, ID back, selfie) ---------- */
+let kycStatus='none',kycData=null,kycUnsub=null,camStream=null;
+const K={files:{front:null,back:null,selfie:null},urls:{}};
+
+function watchKyc(user){
+  $('stSince').textContent=user.metadata&&user.metadata.creationTime?new Date(user.metadata.creationTime).toLocaleDateString():'–';
+  if(kycUnsub)kycUnsub();
+  kycUnsub=db.collection('kyc').doc(user.uid).onSnapshot(doc=>{
+    kycData=doc.exists?doc.data():null;kycStatus=kycData?(kycData.status||'pending'):'none';renderKycStatus();
+  },()=>{kycStatus='none';renderKycStatus()});
+}
+function renderKycStatus(){
+  const tags={none:['w','NOT VERIFIED'],pending:['w','UNDER REVIEW'],approved:['ok','VERIFIED'],rejected:['p','REJECTED']};
+  const done=kycStatus==='approved';
+  $('stKycCard').hidden=done;$('vBadge').hidden=!done;$('stSince').parentElement.classList.toggle('wide',done);
+  if(done){$('kycBanner').hidden=true;return}
+  const [c,t]=tags[kycStatus]||tags.none;
+  $('stKyc').innerHTML=`<span class="tag ${c}">${t}</span>`+(kycStatus==='none'||kycStatus==='rejected'?` <button class="linkbtn" onclick="openKyc()">Verify</button>`:'');
+  const b=$('kycBanner');
+  if(kycStatus==='approved'){b.hidden=true;return}
+  b.hidden=false;b.className='kycbar'+(kycStatus==='pending'?' p':kycStatus==='rejected'?' r':'');
+  const msg={
+    none:'<b>Verify your identity</b><br><span class="sub">Complete a quick ID and face check to unlock withdrawals.</span>',
+    pending:'<b>Verification under review</b><br><span class="sub">We received your documents. This page updates when the review is done.</span>',
+    rejected:`<b>Verification not approved</b><br><span class="sub">${esc((kycData&&kycData.reason)||'Please resubmit clear photos of your ID and a fresh selfie.')}</span>`
+  }[kycStatus]||'';
+  b.innerHTML=`<div>${msg}</div>`+(kycStatus==='pending'?'':`<button class="btn-brix btn sm" onclick="openKyc()">${kycStatus==='rejected'?'Try again':'Start verification'}</button>`);
+}
+function openKyc(){
+  if(kycStatus==='approved')return;
+  if(kycStatus==='pending'){toast("Your documents are under review","");return}
+  Object.keys(K.urls).forEach(k=>URL.revokeObjectURL(K.urls[k]));K.urls={};K.files={front:null,back:null,selfie:null};
+  ['front','back'].forEach(k=>{$('k'+k+'Box').textContent='No photo yet';$('k'+k+'Btn').textContent='Take or upload photo'});
+  $('kselfieImg').hidden=true;$('kselfieHint').hidden=false;$('kselfieHint').textContent='Camera is off';
+  $('kConsent').checked=false;
+  openM('kycModal');kNext(1,true);
+}
+function closeKyc(){stopCam();closeM('kycModal')}
+function kNext(n,skipCheck){
+  if(!skipCheck){
+    const cur=['k1','k2','k3','k4','k5'].findIndex(id=>!$(id).hidden)+1;
+    if(n>cur){
+      if(cur===1){
+        if($('kName').value.trim().length<3){toast("Enter your full name as on your ID","err");return}
+        if(!/^[A-Za-z0-9\-\/ ]{5,20}$/.test($('kNum').value.trim())){toast("Enter a valid ID number","err");return}
+      }
+      if(cur===2&&!K.files.front){toast("Add a photo of the front of your ID","err");return}
+      if(cur===3&&!K.files.back){toast("Add a photo of the back of your ID","err");return}
+      if(cur===4&&!K.files.selfie){toast("Take or upload a selfie first","err");return}
+    }
+  }
+  stopCam();
+  [1,2,3,4,5].forEach(i=>$('k'+i).hidden=i!==n);
+  $('kStepLabel').textContent=["","Step 1 of 5 · Your details","Step 2 of 5 · ID front","Step 3 of 5 · ID back","Step 4 of 5 · Face check","Step 5 of 5 · Review"][n];
+  $('kBar').style.width=(n/5*100)+'%';
+  if(n===5)renderKycReview();
+}
+function compressImage(file,max=1400,q=.85){
+  return new Promise((res,rej)=>{
+    const img=new Image(),u=URL.createObjectURL(file);
+    img.onload=()=>{
+      const s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');
+      c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);
+      c.toBlob(b=>b?res(b):rej(new Error('Could not read image')),'image/jpeg',q);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('That file is not a valid image'))};
+    img.src=u;
+  });
+}
+function setKImage(key,blob){
+  if(K.urls[key])URL.revokeObjectURL(K.urls[key]);
+  K.files[key]=blob;K.urls[key]=URL.createObjectURL(blob);
+  if(key==='selfie'){
+    const i=$('kselfieImg');i.src=K.urls[key];i.hidden=false;$('kVideo').hidden=true;$('kselfieHint').hidden=true;$('kCamBtn').textContent='Retake';
+  }else{
+    $('k'+key+'Box').innerHTML=`<img src="${K.urls[key]}" alt="ID ${key}">`;$('k'+key+'Btn').textContent='Retake photo';
+  }
+}
+async function onKFile(key,input){
+  const f=input.files&&input.files[0];input.value='';if(!f)return;
+  if(f.size>15*1024*1024){toast("Image is too large (max 15 MB)","err");return}
+  try{stopCam();setKImage(key,await compressImage(f))}catch(e){toast(e.message,"err")}
+}
+async function startCam(){
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:960}},audio:false});
+    const v=$('kVideo');v.srcObject=camStream;v.hidden=false;
+    $('kselfieImg').hidden=true;$('kselfieHint').hidden=true;
+    $('kCamBtn').hidden=true;$('kSnapBtn').hidden=false;$('kSelfieNext').hidden=true;
+  }catch(e){
+    toast("Camera not available. Upload a selfie instead.","err");$('kselfieFile').click();
+  }
+}
+function stopCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  const v=$('kVideo');if(v){v.srcObject=null;v.hidden=true}
+  if($('kCamBtn')){$('kCamBtn').hidden=false;$('kSnapBtn').hidden=true;$('kSelfieNext').hidden=false}
+  if($('kselfieImg')&&$('kselfieImg').hidden&&!K.files.selfie)$('kselfieHint').hidden=false;
+}
+function snapSelfie(){
+  const v=$('kVideo');if(!v.videoWidth){toast("Camera is still starting, try again","err");return}
+  const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  c.toBlob(b=>{if(!b){toast("Could not capture the photo","err");return}stopCam();setKImage('selfie',b)},'image/jpeg',.88);
+}
+function renderKycReview(){
+  $('kSum').innerHTML=`<div class="row"><span class="sub">Name</span><b>${esc($('kName').value.trim())}</b></div><div class="row"><span class="sub">${esc($('kType').value)}</span><b class="num">${esc($('kNum').value.trim())}</b></div>`;
+  $('kThumbs').innerHTML=[['front','ID front'],['back','ID back'],['selfie','Selfie']].map(([k,l])=>`<div><img src="${K.urls[k]}" alt="${l}">${l}</div>`).join('');
+}
+async function submitKyc(){
+  if(!$('kConsent').checked){toast("Please tick the confirmation box","err");return}
+  if(!K.files.front||!K.files.back||!K.files.selfie){toast("Some photos are missing","err");return}
+  const btn=$('kSubmit');btn.disabled=true;btn.textContent="Uploading…";
+  try{
+    const base='kyc/'+currentUid+'/'+Date.now()+'_';
+    const up=async k=>{const r=storage.ref(base+k+'.jpg');await r.put(K.files[k],{contentType:'image/jpeg'});return r.fullPath};
+    const [frontPath,backPath,selfiePath]=await Promise.all(['front','back','selfie'].map(up));
+    await db.collection('kyc').doc(currentUid).set({
+      uid:currentUid,status:'pending',reason:null,
+      fullName:$('kName').value.trim(),idType:$('kType').value,idNumber:$('kNum').value.trim(),
+      frontPath,backPath,selfiePath,
+      submittedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeKyc();toast("Documents submitted. We will review them shortly.","ok");
+  }catch(e){toast("Upload failed: "+e.message,"err")}
+  btn.disabled=false;btn.textContent="Submit for verification";
+}
+
 /* ---------- referrals ---------- */
 async function loadReferrals(){try{
   const snap=await db.collection("users").doc(currentUid).collection("referrals").get();let paid=0;const list=$('refList');list.innerHTML='';
   $('refCount').textContent=snap.size;
-  snap.forEach(doc=>{const d=doc.data();if(d.bonusAwarded)paid++;const div=document.createElement('div');div.className='txRow';div.innerHTML=`<span>${esc(d.email||doc.id.slice(0,8)+'…')}</span><span>${d.bonusAwarded?'<b class="up">+$5</b>':'<small>waiting for deposit</small>'}</span>`;list.appendChild(div)});
+  snap.forEach(doc=>{const d=doc.data();if(d.bonusAwarded)paid++;const div=document.createElement('div');div.className='row';div.style.cssText='padding:8px 10px;border:1px solid var(--ln);border-radius:8px;background:var(--pn2);font-size:12px';div.innerHTML=`<span>${esc(d.email||doc.id.slice(0,8)+'…')}</span><span>${d.bonusAwarded?'<b class="up">+$5</b>':'<small>waiting for deposit</small>'}</span>`;list.appendChild(div)});
   $('refEarnings').textContent=money(paid*5);
 }catch(e){console.log(e)}}
 
