@@ -158,9 +158,73 @@ document.addEventListener('keydown', function(e){
 
 <aside class="pn" id="asst"><h3>Trade Assistant</h3><button class="btn-brix" onclick="scan()">🔍 Scan markets</button><div id="scan"></div><div id="msgs"></div><div class="chips" id="qch"></div><div class="ask"><input id="q" placeholder="Ask…"><button class="btn-brix" onclick="ask()">Send</button></div></aside>
 </aside>
-<section class="pn pad" id="log"><div class="hd2"><h3 class="sh0">Trade history</h3><div class="chips" id="hfl" style="margin:0"><button class="chip on" data-h="all">All</button><button class="chip" data-h="W">Wins</button><button class="chip" data-h="L">Losses</button><button class="chip" onclick="exportCsv()">⬇ Export CSV</button></div></div><div id="recent" style="margin-top:10px"></div>
-<div class="two"><div class="lim"><label>Daily loss limit (real money, $)</label><input id="lossLim" type="number" min="0" step="1" placeholder="0 = off" onchange="setLim()"><small id="limNote"></small></div><div class="lim"><label>Price alerts</label><div class="ar"><input id="alertP" type="number" step="any" placeholder="Target price"><button class="btn-brix btn" onclick="setAlert()">Set</button></div><div id="alertList"></div></div></div>
-<p class="disclaimer">Prices are real. Win +70% stake, loss = full stake. Break-even ~58.8%. Most traders love it. 18+.</p></section>
+<section class="pn pad" id="log">
+  <div class="hd2"><h3 class="sh0">Market hours</h3><span class="mode" id="mhStatus">…</span></div>
+
+  <!-- kept hidden so the existing scripts don't error -->
+  <div id="recent" style="display:none"></div>
+  <div class="chips" id="hfl" style="display:none"><button class="chip on" data-h="all">All</button><button class="chip" data-h="W">Wins</button><button class="chip" data-h="L">Losses</button></div>
+
+  <div id="mhRows" style="margin-top:10px"></div>
+  <div id="mhNote" style="margin-top:10px;padding:10px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--acbg);font-size:12px;color:var(--mut);line-height:1.5"></div>
+
+  <div class="two"><div class="lim"><label>Daily loss limit (real money, $)</label><input id="lossLim" type="number" min="0" step="1" placeholder="0 = off" onchange="setLim()"><small id="limNote"></small></div><div class="lim"><label>Price alerts</label><div class="ar"><input id="alertP" type="number" step="any" placeholder="Target price"><button class="btn-brix btn" onclick="setAlert()">Set</button></div><div id="alertList"></div></div></div>
+  <p class="disclaimer">Prices are real. Win +70% of your stake, loss = full stake. Break-even is about 58.8%. 18+.</p>
+
+  <script>
+  (function(){
+    var S=[
+      {n:'Sydney',tz:'Australia/Sydney',a:7,b:16},
+      {n:'Tokyo',tz:'Asia/Tokyo',a:9,b:18},
+      {n:'London',tz:'Europe/London',a:8,b:17},
+      {n:'New York',tz:'America/New_York',a:8,b:17}
+    ];
+    var F={};
+    S.forEach(function(s){F[s.tz]=new Intl.DateTimeFormat('en-US',{timeZone:s.tz,weekday:'short',hour:'numeric',minute:'numeric',hourCycle:'h23'});});
+    function parts(d,tz){var o={};F[tz].formatToParts(d).forEach(function(p){o[p.type]=p.value;});return {wd:o.weekday,h:+o.hour};}
+    function sessOpen(s,d){var p=parts(d,s.tz);return p.wd!=='Sat'&&p.wd!=='Sun'&&p.h>=s.a&&p.h<s.b;}
+    function fxOpen(d){var p=parts(d,'America/New_York');
+      if(p.wd==='Sat')return false;
+      if(p.wd==='Fri'&&p.h>=17)return false;
+      if(p.wd==='Sun'&&p.h<17)return false;
+      return true;}
+    function until(fn,now){var st=fn(now);
+      for(var i=1;i<=2100;i++){if(fn(new Date(now.getTime()+i*300000))!==st)return i*5;}
+      return 0;}
+    function dur(min){if(!min)return '';var h=Math.floor(min/60),m=min%60;
+      if(h>=24)return Math.floor(h/24)+'d '+(h%24)+'h';
+      return h+'h '+m+'m';}
+    function render(){
+      var now=new Date(),fx=fxOpen(now),open={};
+      var st=document.getElementById('mhStatus');
+      st.textContent=fx?'FOREX OPEN':'FOREX CLOSED';
+      st.style.color=fx?'var(--up)':'var(--dn)';
+      st.style.borderColor=fx?'var(--up)':'var(--dn)';
+      st.style.background='transparent';
+      var rows='';
+      S.forEach(function(s){
+        var o=sessOpen(s,now);open[s.n]=o;
+        var t=dur(until(function(d){return sessOpen(s,d);},now));
+        rows+='<div class="rt"><span><span style="color:'+(o?'var(--up)':'var(--dn)')+'">●</span> '+s.n+'</span>'+
+              '<span>'+(o?'Open':'Closed')+(t?' · '+(o?'closes':'opens')+' in '+t:'')+'</span></div>';
+      });
+      document.getElementById('mhRows').innerHTML=rows;
+      var note;
+      if(!fx){
+        var t2=dur(until(fxOpen,now));
+        note='<b style="color:var(--ink)">Forex is closed.</b> Prices barely move until it reopens'+(t2?' (in about '+t2+')':'')+'. Trading now means very little price movement.';
+      }else if(open['London']&&open['New York']){
+        note='<b style="color:var(--ink)">London and New York are both open.</b> This overlap is usually the busiest and fastest-moving time of the day.';
+      }else{
+        note='Prices usually move the most when London and New York are open together. Quiet sessions can mean small, slow moves.';
+      }
+      document.getElementById('mhNote').innerHTML=note;
+    }
+    render();
+    setInterval(render,60000);
+  })();
+  </script>
+</section>
 </main>
 <script>
 let isDemo=false,demoBal=1000,bal=0,pnl=0,pnlDemo=0,tr=null,busy=false,activeBot="scalper",currentUid=null,VIS=70,sel="XAU",flt="all",hf="all";
