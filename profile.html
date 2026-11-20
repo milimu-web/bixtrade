@@ -3,13 +3,11 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script>
 const firebaseConfig = {apiKey:"AIzaSyA7KMnx_MBfX3DQ5hQ6qzOg6jCbX7kZs-o",authDomain:"brixtrade-c142d.firebaseapp.com",projectId:"brixtrade-c142d",storageBucket:"brixtrade-c142d.firebasestorage.app",messagingSenderId:"489953142453",appId:"1:489953142453:web:2499588c325482d17a00fc",measurementId:"G-EX79EB9RDN"};
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b111b">
@@ -590,7 +588,7 @@ function kNext(n,skipCheck){
   $('kBar').style.width=(n/5*100)+'%';
   if(n===5)renderKycReview();
 }
-function compressImage(file,max=1400,q=.85){
+function compressImage(file,max=900,q=.7){
   return new Promise((res,rej)=>{
     const img=new Image(),u=URL.createObjectURL(file);
     img.onload=()=>{
@@ -638,28 +636,30 @@ function snapSelfie(){
   const v=$('kVideo');if(!v.videoWidth){toast("Camera is still starting, try again","err");return}
   const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
   c.getContext('2d').drawImage(v,0,0);
-  c.toBlob(b=>{if(!b){toast("Could not capture the photo","err");return}stopCam();setKImage('selfie',b)},'image/jpeg',.88);
+  c.toBlob(b=>{if(!b){toast("Could not capture the photo","err");return}stopCam();setKImage('selfie',b)},'image/jpeg',.7);
 }
 function renderKycReview(){
   $('kSum').innerHTML=`<div class="row"><span class="sub">Name</span><b>${esc($('kName').value.trim())}</b></div><div class="row"><span class="sub">${esc($('kType').value)}</span><b class="num">${esc($('kNum').value.trim())}</b></div>`;
   $('kThumbs').innerHTML=[['front','ID front'],['back','ID back'],['selfie','Selfie']].map(([k,l])=>`<div><img src="${K.urls[k]}" alt="${l}">${l}</div>`).join('');
 }
+const blobToDataUrl=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read the photo'));r.readAsDataURL(b)});
 async function submitKyc(){
   if(!$('kConsent').checked){toast("Please tick the confirmation box","err");return}
-  if(!K.files.front||!K.files.back||!K.files.selfie){toast("Some photos are missing","err");return}
-  const btn=$('kSubmit');btn.disabled=true;btn.textContent="Uploading…";
+  const keys=['front','back','selfie'];
+  if(keys.some(k=>!K.files[k])){toast("Some photos are missing","err");return}
+  if(keys.some(k=>K.files[k].size>700000)){toast("A photo is too large. Retake it in good light, with the ID filling the frame.","err");return}
+  const btn=$('kSubmit');btn.disabled=true;btn.textContent="Submitting…";
   try{
-    const base='kyc/'+currentUid+'/'+Date.now()+'_';
-    const up=async k=>{const r=storage.ref(base+k+'.jpg');await r.put(K.files[k],{contentType:'image/jpeg'});return r.fullPath};
-    const [frontPath,backPath,selfiePath]=await Promise.all(['front','back','selfie'].map(up));
-    await db.collection('kyc').doc(currentUid).set({
-      uid:currentUid,status:'pending',reason:null,
-      fullName:$('kName').value.trim(),idType:$('kType').value,idNumber:$('kNum').value.trim(),
-      frontPath,backPath,selfiePath,
-      submittedAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const urls=await Promise.all(keys.map(k=>blobToDataUrl(K.files[k])));
+    const ts=firebase.firestore.FieldValue.serverTimestamp(),ref=db.collection('kyc').doc(currentUid),batch=db.batch();
+    keys.forEach((k,i)=>batch.set(ref.collection('images').doc(k),{uid:currentUid,data:urls[i],createdAt:ts}));
+    batch.set(ref,{uid:currentUid,status:'pending',reason:null,fullName:$('kName').value.trim(),idType:$('kType').value,idNumber:$('kNum').value.trim(),submittedAt:ts});
+    await Promise.race([batch.commit(),new Promise((_,rej)=>setTimeout(()=>rej(Object.assign(new Error('timeout'),{code:'kyc/timeout'})),30000))]);
     closeKyc();toast("Documents submitted. We will review them shortly.","ok");
-  }catch(e){toast("Upload failed: "+e.message,"err")}
+  }catch(e){
+    const m={'kyc/timeout':'This is taking too long. Check your internet connection and try again.','permission-denied':'Database rules blocked saving your verification. Update your Firestore rules for the kyc collection.','unavailable':'Could not reach the server. Check your connection and try again.'};
+    console.error('KYC submit error',e);toast(m[e.code]||("Submit failed: "+e.message),"err");
+  }
   btn.disabled=false;btn.textContent="Submit for verification";
 }
 
