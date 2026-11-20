@@ -27,6 +27,16 @@ td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:
 .approve{background:#00d084;color:#000}.reject{background:#ff5a5a;color:#fff}.view{background:#2a2a44;color:#fff}
 @media(max-width:700px){.header{padding:10px 12px}.tabs{padding:10px 12px;top:52px}.stats{grid-template-columns:1fr 1fr;padding:12px;gap:8px}.main{padding:0 8px 20px}th,td{padding:8px 6px}.btn{padding:5px 8px;font-size:11px}}
 #appContent{display:none}
+#kycModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;justify-content:center;align-items:flex-start;overflow:auto;padding:20px}
+#kycModal.show{display:flex}
+.kbox{background:#16161f;border:1px solid #26263a;border-radius:14px;padding:20px;width:100%;max-width:900px}
+.kimgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+.kimgs figure{background:#0e0e18;border:1px solid #26263a;border-radius:10px;overflow:hidden}
+.kimgs img{width:100%;display:block;cursor:zoom-in;max-height:360px;object-fit:contain;background:#000}
+.kimgs img.zoom{position:fixed;inset:0;width:100vw;height:100vh;max-height:none;z-index:600;cursor:zoom-out}
+.kimgs figcaption{padding:6px 10px;font-size:12px;color:#9a9ab8}
+.kimgs .none{padding:40px 10px;text-align:center;color:#666;font-size:12px}
+.krow{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#cfcfe6}.krow small{color:#8a8ab3;display:block;font-size:11px;text-transform:uppercase}
 </style>
 </head><body>
  
@@ -43,8 +53,8 @@ td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:
  
 <div id="appContent">
 <div class="header"><div><b>BrixTrade LIVE</b> <span style="color:#666;font-size:12px">/ brixtrade-c142d</span></div><div><span style="color:#00d084">● LIVE</span> <button onclick="location.reload()" class="btn view">Refresh</button> <button onclick="logoutAdmin()" class="btn view">Logout</button></div></div>
-<div class="tabs"><button class="tab on" id="tabDep" onclick="switchType('deposits')">Deposits <span id="cDep">0</span></button><button class="tab" id="tabWit" onclick="switchType('withdrawals')">Withdrawals <span id="cWit">0</span></button></div>
-<div class="stats"><div class="card"><small>Total Requests</small><h3 id="sTotal">0</h3></div><div class="card pending"><small>Pending Amount</small><h3 id="sPending">$0</h3></div><div class="card fee"><small>Total Fees (3%)</small><h3 id="sFee">$0</h3></div><div class="card"><small>Net To Pay / Add</small><h3 id="sReceive">$0</h3></div></div>
+<div class="tabs"><button class="tab on" id="tabDep" onclick="switchType('deposits')">Deposits <span id="cDep">0</span></button><button class="tab" id="tabWit" onclick="switchType('withdrawals')">Withdrawals <span id="cWit">0</span></button><button class="tab" id="tabKyc" onclick="switchType('kyc')">Verification <span id="cKyc">0</span></button></div>
+<div class="stats"><div class="card"><small>Total Users</small><h3 id="sUsers">0</h3></div><div class="card"><small id="lTotal">Total Requests</small><h3 id="sTotal">0</h3></div><div class="card pending"><small id="lPending">Pending Amount</small><h3 id="sPending">$0</h3></div><div class="card fee"><small id="lFee">Total Fees (3%)</small><h3 id="sFee">$0</h3></div><div class="card"><small id="lReceive">Net To Pay / Add</small><h3 id="sReceive">$0</h3></div></div>
 <div class="main"><div style="overflow:auto"><table><thead id="thead"></thead><tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:30px">Connecting...</td></tr></tbody></table></div></div>
 </div>
  
@@ -90,12 +100,13 @@ auth.onAuthStateChanged(async user => {
 });
  
 let curType = 'deposits';
-let deposits = [], withdrawals = [];
+let deposits = [], withdrawals = [], kycList = [];
  
 function switchType(t){
   curType = t;
   document.getElementById('tabDep').classList.toggle('on', t === 'deposits');
   document.getElementById('tabWit').classList.toggle('on', t === 'withdrawals');
+  document.getElementById('tabKyc').classList.toggle('on', t === 'kyc');
   render();
 }
  
@@ -107,6 +118,7 @@ function startApp(){
     deposits = [];
     snap.forEach(doc => {
       const d = doc.data();
+      if(String(d.status || '').toLowerCase() !== 'success') return; // only successful deposits
       deposits.push(Object.assign({ docId: doc.id }, d, {
         amount: Number(d.amount != null ? d.amount : d.usd) || 0,
         ref: d.ref || d.reference || '',
@@ -118,6 +130,19 @@ function startApp(){
     if(curType === 'deposits') render();
   }, fail);
  
+  db.collection('kyc').onSnapshot(snap => {
+    kycList = [];
+    snap.forEach(doc => kycList.push(Object.assign({ docId: doc.id }, doc.data(), { sortKey: tms(doc.data().submittedAt) })));
+    kycList.sort((a, b) => b.sortKey - a.sortKey);
+    document.getElementById('cKyc').textContent = kycList.filter(r => String(r.status || '').toLowerCase() === 'pending').length;
+    if(curType === 'kyc') render();
+  }, fail);
+
+  db.collection('users').onSnapshot(
+    snap => { document.getElementById('sUsers').textContent = snap.size; },
+    () => { document.getElementById('sUsers').textContent = '–'; }
+  );
+
   db.collection('withdrawals').onSnapshot(snap => {
     withdrawals = [];
     snap.forEach(doc => {
@@ -135,6 +160,8 @@ function startApp(){
   document.getElementById('tbody').addEventListener('click', e => {
     const b = e.target.closest('button[data-id]');
     if(b) updateStatus(b.dataset.id, b.dataset.s);
+    const k = e.target.closest('button[data-kyc]');
+    if(k) reviewKyc(k.dataset.kyc);
   });
 }
  
@@ -144,11 +171,15 @@ function actions(r){
     : '';
 }
  
+function setLabels(a){ ['lTotal','lPending','lFee','lReceive'].forEach((id, i) => document.getElementById(id).textContent = a[i]); }
+
 function render(){
+  if(curType === 'kyc'){ renderKyc(); return; }
+  setLabels(['Total Requests','Pending Amount','Total Fees (3%)','Net To Pay / Add']);
   const list = curType === 'deposits' ? deposits : withdrawals;
   document.getElementById('thead').innerHTML = curType === 'deposits'
     ? '<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Ref</th><th>KES</th><th>Status</th><th>Action</th></tr>'
-    : '<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>ID</th><th>Status</th><th>Action</th></tr>';
+    : '<tr><th>Date</th><th>User / Phone</th><th>Amount</th><th>Fee 3%</th><th>Receive / KES</th><th>KYC</th><th>Status</th><th>Action</th></tr>';
  
   let pendingAmt = 0, feeTot = 0, receiveTot = 0;
   list.forEach(r => {
@@ -162,7 +193,7 @@ function render(){
   document.getElementById('sReceive').textContent = '$' + receiveTot.toFixed(2);
  
   if(!list.length){
-    document.getElementById('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No ' + curType + ' yet</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">' + (curType === 'deposits' ? 'No successful deposits yet' : 'No withdrawals yet') + '</td></tr>';
     return;
   }
  
@@ -172,10 +203,83 @@ function render(){
       return '<tr><td>' + esc(fmtDate(r.createdAt || r.date)) + '</td><td><b>' + esc(r.name) + '</b><br>' + esc(r.phone) + '<br><small style="color:#666">' + esc(r.email) + '</small></td><td><b>$' + r.amount.toFixed(2) + '</b></td><td style="font-size:11px">' + esc(r.ref) + '</td><td>KES ' + esc(r.kes != null ? Number(r.kes).toLocaleString() : (r.amount * 130).toFixed(0)) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></td><td>' + actions(r) + '</td></tr>';
     }
     const fee = r.fee || r.amount * 0.03, rec = r.receive || r.amount - fee;
-    return '<tr><td>' + esc(fmtDate(r.date)) + '</td><td><b>' + esc(r.mpesaName) + '</b><br>' + esc(r.phone) + '</td><td><b>$' + r.amount.toFixed(2) + '</b></td><td style="color:#ffbd2e">$' + fee.toFixed(2) + '</td><td style="color:#00d084"><b>$' + rec.toFixed(2) + '</b><br><small>KES ' + (rec * 130).toFixed(0) + '</small></td><td>' + esc(r.idNum) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></td><td>' + actions(r) + '</td></tr>';
+    return '<tr><td>' + esc(fmtDate(r.date)) + '</td><td><b>' + esc(r.mpesaName) + '</b><br>' + esc(r.phone) + '</td><td><b>$' + r.amount.toFixed(2) + '</b></td><td style="color:#ffbd2e">$' + fee.toFixed(2) + '</td><td style="color:#00d084"><b>$' + rec.toFixed(2) + '</b><br><small>KES ' + (rec * 130).toFixed(0) + '</small></td><td>' + (r.idNum ? esc(r.idNum) : (r.kycVerified ? '✓ KYC' : '')) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></td><td>' + actions(r) + '</td></tr>';
   }).join('');
 }
  
+function renderKyc(){
+  document.getElementById('thead').innerHTML = '<tr><th>Submitted</th><th>Name / ID number</th><th>ID type</th><th>Status</th><th>Action</th></tr>';
+  const c = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
+  kycList.forEach(r => { const st = String(r.status || '').toUpperCase(); if(c[st] != null) c[st]++; });
+  setLabels(['Total Submissions','Pending Review','Approved','Rejected']);
+  document.getElementById('sTotal').textContent = kycList.length;
+  document.getElementById('sPending').textContent = c.PENDING;
+  document.getElementById('sFee').textContent = c.APPROVED;
+  document.getElementById('sReceive').textContent = c.REJECTED;
+  if(!kycList.length){
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#666">No verification requests yet</td></tr>';
+    return;
+  }
+  document.getElementById('tbody').innerHTML = kycList.map(r => {
+    const st = String(r.status || '').toUpperCase();
+    return '<tr><td>' + esc(fmtDate(r.submittedAt)) + '</td><td><b>' + esc(r.fullName) + '</b><br><span style="font-family:monospace">' + esc(r.idNumber) + '</span><br><small style="color:#666">' + esc(r.docId) + '</small></td><td>' + esc(r.idType) + '</td><td><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span>' + (r.reason ? '<br><small style="color:#8a8ab3">' + esc(r.reason) + '</small>' : '') + '</td><td><button class="btn view" data-kyc="' + esc(r.docId) + '">Review</button></td></tr>';
+  }).join('');
+}
+
+function kycModalEl(){
+  let m = document.getElementById('kycModal');
+  if(m) return m;
+  m = document.createElement('div');
+  m.id = 'kycModal';
+  m.innerHTML = '<div class="kbox"></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click', e => {
+    if(e.target === m){ m.classList.remove('show'); return; }
+    const img = e.target.closest('.kimgs img'); if(img){ img.classList.toggle('zoom'); return; }
+    const b = e.target.closest('button[data-act]'); if(!b) return;
+    if(b.dataset.act === 'close') m.classList.remove('show');
+    else setKyc(b.dataset.id, b.dataset.act);
+  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') m.classList.remove('show'); });
+  return m;
+}
+
+async function reviewKyc(id){
+  const r = kycList.find(x => x.docId === id); if(!r) return;
+  const m = kycModalEl(), box = m.querySelector('.kbox');
+  m.classList.add('show');
+  box.innerHTML = '<p style="color:#8a8ab3">Loading photos…</p>';
+  const imgs = {};
+  try{
+    const s = await db.collection('kyc').doc(id).collection('images').get();
+    s.forEach(d => { imgs[d.id] = d.data().data; });
+  }catch(e){
+    box.innerHTML = '<p style="color:#ff5a5a">Could not load photos: ' + esc(e.message) + '</p><button class="btn view" data-act="close">Close</button>';
+    return;
+  }
+  const ok = v => typeof v === 'string' && /^data:image\/(jpeg|png);base64,[A-Za-z0-9+\/=]+$/.test(v);
+  const fig = (k, label) => '<figure>' + (ok(imgs[k]) ? '<img src="' + imgs[k] + '" alt="' + label + '">' : '<div class="none">No photo</div>') + '<figcaption>' + label + '</figcaption></figure>';
+  const st = String(r.status || '').toUpperCase();
+  box.innerHTML =
+    '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2 style="font-size:18px">Verification review</h2><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></div>' +
+    '<div class="krow" style="margin-top:12px"><div><small>Full name</small><b>' + esc(r.fullName) + '</b></div><div><small>ID type</small>' + esc(r.idType) + '</div><div><small>ID number</small><b style="font-family:monospace">' + esc(r.idNumber) + '</b></div><div><small>Submitted</small>' + esc(fmtDate(r.submittedAt)) + '</div><div><small>User ID</small><span style="font-size:11px">' + esc(r.docId) + '</span></div></div>' +
+    '<div class="kimgs">' + fig('front', 'ID front') + fig('back', 'ID back') + fig('selfie', 'Selfie') + '</div>' +
+    '<p style="color:#8a8ab3;font-size:12px;margin-bottom:12px">Check that the name and number match the ID, the ID is real and readable, and the selfie is the same person. Click a photo to enlarge.</p>' +
+    '<div>' + (st !== 'APPROVED' ? '<button class="btn approve" data-act="approved" data-id="' + esc(id) + '">Approve</button>' : '') + (st !== 'REJECTED' ? '<button class="btn reject" data-act="rejected" data-id="' + esc(id) + '">Reject</button>' : '') + '<button class="btn view" data-act="close">Close</button></div>';
+}
+
+async function setKyc(id, status){
+  let reason = null;
+  if(status === 'rejected'){
+    reason = prompt('Reason shown to the user:', 'Photo is not clear. Please retake your ID and selfie.');
+    if(reason === null) return;
+  }else if(!confirm('Approve this verification? The user will be able to withdraw.')) return;
+  try{
+    await db.collection('kyc').doc(id).update({ status, reason: reason || null, reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById('kycModal').classList.remove('show');
+  }catch(e){ alert('Could not update: ' + e.message); }
+}
+
 async function updateStatus(docId, status){
   if(!confirm(status + ' this request?')) return;
   try{ await db.collection(curType).doc(docId).update({ status }); }
