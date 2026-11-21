@@ -27,8 +27,8 @@ td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:
 .approve{background:#00d084;color:#000}.reject{background:#ff5a5a;color:#fff}.view{background:#2a2a44;color:#fff}
 @media(max-width:700px){.header{padding:10px 12px}.tabs{padding:10px 12px;top:52px}.stats{grid-template-columns:1fr 1fr;padding:12px;gap:8px}.main{padding:0 8px 20px}th,td{padding:8px 6px}.btn{padding:5px 8px;font-size:11px}}
 #appContent{display:none}
-#kycModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;justify-content:center;align-items:flex-start;overflow:auto;padding:20px}
-#kycModal.show{display:flex}
+#kycModal,#payModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;justify-content:center;align-items:flex-start;overflow:auto;padding:20px}
+#kycModal.show,#payModal.show{display:flex}
 .kbox{background:#16161f;border:1px solid #26263a;border-radius:14px;padding:20px;width:100%;max-width:900px}
 .kimgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
 .kimgs figure{background:#0e0e18;border:1px solid #26263a;border-radius:10px;overflow:hidden}
@@ -36,6 +36,7 @@ td{padding:12px 10px;border-top:1px solid #22223a;font-size:13px;vertical-align:
 .kimgs img.zoom{position:fixed;inset:0;width:100vw;height:100vh;max-height:none;z-index:600;cursor:zoom-out}
 .kimgs figcaption{padding:6px 10px;font-size:12px;color:#9a9ab8}
 .kimgs .none{padding:40px 10px;text-align:center;color:#666;font-size:12px}
+.pr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #22223a;font-size:14px}.pr small{color:#8a8ab3;display:block;font-size:11px;text-transform:uppercase}.pr b{font-size:16px}.cp{background:#2a2a44;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-weight:700;cursor:pointer;font-size:12px;margin-left:8px}.warn{margin:12px 0;padding:10px 12px;border-radius:10px;background:#332a00;color:#ffbd2e;font-size:12px;line-height:1.5}.pin{width:100%;padding:12px;border-radius:10px;border:1px solid #333355;background:#0e0e18;color:#fff;font-size:15px;margin:6px 0 12px;text-transform:uppercase}
 .krow{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#cfcfe6}.krow small{color:#8a8ab3;display:block;font-size:11px;text-transform:uppercase}
 </style>
 </head><body>
@@ -263,6 +264,7 @@ async function reviewKyc(id){
   box.innerHTML =
     '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2 style="font-size:18px">Verification review</h2><span class="badge ' + esc(st) + '">' + esc(r.status) + '</span></div>' +
     '<div class="krow" style="margin-top:12px"><div><small>Full name</small><b>' + esc(r.fullName) + '</b></div><div><small>ID type</small>' + esc(r.idType) + '</div><div><small>ID number</small><b style="font-family:monospace">' + esc(r.idNumber) + '</b></div><div><small>Submitted</small>' + esc(fmtDate(r.submittedAt)) + '</div><div><small>User ID</small><span style="font-size:11px">' + esc(r.docId) + '</span></div></div>' +
+    '<div class="krow" style="margin-top:12px">' + kf('Date of birth', r.dob) + kf('Nationality', r.nationality) + kf('Address', [r.address, r.town, r.county].filter(Boolean).join(', ')) + kf('Occupation', r.occupation) + kf('Source of funds', r.sourceOfFunds) + '</div>' +
     '<div class="kimgs">' + fig('front', 'ID front') + fig('back', 'ID back') + fig('selfie', 'Selfie') + '</div>' +
     '<p style="color:#8a8ab3;font-size:12px;margin-bottom:12px">Check that the name and number match the ID, the ID is real and readable, and the selfie is the same person. Click a photo to enlarge.</p>' +
     '<div>' + (st !== 'APPROVED' ? '<button class="btn approve" data-act="approved" data-id="' + esc(id) + '">Approve</button>' : '') + (st !== 'REJECTED' ? '<button class="btn reject" data-act="rejected" data-id="' + esc(id) + '">Reject</button>' : '') + '<button class="btn view" data-act="close">Close</button></div>';
@@ -280,7 +282,83 @@ async function setKyc(id, status){
   }catch(e){ alert('Could not update: ' + e.message); }
 }
 
+const kf = (l, v) => '<div><small>' + l + '</small>' + esc(v || '-') + '</div>';
+
+function payModalEl(){
+  let m = document.getElementById('payModal');
+  if(m) return m;
+  m = document.createElement('div');
+  m.id = 'payModal';
+  m.innerHTML = '<div class="kbox" style="max-width:460px"></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click', e => {
+    if(e.target === m){ m.classList.remove('show'); return; }
+    const c = e.target.closest('button[data-copy]');
+    if(c){
+      const v = c.dataset.copy;
+      (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).catch(() => { const t = document.createElement('textarea'); t.value = v; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }).finally(() => { c.textContent = 'Copied'; setTimeout(() => c.textContent = 'Copy', 1500); });
+      return;
+    }
+    const b = e.target.closest('button[data-pay]'); if(!b) return;
+    if(b.dataset.pay === 'close') m.classList.remove('show');
+    else confirmPaid(b.dataset.id);
+  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') m.classList.remove('show'); });
+  return m;
+}
+
+function openPayout(id){
+  const r = withdrawals.find(x => x.docId === id); if(!r) return;
+  const fee = r.fee != null ? Number(r.fee) : Math.round(r.amount * 3) / 100;
+  const rec = r.receive != null ? Number(r.receive) : Math.round((r.amount - fee) * 100) / 100;
+  const kes = r.receiveKes != null ? Number(r.receiveKes) : Math.round(rec * 130);
+  const m = payModalEl();
+  m.querySelector('.kbox').innerHTML =
+    '<h2 style="font-size:18px;margin-bottom:4px">Send M-PESA payment</h2>' +
+    '<div class="pr"><div><small>Name on M-PESA</small><b>' + esc(r.mpesaName) + '</b></div></div>' +
+    '<div class="pr"><div><small>Phone</small><b style="font-family:monospace">' + esc(r.phone) + '</b></div><button class="cp" data-copy="' + esc(r.phone) + '">Copy</button></div>' +
+    '<div class="pr"><div><small>Send this amount (KES)</small><b style="color:#00d084">' + kes.toLocaleString() + '</b></div><button class="cp" data-copy="' + kes + '">Copy</button></div>' +
+    '<div class="pr"><div><small>Requested / fee 3% / user gets</small>$' + r.amount.toFixed(2) + ' / $' + fee.toFixed(2) + ' / $' + rec.toFixed(2) + '</div></div>' +
+    '<div class="warn">Send the money first, then press Confirm. The user is told "Withdrawal successful" the moment you confirm.</div>' +
+    '<label style="font-size:12px;color:#8a8ab3">M-PESA transaction code (optional, the user will see it)</label>' +
+    '<input class="pin" id="payCode" maxlength="20" placeholder="e.g. SKL1ABC2DE" autocomplete="off">' +
+    '<div><button class="btn approve" data-pay="ok" data-id="' + esc(id) + '" style="padding:10px 14px">Confirm money sent</button><button class="btn view" data-pay="close" style="padding:10px 14px">Cancel</button></div>';
+  m.classList.add('show');
+}
+
+async function confirmPaid(id){
+  const code = (document.getElementById('payCode').value || '').trim().toUpperCase();
+  if(code && !/^[A-Z0-9]{6,20}$/.test(code)){ alert('The M-PESA code should be letters and numbers only.'); return; }
+  const ref = db.collection('withdrawals').doc(id);
+  try{
+    await db.runTransaction(async tx => {
+      const w = await tx.get(ref);
+      if(!w.exists) throw new Error('Withdrawal not found');
+      if(w.data().status !== 'PENDING') throw new Error('Already ' + w.data().status);
+      tx.update(ref, { status: 'APPROVED', mpesaCode: code || null, paidAt: firebase.firestore.FieldValue.serverTimestamp() });
+    });
+    document.getElementById('payModal').classList.remove('show');
+  }catch(e){ alert('Could not confirm: ' + e.message); }
+}
+
+async function rejectWithdrawal(id){
+  const reason = prompt('Reason shown to the user (their money will be refunded):', 'Details could not be verified.');
+  if(reason === null) return;
+  const ref = db.collection('withdrawals').doc(id);
+  try{
+    await db.runTransaction(async tx => {
+      const w = await tx.get(ref);
+      if(!w.exists) throw new Error('Withdrawal not found');
+      const d = w.data();
+      if(d.status !== 'PENDING') throw new Error('Already ' + d.status);
+      tx.update(ref, { status: 'REJECTED', reason: reason || null, reviewedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      tx.update(db.collection('users').doc(d.uid), { balance: firebase.firestore.FieldValue.increment(Number(d.amount) || 0) });
+    });
+  }catch(e){ alert('Could not reject: ' + e.message); }
+}
+
 async function updateStatus(docId, status){
+  if(curType === 'withdrawals'){ return status === 'APPROVED' ? openPayout(docId) : rejectWithdrawal(docId); }
   if(!confirm(status + ' this request?')) return;
   try{ await db.collection(curType).doc(docId).update({ status }); }
   catch(e){ alert('Could not update: ' + e.message); }
