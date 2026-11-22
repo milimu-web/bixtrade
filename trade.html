@@ -298,11 +298,17 @@ function pushPopup(title,msg){
   document.getElementById('popMsg').textContent=msg||'';
   document.getElementById('popup').classList.add('show');
 }
-async function pushRegister(){
+async function pushRegister(step){
+  step=step||function(){};
   const reg=await navigator.serviceWorker.register('/firebase-messaging-sw.js',{scope:'/firebase-cloud-messaging-push-scope'});
+  step('Service worker: ok');
   const token=await firebase.messaging().getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
   if(!token) throw new Error('No token received');
-  await db.collection('users').doc(auth.currentUser.uid).collection('fcmTokens').doc(token).set({token:token,agent:navigator.userAgent.slice(0,140),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  step('Device token: received');
+  const ref=db.collection('users').doc(auth.currentUser.uid).collection('fcmTokens').doc(token);
+  await ref.set({token:token,agent:navigator.userAgent.slice(0,140),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  const chk=await ref.get();
+  step('Saved in Firestore: '+(chk.exists?'yes':'NO'));
   return token;
 }
 let pushListening=false;
@@ -311,24 +317,31 @@ function pushListen(){
   try{firebase.messaging().onMessage(function(p){const d=p.data||{};pushPopup(d.title,d.body)});pushListening=true}catch(e){}
 }
 async function brixEnablePush(){
+  const log=[];
+  const step=function(t){log.push(t)};
   if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)){
     pushPopup('Not supported here','This browser cannot receive push notifications. On iPhone, tap Share, then Add to Home Screen, and open Brixtrade from the Home Screen icon.');return}
-  if(VAPID_KEY.indexOf('PASTE')===0){pushPopup('Setup needed','The push key has not been added to the page yet.');return}
-  if(!auth.currentUser){pushPopup('Log in first','Please log in, then turn on notifications.');return}
+  if(VAPID_KEY.indexOf('PASTE')===0){pushPopup('Setup needed','The push key (VAPID_KEY) has not been added to trade.html.');return}
+  if(!auth.currentUser){pushPopup('Log in first','Please log in, then turn on alerts.');return}
   try{
+    step('Account: '+auth.currentUser.uid);
+    step('Project: '+firebase.app().options.projectId);
     const perm=await Notification.requestPermission();
-    if(perm!=='granted'){pushPopup('Notifications are off','Allow notifications for this site in your browser or phone settings, then try again.');return}
-    await pushRegister();pushListen();
+    step('Permission: '+perm);
+    if(perm!=='granted'){pushPopup('Alerts are off',log.join('\n')+'\n\nAllow notifications for this site in your browser or phone settings, then try again.');return}
+    await pushRegister(step);pushListen();
     let sent=false;
     try{
       const idt=await auth.currentUser.getIdToken();
       const r=await fetch('/api/push-test',{method:'POST',headers:{Authorization:'Bearer '+idt}});
       sent=r.ok;
-    }catch(e){}
-    pushPopup('Alerts are on',sent?'This device is registered. A test notification is on its way.':'This device is registered for alerts, but the test could not be sent.');
+      step('Test call to server: '+(r.ok?'ok':'failed ('+r.status+')'));
+    }catch(e){step('Test call to server: failed')}
+    pushPopup('Alerts are on',log.join('\n'));
   }catch(e){
     console.error('push',e);
-    pushPopup('Could not turn on','Something went wrong: '+(e&&e.message?e.message:e));
+    step('FAILED: '+(e&&e.code?e.code+' - ':'')+(e&&e.message?e.message:e));
+    pushPopup('Could not turn on',log.join('\n'));
   }
 }
 try{
