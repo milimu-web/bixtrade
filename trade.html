@@ -4,6 +4,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b1220">
 <link rel="manifest" href="/manifest.json">
@@ -287,6 +288,55 @@ function thRender(){
   }).join('');
 }
 function closeHistory(){document.getElementById('hisOverlay').classList.remove('show')}
+
+/* PUSH NOTIFICATIONS (Firebase Cloud Messaging) */
+const VAPID_KEY="BGanhxNDIKP7NH5Zl__-SBjhkRVX-a2DzlljO3Of5rRbkuKjFnOfDPIckUrelSoK9AWKmLJ-hPjPOk6fjwNh5-s";
+function pushPopup(title,msg){
+  document.getElementById('popupBox').className='deposit';
+  document.getElementById('popupIcon').textContent='🔔';
+  document.getElementById('popTitle').textContent=title||'Brixtrade';
+  document.getElementById('popMsg').textContent=msg||'';
+  document.getElementById('popup').classList.add('show');
+}
+async function pushRegister(){
+  const reg=await navigator.serviceWorker.register('/firebase-messaging-sw.js',{scope:'/firebase-cloud-messaging-push-scope'});
+  const token=await firebase.messaging().getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
+  if(!token) throw new Error('No token received');
+  await db.collection('users').doc(auth.currentUser.uid).collection('fcmTokens').doc(token).set({token:token,agent:navigator.userAgent.slice(0,140),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  return token;
+}
+let pushListening=false;
+function pushListen(){
+  if(pushListening) return;
+  try{firebase.messaging().onMessage(function(p){const d=p.data||{};pushPopup(d.title,d.body)});pushListening=true}catch(e){}
+}
+async function enableNotifications(){
+  if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)){
+    pushPopup('Not supported here','This browser cannot receive push notifications. On iPhone, tap Share, then Add to Home Screen, and open Brixtrade from the Home Screen icon.');return}
+  if(VAPID_KEY.indexOf('PASTE')===0){pushPopup('Setup needed','The push key has not been added to the page yet.');return}
+  if(!auth.currentUser){pushPopup('Log in first','Please log in, then turn on notifications.');return}
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){pushPopup('Notifications are off','Allow notifications for this site in your browser or phone settings, then try again.');return}
+    await pushRegister();pushListen();
+    let sent=false;
+    try{
+      const idt=await auth.currentUser.getIdToken();
+      const r=await fetch('/api/push-test',{method:'POST',headers:{Authorization:'Bearer '+idt}});
+      sent=r.ok;
+    }catch(e){}
+    pushPopup('Notifications on',sent?'A test notification is on its way to this device.':'You will now get alerts for deposits, withdrawals and verification on this device.');
+  }catch(e){
+    console.error('push',e);
+    pushPopup('Could not turn on','Something went wrong: '+(e&&e.message?e.message:e));
+  }
+}
+try{
+  if('Notification' in window&&Notification.permission==='granted'){
+    pushListen();
+    auth.onAuthStateChanged(function(u){if(u)pushRegister().catch(function(){})});
+  }
+}catch(e){}
 </script>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button><button data-f="fav">★</button></div><div id="il"></div></aside>
