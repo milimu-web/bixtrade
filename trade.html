@@ -99,6 +99,15 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 .sb-i.on{background:var(--acbg);color:var(--ac);border-color:var(--ac)}
 .sb-out{margin-top:auto;color:var(--dn)}
 #themeBtn::after{content:"Theme"}#sndBtn::after{content:"Sound"}#logoutMenuBtn::after{content:"Log out"}
+
+/* SETTINGS MODAL */
+#setOverlay{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:9100;padding:12px}
+#setOverlay.show{display:flex}
+#setBox{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:20px;width:400px;max-width:100%;max-height:calc(100vh - 24px);overflow-y:auto;box-shadow:var(--sh)}
+.set-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.set-h h2{margin:0;font:700 18px Sora}
+.set-f{margin-top:10px}.set-go{width:100%;margin-top:12px;padding:12px}.set-go:disabled{opacity:.5;cursor:wait}
+.set-msg{min-height:18px;margin:8px 0 0;font-size:12px;color:var(--mut)}.set-msg.ok{color:var(--up)}.set-msg.err{color:var(--dn)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-top:8px;border:1px solid var(--ln);border-radius:10px;background:var(--bg2);font-size:13px}
 </style></head><body>
 <div id="authGate" style="position:fixed;inset:0;background:rgba(3,6,12,.92);display:flex;align-items:center;justify-content:center;z-index:9999"><div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:28px;width:400px;max-width:92%;text-align:center"><h1 style="margin:0;font-family:Sora;color:#e8edf6">BRIX<span style="color:#8b8dff">TRADE</span></h1><p style="color:#8593a8;font-size:13px;margin:8px 0 18px">Checking secure session...</p></div></div>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
@@ -117,6 +126,7 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 
   <div class="sb-sec">Trade</div>
   <a class="sb-i on" href="trade.html"><span>📈</span>Trade</a>
+  <button class="sb-i" type="button" onclick="goHistory()"><span>🕘</span>Trade history</button>
   <button class="sb-i" id="demoBtn" type="button" onclick="toggleDemo()"><span>🧪</span>Demo mode</button>
 
   <div class="sb-sec">Money</div>
@@ -125,11 +135,33 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
   <a class="sb-i" href="profile.html#withdraw"><span>⬆️</span>Withdraw</a>
 
   <div class="sb-sec">Account</div>
+  <button class="sb-i" type="button" onclick="openSettings()"><span>⚙️</span>Settings</button>
   <button class="sb-i" type="button" onclick="typeof enableNotifications==='function'?enableNotifications():alert('Notifications are not available yet.')"><span>🔔</span>Alerts</button>
   <button class="sb-i" id="themeBtn" type="button" onclick="toggleTheme()">☀</button>
   <button class="sb-i" id="sndBtn" type="button" onclick="toggleSnd()">🔊</button>
+  <button class="sb-i" type="button" onclick="showInfo('help')"><span>💬</span>Help &amp; risk info</button>
   <button class="sb-i sb-out" id="logoutMenuBtn" type="button" onclick="logoutPhone()">↩</button>
 </aside>
+
+<div id="setOverlay" onclick="closeSettings()"><div id="setBox" onclick="event.stopPropagation()" role="dialog" aria-label="Settings">
+  <div class="set-h"><h2>Settings</h2><button class="sb-x" type="button" onclick="closeSettings()" aria-label="Close settings">✕</button></div>
+
+  <h3 class="sh0">Change password</h3>
+  <div class="set-f"><label class="l" for="pwCur">Current password</label><input id="pwCur" type="password" autocomplete="current-password"></div>
+  <div class="set-f"><label class="l" for="pwNew">New password</label><input id="pwNew" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
+  <div class="set-f"><label class="l" for="pwCnf">Confirm new password</label><input id="pwCnf" type="password" autocomplete="new-password"></div>
+  <button class="btn-brix set-go" type="button" id="pwGo" onclick="changePassword()">Update password</button>
+  <p id="pwMsg" class="set-msg"></p>
+
+  <h3 class="sh0" style="margin-top:18px">Preferences</h3>
+  <div class="set-row"><span>Theme (dark / light)</span><button class="btn" type="button" onclick="toggleTheme()">Switch</button></div>
+  <div class="set-row"><span>Sound effects</span><button class="btn" type="button" onclick="toggleSnd()">On / Off</button></div>
+  <div class="set-row"><span>Trade alerts</span><button class="btn" type="button" onclick="typeof enableNotifications==='function'?enableNotifications():alert('Notifications are not available yet.')">Enable</button></div>
+
+  <h3 class="sh0" style="margin-top:18px">Account</h3>
+  <div class="set-row"><span>Signed in as</span><b id="setUser" style="font-family:JetBrains Mono"></b></div>
+  <div class="set-row"><span>Log out of this device</span><button class="btn" type="button" style="color:var(--dn)" onclick="logoutPhone()">Log out</button></div>
+</div></div>
 <script>
 /* SIDEBAR MENU - replaces your old toggleMenu */
 function toggleMenu(e){
@@ -143,6 +175,61 @@ function toggleMenu(e){
   document.body.style.overflow=open?'hidden':'';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('sidebar').classList.contains('open'))toggleMenu()});
+
+function closeSidebar(){const sb=document.getElementById('sidebar');if(sb.classList.contains('open'))toggleMenu()}
+function goHistory(){
+  closeSidebar();
+  setTimeout(function(){
+    const el=document.getElementById('log');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  },300);
+}
+function openSettings(){
+  closeSidebar();
+  const p=document.getElementById('userPhoneShow');
+  document.getElementById('setUser').textContent=(p&&p.textContent)||'';
+  ['pwCur','pwNew','pwCnf'].forEach(function(i){document.getElementById(i).value=''});
+  setPwMsg('');
+  document.getElementById('setOverlay').classList.add('show');
+}
+function closeSettings(){document.getElementById('setOverlay').classList.remove('show')}
+function setPwMsg(t,c){const m=document.getElementById('pwMsg');m.textContent=t;m.className='set-msg'+(c?' '+c:'')}
+async function changePassword(){
+  const cur=document.getElementById('pwCur').value, nw=document.getElementById('pwNew').value, cf=document.getElementById('pwCnf').value;
+  const go=document.getElementById('pwGo');
+  if(!cur||!nw||!cf) return setPwMsg('Fill in all three fields.','err');
+  if(nw.length<6) return setPwMsg('New password must be at least 6 characters.','err');
+  if(nw!==cf) return setPwMsg('New passwords do not match.','err');
+  if(nw===cur) return setPwMsg('New password must be different from the current one.','err');
+  if(typeof auth==='undefined'||!auth.currentUser) return setPwMsg('You are not signed in.','err');
+  const u=auth.currentUser;
+  if(!u.email) return setPwMsg('This account has no email login, so the password cannot be changed here.','err');
+  go.disabled=true; setPwMsg('Updating...');
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(u.email,cur);
+    await u.reauthenticateWithCredential(cred);
+    await u.updatePassword(nw);
+    ['pwCur','pwNew','pwCnf'].forEach(function(i){document.getElementById(i).value=''});
+    setPwMsg('Password updated successfully.','ok');
+  }catch(e){
+    const c=e&&e.code||'';
+    if(c==='auth/wrong-password'||c==='auth/invalid-credential'||c==='auth/invalid-login-credentials') setPwMsg('Current password is incorrect.','err');
+    else if(c==='auth/weak-password') setPwMsg('New password is too weak.','err');
+    else if(c==='auth/too-many-requests') setPwMsg('Too many attempts. Try again later.','err');
+    else if(c==='auth/requires-recent-login') setPwMsg('Please log out and log in again, then retry.','err');
+    else setPwMsg('Could not update password. Try again.','err');
+  }
+  go.disabled=false;
+}
+function showInfo(kind){
+  closeSidebar();
+  document.getElementById('popupBox').className='deposit';
+  document.getElementById('popupIcon').textContent='💬';
+  document.getElementById('popTitle').textContent='Help & risk info';
+  document.getElementById('popMsg').textContent='Trading currencies and metals carries risk, and you can lose money. Only trade with funds you can afford to lose.\n\nFor deposits, withdrawals or account problems, open Wallet from the menu.';
+  document.getElementById('popup').classList.add('show');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSettings()});
 </script>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button><button data-f="fav">★</button></div><div id="il"></div></aside>
