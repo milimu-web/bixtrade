@@ -298,10 +298,25 @@ function pushPopup(title,msg){
   document.getElementById('popMsg').textContent=msg||'';
   document.getElementById('popup').classList.add('show');
 }
+async function pushWaitActive(reg){
+  if(reg.active) return reg;
+  const sw=reg.installing||reg.waiting;
+  if(!sw) throw new Error('Service worker did not start. Check that /firebase-messaging-sw.js opens in the browser.');
+  await new Promise(function(resolve,reject){
+    const t=setTimeout(function(){reject(new Error('Service worker took too long to start'))},15000);
+    const check=function(){
+      if(sw.state==='activated'){clearTimeout(t);resolve()}
+      else if(sw.state==='redundant'){clearTimeout(t);reject(new Error('Service worker failed to install. Check that /firebase-messaging-sw.js opens in the browser.'))}
+    };
+    sw.addEventListener('statechange',check);check();
+  });
+  return reg;
+}
 async function pushRegister(step){
   step=step||function(){};
   const reg=await navigator.serviceWorker.register('/firebase-messaging-sw.js',{scope:'/firebase-cloud-messaging-push-scope'});
-  step('Service worker: ok');
+  await pushWaitActive(reg);
+  step('Service worker: active');
   const token=await firebase.messaging().getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
   if(!token) throw new Error('No token received');
   step('Device token: received');
