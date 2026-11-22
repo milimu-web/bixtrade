@@ -108,7 +108,20 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 .set-f{margin-top:10px}.set-go{width:100%;margin-top:12px;padding:12px}.set-go:disabled{opacity:.5;cursor:wait}
 .set-msg{min-height:18px;margin:8px 0 0;font-size:12px;color:var(--mut)}.set-msg.ok{color:var(--up)}.set-msg.err{color:var(--dn)}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-top:8px;border:1px solid var(--ln);border-radius:10px;background:var(--bg2);font-size:13px}
-</style></head><body>
+
+/* TRADE HISTORY MODAL */
+#hisOverlay{position:fixed;inset:0;background:rgba(3,6,12,.72);display:none;align-items:center;justify-content:center;z-index:9100;padding:12px}
+#hisOverlay.show{display:flex}
+#hisBox{background:var(--pn);border:1px solid var(--ln);border-radius:18px;padding:20px;width:560px;max-width:100%;max-height:calc(100vh - 24px);overflow-y:auto;box-shadow:var(--sh)}
+.th-sum{font-size:12px;color:var(--mut);background:var(--bg2);border:1px solid var(--ln);border-radius:10px;padding:9px 12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-family:JetBrains Mono}
+#hisList{display:grid;gap:8px;margin-top:12px}
+.th-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--pn2)}
+.th-row b{font-size:13px}.th-row small{color:var(--mut);font-size:11px}
+.th-r{text-align:right}
+.th-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:5px;padding:2px 7px;border:1px solid currentColor;margin-left:4px}
+.th-tag.demo{color:var(--ac)}.th-tag.real{color:var(--mut)}.th-tag.win{color:var(--up)}.th-tag.loss{color:var(--dn)}
+</style>
+</head><body>
 <div id="authGate" style="position:fixed;inset:0;background:rgba(3,6,12,.92);display:flex;align-items:center;justify-content:center;z-index:9999"><div style="background:#121927;border:1px solid #222d40;border-radius:20px;padding:28px;width:400px;max-width:92%;text-align:center"><h1 style="margin:0;font-family:Sora;color:#e8edf6">BRIX<span style="color:#8b8dff">TRADE</span></h1><p style="color:#8593a8;font-size:13px;margin:8px 0 18px">Checking secure session...</p></div></div>
 <div id="popup" onclick="closePopup()"><div id="popupBox" onclick="event.stopPropagation()"><div id="popupIcon"></div><h2 id="popTitle"></h2><p id="popMsg"></p><button class="btn-brix" style="width:100%;padding:12px" onclick="closePopup()">Continue</button></div></div>
 <header><h1>BRIX<span>TRADE</span><small>Currencies & Metals • <span id="userPhoneShow" style="color:var(--ac)"></span></small></h1>
@@ -126,7 +139,7 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
 
   <div class="sb-sec">Trade</div>
   <a class="sb-i on" href="trade.html"><span>📈</span>Trade</a>
-  <button class="sb-i" type="button" onclick="goHistory()"><span>🕘</span>Trade history</button>
+  <button class="sb-i" type="button" onclick="openHistory()"><span>🕘</span>Trade history</button>
   <button class="sb-i" id="demoBtn" type="button" onclick="toggleDemo()"><span>🧪</span>Demo mode</button>
 
   <div class="sb-sec">Money</div>
@@ -162,6 +175,12 @@ input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);background:
   <div class="set-row"><span>Signed in as</span><b id="setUser" style="font-family:JetBrains Mono"></b></div>
   <div class="set-row"><span>Log out of this device</span><button class="btn" type="button" style="color:var(--dn)" onclick="logoutPhone()">Log out</button></div>
 </div></div>
+<div id="hisOverlay" onclick="closeHistory()"><div id="hisBox" onclick="event.stopPropagation()" role="dialog" aria-label="Trade history">
+  <div class="set-h"><h2>Trade history</h2><button class="sb-x" type="button" onclick="closeHistory()" aria-label="Close history">✕</button></div>
+  <div class="th-sum" id="hisSum"></div>
+  <div class="chips" id="hisFilters"></div>
+  <div id="hisList"></div>
+</div></div>
 <script>
 /* SIDEBAR MENU - replaces your old toggleMenu */
 function toggleMenu(e){
@@ -177,13 +196,6 @@ function toggleMenu(e){
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('sidebar').classList.contains('open'))toggleMenu()});
 
 function closeSidebar(){const sb=document.getElementById('sidebar');if(sb.classList.contains('open'))toggleMenu()}
-function goHistory(){
-  closeSidebar();
-  setTimeout(function(){
-    const el=document.getElementById('log');
-    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
-  },300);
-}
 function openSettings(){
   closeSidebar();
   const p=document.getElementById('userPhoneShow');
@@ -229,7 +241,52 @@ function showInfo(kind){
   document.getElementById('popMsg').textContent='Trading currencies and metals carries risk, and you can lose money. Only trade with funds you can afford to lose.\n\nFor deposits, withdrawals or account problems, open Wallet from the menu.';
   document.getElementById('popup').classList.add('show');
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSettings()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeSettings();closeHistory()}});
+
+/* TRADE HISTORY (same loading logic as profile.html: demo + real) */
+let thRows=[],thFilter='all';
+const thEsc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const thMoney=n=>'$'+(Number(n)||0).toFixed(2);
+const thT=v=>v&&v.toMillis?v.toMillis():(typeof v==='number'?v:(Date.parse(v)||0));
+async function openHistory(){
+  closeSidebar();
+  document.getElementById('hisOverlay').classList.add('show');
+  const L=document.getElementById('hisList');
+  L.innerHTML='<div class="empty">Loading...</div>';
+  document.getElementById('hisSum').textContent='';
+  thFilter='all';
+  let rows=[];
+  try{
+    if(typeof auth==='undefined'||!auth.currentUser) throw new Error('not signed in');
+    const uid=auth.currentUser.uid;
+    try{
+      const s=await db.collection('trades').where('uid','==',uid).get();
+      rows=s.docs.map(d=>d.data());
+    }catch(e){
+      try{rows=JSON.parse(localStorage.getItem('brixTrades_'+uid)||'[]')}catch(x){rows=[]}
+    }
+  }catch(e){
+    L.innerHTML='<div class="empty">Could not load your history. Please log in again.</div>';
+    return;
+  }
+  thRows=rows.sort((a,b)=>thT(b.timestamp||b.createdAt||b.id)-thT(a.timestamp||a.createdAt||a.id)).slice(0,300);
+  thRender();
+}
+function thSet(k){thFilter=k;thRender()}
+function thRender(){
+  document.getElementById('hisFilters').innerHTML=[['all','All'],['win','Wins'],['lose','Losses'],['demo','Demo'],['real','Real']].map(([k,l])=>`<button class="chip ${thFilter===k?'on':''}" type="button" onclick="thSet('${k}')">${l}</button>`).join('');
+  const rows=thRows.filter(d=>thFilter==='all'||(thFilter==='win'&&d.result==='WIN')||(thFilter==='lose'&&d.result!=='WIN')||(thFilter==='demo'&&d.demo)||(thFilter==='real'&&!d.demo));
+  const L=document.getElementById('hisList'),S=document.getElementById('hisSum');
+  if(!rows.length){S.textContent='';L.innerHTML='<div class="empty">'+(thRows.length?'No trades match this filter.':'No trades yet. Place a trade and it will show up here.')+'</div>';return}
+  const wins=rows.filter(d=>d.result==='WIN').length;
+  const net=rows.reduce((t,d)=>t+(d.result==='WIN'?(Number(d.profit)||0):-(Number(d.stake)||0)),0);
+  S.innerHTML=`<span>${rows.length} trades</span><span>${Math.round(wins/rows.length*100)}% wins</span><span class="${net>=0?'up':'dn'}">Net ${net>=0?'+':'-'}${thMoney(Math.abs(net))}</span>`;
+  L.innerHTML=rows.map(d=>{
+    const w=d.result==='WIN';
+    return `<div class="th-row"><div><b>${thEsc(d.dir)} ${thEsc(d.asset)}</b><span class="th-tag ${d.demo?'demo':'real'}">${d.demo?'DEMO':'REAL'}</span><span class="th-tag ${w?'win':'loss'}">${w?'WIN':'LOSS'}</span></div><div class="th-r"><b class="${w?'up':'dn'}">${w?'+'+thMoney(d.profit):'-'+thMoney(d.stake)}</b></div><small>${thEsc(d.date)}</small><small class="th-r">Stake ${thMoney(d.stake)}${d.duration?' · '+thEsc(d.duration)+'s':''}${d.entry!=null?' · '+thEsc(d.entry)+' → '+thEsc(d.exit):''}</small></div>`;
+  }).join('');
+}
+function closeHistory(){document.getElementById('hisOverlay').classList.remove('show')}
 </script>
 <main>
 <aside class="pn" id="list"><div class="tabs" id="ft"><button class="on" data-f="all">All</button><button data-f="fx">Currencies</button><button data-f="mt">Metals</button><button data-f="fav">★</button></div><div id="il"></div></aside>
