@@ -1,9 +1,9 @@
 /* Shared helper. The underscore keeps Vercel from exposing it as a public URL.
    Needs env var FIREBASE_SERVICE_ACCOUNT (the service-account JSON as one line).
    If your other api files already set up firebase-admin under another env name, change it below. */
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 
-function getAdmin() {
+export function getAdmin() {
   if (!admin.apps.length) {
     admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
   }
@@ -11,7 +11,7 @@ function getAdmin() {
 }
 
 /* sendPush(uid, 'Title', 'Message', '/profile.html') -> number of devices reached */
-async function sendPush(uid, title, body, url) {
+export async function sendPush(uid, title, body, url) {
   const a = getAdmin();
   const db = a.firestore();
   const snap = await db.collection('users').doc(uid).collection('fcmTokens').get();
@@ -35,5 +35,3 @@ async function sendPush(uid, title, body, url) {
   }));
   return res.successCount;
 }
-
-module.exports = { getAdmin, sendPush };

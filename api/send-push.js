@@ -1,6 +1,6 @@
 /* POST /api/send-push   (admins only: a user whose id exists in the "admins" collection)
    Body: { title, body, url?, uid? }   -> no uid = send to EVERYONE who turned on alerts */
-const { getAdmin } = require('./_push');
+import { getAdmin } from './_push.js';
 
 const ALLOWED_ORIGINS = ['https://admin-gamma-rouge.vercel.app'];
 
@@ -14,7 +14,7 @@ function cors(req, res) {
   }
 }
 
-module.exports = async function (req, res) {
+export default async function handler(req, res) {
   cors(req, res);
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -62,4 +62,4 @@ module.exports = async function (req, res) {
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
-};
+}

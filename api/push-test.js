@@ -1,7 +1,7 @@
 /* POST /api/push-test  (signed-in users only; sends a test push to their OWN devices) */
-const { getAdmin, sendPush } = require('./_push');
+import { getAdmin, sendPush } from './_push.js';
 
-module.exports = async function (req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   try {
     const h = req.headers.authorization || '';
@@ -13,4 +13,4 @@ module.exports = async function (req, res) {
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
-};
+}
