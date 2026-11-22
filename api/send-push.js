@@ -2,7 +2,21 @@
    Body: { title, body, url?, uid? }   -> no uid = send to EVERYONE who turned on alerts */
 const { getAdmin } = require('./_push');
 
+const ALLOWED_ORIGINS = ['https://admin-gamma-rouge.vercel.app'];
+
+function cors(req, res) {
+  const o = req.headers.origin;
+  if (ALLOWED_ORIGINS.indexOf(o) !== -1) {
+    res.setHeader('Access-Control-Allow-Origin', o);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  }
+}
+
 module.exports = async function (req, res) {
+  cors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   try {
     const a = getAdmin();
