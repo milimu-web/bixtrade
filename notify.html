@@ -126,7 +126,7 @@ async function sendNow(){
   const btn = $('sendBtn'); btn.disabled = true; btn.textContent = 'Sending...';
   try{
     const token = await auth.currentUser.getIdToken();
-    const r = await fetch('/api/send-push', {
+   const r = await fetch('https://bixtrade-peach.vercel.app//api/send-push', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ title, body, url, uid: to === 'one' ? uid : undefined })
