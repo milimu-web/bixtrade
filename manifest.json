@@ -1,6 +1,6 @@
 {
-  "name": "BRIXTRADE",
-  "short_name": "BRIXTRADE",
+  "name": "Brixtrade",
+  "short_name": "Brixtrade",
   "description": "Trade metals and currencies like a pro.",
   "id": "/index.html",
   "start_url": "/index.html",
@@ -9,7 +9,7 @@
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/icons/icon-192.jpg", "sizes": "192x192", "type": "image/jpg", "purpose": "any" },
+    { "src": "/icons/icon-512.jpg", "sizes": "512x512", "type": "image/jpg", "purpose": "any" }
   ]
 }
